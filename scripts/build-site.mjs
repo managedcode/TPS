@@ -111,6 +111,12 @@ const page = `<!DOCTYPE html>
         </div>
       </article>
     </main>
+
+    <footer class="site-footer">
+      <span>Copyright &copy; Managed Code</span>
+      <span>Licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>
+      <span><a href="https://github.com/managedcode/TPS/blob/main/LICENSE">View license</a></span>
+    </footer>
   </div>
 </body>
 </html>`;

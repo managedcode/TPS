@@ -289,6 +289,27 @@ pre code {
   background: linear-gradient(180deg, rgba(11, 20, 36, 0.88), rgba(8, 15, 26, 0.96));
 }
 
+.site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem 1.25rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+  padding: 1rem 1.25rem 0;
+  color: var(--muted);
+  font-family: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+}
+
+.site-footer a {
+  color: var(--warm);
+}
+
+.site-footer a:hover {
+  color: #ffe2af;
+}
+
 .content-meta {
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
@@ -484,5 +505,11 @@ pre code {
   .content-meta,
   .toc-header {
     align-items: flex-start;
+  }
+
+  .site-footer {
+    justify-content: flex-start;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
   }
 }
