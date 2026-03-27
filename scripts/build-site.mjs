@@ -18,6 +18,20 @@ const readmeUrl = `${repoUrl}/blob/main/README.md`;
 const licenseUrl = `${repoUrl}/blob/main/LICENSE`;
 const socialImageUrl = `${siteUrl}social-card.svg`;
 const siteName = "TPS Format Specification";
+const emotionStyles = {
+  warm: { colorLabel: "Orange" },
+  concerned: { colorLabel: "Red" },
+  focused: { colorLabel: "Green" },
+  motivational: { colorLabel: "Purple" },
+  neutral: { colorLabel: "Blue" },
+  urgent: { colorLabel: "Bright Red" },
+  happy: { colorLabel: "Yellow" },
+  excited: { colorLabel: "Pink" },
+  sad: { colorLabel: "Indigo" },
+  calm: { colorLabel: "Teal" },
+  energetic: { colorLabel: "Orange-Red" },
+  professional: { colorLabel: "Navy" }
+};
 
 const readme = await readFile(readmePath, "utf8");
 const styles = await readFile(stylesPath, "utf8");
@@ -47,7 +61,7 @@ const title = extractTitle(tokens) ?? "TPS Format Specification";
 const summary = extractSummary(tokens) ?? "Markdown-based teleprompter scripts with timing, pacing, emotion, and styling metadata.";
 const sections = extractSections(tokens);
 const stats = buildStats(readme, sections);
-const articleHtml = md.renderer.render(trimTitle(tokens), md.options, {});
+const articleHtml = enhanceArticleHtml(md.renderer.render(trimTitle(tokens), md.options, {}));
 const heroTitle = buildHeroTitle(title);
 const quickAnswers = buildQuickAnswers(summary);
 const keywords = buildKeywords();
@@ -263,6 +277,38 @@ function buildStats(markdown, sectionList) {
     subsectionCount: sectionList.filter((section) => section.depth === 3).length,
     wordCount: markdown.match(/\b[\p{L}\p{N}][\p{L}\p{N}'-]*\b/gu)?.length ?? 0
   };
+}
+
+function enhanceArticleHtml(html) {
+  return decorateEmotionTable(html);
+}
+
+function decorateEmotionTable(html) {
+  const sectionPattern = /(<h3 id="emotions-case-insensitive"[\s\S]*?<\/h3>\s*)(<table>[\s\S]*?<\/table>)/;
+
+  return html.replace(sectionPattern, (match, headingHtml, tableHtml) => {
+    let enhancedTable = tableHtml.replace("<table>", '<table class="emotion-table">');
+
+    for (const [keyword, { colorLabel }] of Object.entries(emotionStyles)) {
+      const escapedKeyword = escapeRegExp(keyword);
+      const escapedColorLabel = escapeRegExp(colorLabel);
+      const rowPattern = new RegExp(
+        `<tr>\\s*<td><code>${escapedKeyword}<\\/code><\\/td>\\s*<td>${escapedColorLabel}<\\/td>\\s*<td>([^<]+)<\\/td>\\s*<td>([\\s\\S]*?)<\\/td>\\s*<\\/tr>`
+      );
+
+      enhancedTable = enhancedTable.replace(
+        rowPattern,
+        `<tr class="emotion-row emotion-row-${keyword}">
+<td class="emotion-keyword-cell"><code class="emotion-token">${keyword}</code></td>
+<td class="emotion-color-cell"><span class="emotion-swatch-wrap"><span class="emotion-swatch" aria-hidden="true"></span><span class="emotion-color-name">${colorLabel}</span></span></td>
+<td class="emotion-emoji-cell"><span class="emotion-emoji" aria-hidden="true">$1</span></td>
+<td>$2</td>
+</tr>`
+      );
+    }
+
+    return `${headingHtml}${enhancedTable}`;
+  });
 }
 
 function trimTitle(tokenList) {
@@ -495,4 +541,8 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

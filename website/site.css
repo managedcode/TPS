@@ -722,6 +722,155 @@ pre code {
   border-bottom: 0;
 }
 
+.markdown-body .emotion-table {
+  border-color: rgba(153, 179, 210, 0.18);
+}
+
+.markdown-body .emotion-table tbody tr {
+  transition:
+    transform 160ms ease,
+    background-color 160ms ease;
+}
+
+.markdown-body .emotion-table tbody tr:hover {
+  transform: translateY(-1px);
+}
+
+.markdown-body .emotion-row td {
+  vertical-align: middle;
+}
+
+.markdown-body .emotion-row td:first-child {
+  box-shadow: inset 3px 0 0 var(--emotion-color);
+}
+
+.markdown-body .emotion-row td:last-child {
+  color: var(--text);
+}
+
+.markdown-body .emotion-row:hover td {
+  background:
+    linear-gradient(90deg, var(--emotion-soft), rgba(14, 28, 45, 0.16) 72%),
+    rgba(14, 28, 45, 0.18);
+}
+
+.markdown-body .emotion-keyword-cell,
+.markdown-body .emotion-color-cell,
+.markdown-body .emotion-emoji-cell {
+  white-space: nowrap;
+}
+
+.markdown-body .emotion-token {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 7.75rem;
+  padding: 0.45rem 0.82rem;
+  border: 1px solid color-mix(in srgb, var(--emotion-color) 42%, transparent);
+  border-radius: 999px;
+  background: var(--emotion-soft);
+  color: var(--emotion-color);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.markdown-body .emotion-swatch-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.72rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.markdown-body .emotion-swatch {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 999px;
+  background: var(--emotion-color);
+  box-shadow:
+    0 0 0 4px var(--emotion-soft),
+    0 0 18px rgba(255, 255, 255, 0.08);
+}
+
+.markdown-body .emotion-color-name {
+  color: var(--emotion-color);
+  font-weight: 800;
+}
+
+.markdown-body .emotion-emoji {
+  display: inline-grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 1px solid rgba(153, 179, 210, 0.14);
+  border-radius: 16px;
+  background: var(--emotion-soft);
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.markdown-body .emotion-row-warm {
+  --emotion-color: #ffb55c;
+  --emotion-soft: rgba(255, 181, 92, 0.16);
+}
+
+.markdown-body .emotion-row-concerned {
+  --emotion-color: #ff7282;
+  --emotion-soft: rgba(255, 114, 130, 0.16);
+}
+
+.markdown-body .emotion-row-focused {
+  --emotion-color: #62d893;
+  --emotion-soft: rgba(98, 216, 147, 0.16);
+}
+
+.markdown-body .emotion-row-motivational {
+  --emotion-color: #c291ff;
+  --emotion-soft: rgba(194, 145, 255, 0.16);
+}
+
+.markdown-body .emotion-row-neutral {
+  --emotion-color: #78caff;
+  --emotion-soft: rgba(120, 202, 255, 0.16);
+}
+
+.markdown-body .emotion-row-urgent {
+  --emotion-color: #ff5252;
+  --emotion-soft: rgba(255, 82, 82, 0.16);
+}
+
+.markdown-body .emotion-row-happy {
+  --emotion-color: #ffd76b;
+  --emotion-soft: rgba(255, 215, 107, 0.16);
+}
+
+.markdown-body .emotion-row-excited {
+  --emotion-color: #ff94d8;
+  --emotion-soft: rgba(255, 148, 216, 0.16);
+}
+
+.markdown-body .emotion-row-sad {
+  --emotion-color: #97a4ff;
+  --emotion-soft: rgba(151, 164, 255, 0.16);
+}
+
+.markdown-body .emotion-row-calm {
+  --emotion-color: #5fd8d0;
+  --emotion-soft: rgba(95, 216, 208, 0.16);
+}
+
+.markdown-body .emotion-row-energetic {
+  --emotion-color: #ff874f;
+  --emotion-soft: rgba(255, 135, 79, 0.16);
+}
+
+.markdown-body .emotion-row-professional {
+  --emotion-color: #89a8d8;
+  --emotion-soft: rgba(137, 168, 216, 0.16);
+}
+
 .markdown-body pre {
   position: relative;
   padding: 2.6rem 1.3rem 1.25rem;
