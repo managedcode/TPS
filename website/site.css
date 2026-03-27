@@ -91,14 +91,10 @@ pre code {
 }
 
 .hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.9fr);
-  gap: 1.5rem;
-  align-items: stretch;
+  display: block;
 }
 
 .hero-copy,
-.hero-panel,
 .toc-card,
 .content-card {
   backdrop-filter: blur(18px);
@@ -110,11 +106,6 @@ pre code {
 
 .hero-copy {
   padding: 3rem;
-}
-
-.hero-panel {
-  padding: 2rem;
-  background: linear-gradient(180deg, rgba(13, 23, 39, 0.9), rgba(9, 17, 31, 0.92));
 }
 
 .eyebrow {
@@ -191,41 +182,6 @@ pre code {
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.9rem;
-  margin: 0;
-}
-
-.stats-grid div {
-  padding: 1rem;
-  border-radius: 20px;
-  background: rgba(125, 211, 252, 0.08);
-  border: 1px solid rgba(125, 211, 252, 0.12);
-}
-
-.stats-grid dt {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.stats-grid dd {
-  margin: 0.55rem 0 0;
-  font-family: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
-  font-size: 1.8rem;
-  font-weight: 700;
-}
-
-.panel-note {
-  margin: 1.2rem 0 0;
-  color: var(--muted);
-  line-height: 1.7;
 }
 
 .layout {
@@ -456,17 +412,12 @@ pre code {
 }
 
 @media (max-width: 1040px) {
-  .hero,
   .layout {
     grid-template-columns: 1fr;
   }
 
   .toc-card {
     position: static;
-  }
-
-  .stats-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -496,10 +447,6 @@ pre code {
   .hero-summary,
   .markdown-body {
     font-size: 1rem;
-  }
-
-  .stats-grid {
-    grid-template-columns: 1fr;
   }
 
   .content-meta,

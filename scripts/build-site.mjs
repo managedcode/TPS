@@ -40,7 +40,6 @@ const tokens = md.parse(readme, {});
 const title = extractTitle(tokens) ?? "TPS Format Specification";
 const summary = extractSummary(tokens) ?? "Markdown-based teleprompter scripts with timing, pacing, emotion, and styling metadata.";
 const sections = extractSections(tokens);
-const stats = buildStats(readme, sections);
 const articleHtml = md.render(readme);
 const builtAt = new Intl.DateTimeFormat("en", {
   dateStyle: "long",
@@ -79,13 +78,6 @@ const page = `<!DOCTYPE html>
           <a class="button button-secondary" href="https://github.com/managedcode/TPS/blob/main/README.md">View Raw README</a>
         </div>
       </div>
-      <aside class="hero-panel">
-        <p class="panel-label">At a glance</p>
-        <dl class="stats-grid">
-          ${stats.map(({ label, value }) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join("")}
-        </dl>
-        <p class="panel-note">Built from <code>README.md</code> and published with GitHub Pages.</p>
-      </aside>
     </header>
 
     <main class="layout">
@@ -185,24 +177,6 @@ function extractSections(tokenList) {
   }
 
   return sectionList;
-}
-
-function buildStats(markdown, sectionList) {
-  const textOnly = markdown
-    .replace(/```[\s\S]*?```/g, " ")
-    .replace(/`[^`]+`/g, " ")
-    .replace(/\[[^\]]+\]\([^)]+\)/g, " ")
-    .replace(/[#>*_\-\n\r|]/g, " ");
-
-  const words = textOnly.match(/\b[\p{L}\p{N}'-]+\b/gu) ?? [];
-  const segments = sectionList.filter((section) => section.depth === 2).length;
-  const subSections = sectionList.filter((section) => section.depth === 3).length;
-
-  return [
-    { label: "Sections", value: String(segments) },
-    { label: "Subsections", value: String(subSections) },
-    { label: "Words", value: new Intl.NumberFormat("en").format(words.length) }
-  ];
 }
 
 function renderSections(sectionList) {
