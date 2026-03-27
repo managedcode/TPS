@@ -12,6 +12,12 @@ const readmePath = path.join(rootDir, "README.md");
 const stylesPath = path.join(rootDir, "website", "site.css");
 const publicDir = path.join(rootDir, "public");
 const distDir = path.join(rootDir, "dist");
+const siteUrl = "https://tps.managed-code.com/";
+const repoUrl = "https://github.com/managedcode/TPS";
+const readmeUrl = `${repoUrl}/blob/main/README.md`;
+const licenseUrl = `${repoUrl}/blob/main/LICENSE`;
+const socialImageUrl = `${siteUrl}social-card.svg`;
+const siteName = "TPS Format Specification";
 
 const readme = await readFile(readmePath, "utf8");
 const styles = await readFile(stylesPath, "utf8");
@@ -43,11 +49,29 @@ const sections = extractSections(tokens);
 const stats = buildStats(readme, sections);
 const articleHtml = md.renderer.render(trimTitle(tokens), md.options, {});
 const heroTitle = buildHeroTitle(title);
+const quickAnswers = buildQuickAnswers(summary);
+const keywords = buildKeywords();
+const buildDate = new Date();
+const dateModifiedIso = buildDate.toISOString();
+const structuredData = buildStructuredData({
+  dateModifiedIso,
+  keywords,
+  licenseUrl,
+  quickAnswers,
+  readmeUrl,
+  repoUrl,
+  sections,
+  socialImageUrl,
+  siteName,
+  siteUrl,
+  summary,
+  title
+});
 const builtAt = new Intl.DateTimeFormat("en", {
   dateStyle: "long",
   timeStyle: "short",
   timeZone: "UTC"
-}).format(new Date());
+}).format(buildDate);
 
 await rm(distDir, { recursive: true, force: true });
 await mkdir(distDir, { recursive: true });
@@ -60,12 +84,34 @@ const page = `<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${escapeHtml(title)}</title>
   <meta name="description" content="${escapeHtml(summary)}" />
-  <meta name="theme-color" content="#0f172a" />
+  <meta name="keywords" content="${escapeHtml(keywords.join(", "))}" />
+  <meta name="author" content="Managed Code" />
+  <meta name="publisher" content="Managed Code" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="theme-color" content="#0d1624" />
+  <meta name="application-name" content="${escapeHtml(siteName)}" />
+  <meta name="generator" content="Managed Code TPS static site builder" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <link rel="canonical" href="${siteUrl}" />
+  <link rel="alternate" type="text/markdown" title="README source" href="${readmeUrl}" />
+  <link rel="license" href="${licenseUrl}" />
   <meta property="og:title" content="${escapeHtml(title)}" />
   <meta property="og:description" content="${escapeHtml(summary)}" />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://tps.managed-code.com/" />
+  <meta property="og:site_name" content="${escapeHtml(siteName)}" />
+  <meta property="og:url" content="${siteUrl}" />
+  <meta property="og:image" content="${socialImageUrl}" />
+  <meta property="og:image:type" content="image/svg+xml" />
+  <meta property="og:image:alt" content="TPS Format Specification social preview" />
+  <meta property="article:modified_time" content="${dateModifiedIso}" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="${escapeHtml(title)}" />
+  <meta name="twitter:description" content="${escapeHtml(summary)}" />
+  <meta name="twitter:image" content="${socialImageUrl}" />
+  <meta name="twitter:image:alt" content="TPS Format Specification social preview" />
   <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <script type="application/ld+json">${toJsonLd(structuredData)}</script>
   <style>${styles}</style>
 </head>
 <body>
@@ -92,6 +138,16 @@ const page = `<!DOCTYPE html>
         </div>
       </div>
     </header>
+
+    <section class="answer-strip" aria-labelledby="answer-strip-title">
+      <div class="answer-strip-header">
+        <p class="panel-label">Search Signals</p>
+        <h2 id="answer-strip-title">Quick Answers for Search, AI, and Humans</h2>
+      </div>
+      <div class="answer-grid">
+        ${renderQuickAnswers(quickAnswers)}
+      </div>
+    </section>
 
     <main class="layout">
       <aside class="toc-card">
@@ -129,6 +185,13 @@ const page = `<!DOCTYPE html>
 </html>`;
 
 await writeFile(path.join(distDir, "index.html"), page, "utf8");
+await writeFile(path.join(distDir, "sitemap.xml"), buildSitemapXml(siteUrl, dateModifiedIso), "utf8");
+await writeFile(path.join(distDir, "robots.txt"), buildRobotsTxt(siteUrl), "utf8");
+await writeFile(
+  path.join(distDir, "llms.txt"),
+  buildLlmsTxt({ licenseUrl, quickAnswers, readmeUrl, repoUrl, siteUrl, stats, summary, title }),
+  "utf8"
+);
 
 function slugifyHeading(value) {
   return value
@@ -232,6 +295,186 @@ function buildHeroTitle(value) {
   return `<h1><span class="hero-title-mark">${escapeHtml(lead)}</span><span class="hero-title-main">${escapeHtml(titleTail)}</span></h1><p class="hero-title-sub">${escapeHtml(subtitle)}</p>`;
 }
 
+function buildKeywords() {
+  return [
+    "TPS",
+    "TelePrompterScript",
+    "teleprompter format",
+    "markdown teleprompter",
+    "teleprompter script specification",
+    "RSVP script format",
+    "actor reading profile",
+    "speech pacing metadata",
+    "teleprompter markdown",
+    "script timing metadata"
+  ];
+}
+
+function buildQuickAnswers(summary) {
+  return [
+    {
+      question: "What is TPS?",
+      answer: `${summary} TPS keeps authoring human-readable while giving teleprompter software structured cues for timing, pacing, emotion, and styling.`
+    },
+    {
+      question: "Who is TPS for?",
+      answer: "TPS is designed for script authors, teleprompter app developers, and production teams that need readable source files with structured playback guidance."
+    },
+    {
+      question: "What makes TPS different?",
+      answer: "Unlike plain markdown, SubRip, or WebVTT, TPS is built for teleprompter delivery: it adds hierarchical segments, inline pacing markers, emotion tags, edit points, and profile-aware rendering rules."
+    }
+  ];
+}
+
+function buildStructuredData({
+  dateModifiedIso,
+  keywords,
+  licenseUrl,
+  quickAnswers,
+  readmeUrl,
+  repoUrl,
+  sections,
+  socialImageUrl,
+  siteName,
+  siteUrl,
+  summary,
+  title
+}) {
+  const primarySections = sections
+    .filter((section) => section.depth === 2)
+    .map((section) => section.title);
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": `${siteUrl}#website`,
+        url: siteUrl,
+        name: siteName,
+        description: summary,
+        inLanguage: "en",
+        publisher: {
+          "@type": "Organization",
+          name: "Managed Code",
+          url: "https://managed-code.com/"
+        }
+      },
+      {
+        "@type": "TechArticle",
+        "@id": `${siteUrl}#article`,
+        headline: title,
+        description: summary,
+        url: siteUrl,
+        mainEntityOfPage: siteUrl,
+        isPartOf: {
+          "@id": `${siteUrl}#website`
+        },
+        author: {
+          "@type": "Organization",
+          name: "Managed Code"
+        },
+        publisher: {
+          "@type": "Organization",
+          name: "Managed Code",
+          url: "https://managed-code.com/"
+        },
+        about: [
+          "Teleprompter scripts",
+          "Markdown specification",
+          "Speech pacing metadata",
+          "RSVP reading",
+          "Actor delivery"
+        ],
+        articleSection: primarySections,
+        keywords,
+        license: licenseUrl,
+        dateModified: dateModifiedIso,
+        inLanguage: "en",
+        image: socialImageUrl,
+        sameAs: [repoUrl, readmeUrl],
+        speakable: {
+          "@type": "SpeakableSpecification",
+          cssSelector: [".hero-summary", ".answer-answer"]
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": `${siteUrl}#faq`,
+        mainEntity: quickAnswers.map((entry, index) => ({
+          "@type": "Question",
+          "@id": `${siteUrl}#quick-answer-${index + 1}`,
+          name: entry.question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: entry.answer
+          }
+        }))
+      }
+    ]
+  };
+}
+
+function renderQuickAnswers(entries) {
+  return entries
+    .map(
+      (entry, index) => `<article class="answer-card" id="quick-answer-${index + 1}">
+        <p class="answer-label">AEO / GEO</p>
+        <h3>${escapeHtml(entry.question)}</h3>
+        <p class="answer-answer">${escapeHtml(entry.answer)}</p>
+      </article>`
+    )
+    .join("");
+}
+
+function buildSitemapXml(siteUrl, dateModifiedIso) {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${siteUrl}</loc>
+    <lastmod>${dateModifiedIso}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
+`;
+}
+
+function buildRobotsTxt(siteUrl) {
+  return `User-agent: *
+Allow: /
+
+Sitemap: ${siteUrl}sitemap.xml
+`;
+}
+
+function buildLlmsTxt({ licenseUrl, quickAnswers, readmeUrl, repoUrl, siteUrl, stats, summary, title }) {
+  return `# ${title}
+
+> ${summary}
+
+Canonical: ${siteUrl}
+Repository: ${repoUrl}
+Source of truth: ${readmeUrl}
+License: ${licenseUrl}
+
+## Key Facts
+- ${stats.sectionCount} major sections
+- ${stats.subsectionCount} subsections
+- ${stats.wordCount.toLocaleString("en-US")} words in the current specification
+- Audience: script authors, teleprompter app developers, and production teams
+
+## Quick Answers
+${quickAnswers.map((entry) => `- ${entry.question} ${entry.answer}`).join("\n")}
+
+## Retrieval Guidance
+- Prefer the canonical site for the polished reader experience.
+- Use the GitHub README as the editable source of truth.
+- Cite TPS as a markdown-based teleprompter specification with pacing, timing, emotion, and styling metadata.
+`;
+}
+
 function renderSections(sectionList) {
   return sectionList
     .map((section) => {
@@ -239,6 +482,10 @@ function renderSections(sectionList) {
       return `<li class="${className}"><a href="#${section.slug}">${escapeHtml(section.title)}</a></li>`;
     })
     .join("");
+}
+
+function toJsonLd(value) {
+  return JSON.stringify(value).replaceAll("<", "\\u003c");
 }
 
 function escapeHtml(value) {

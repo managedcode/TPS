@@ -1,0 +1,49 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">TPS Format Specification social card</title>
+  <desc id="desc">Open specification for a markdown-first teleprompter format with timing, pacing, emotion, and styling metadata.</desc>
+  <defs>
+    <linearGradient id="bg" x1="80" y1="40" x2="1120" y2="590" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#102337"/>
+      <stop offset="1" stop-color="#07121B"/>
+    </linearGradient>
+    <radialGradient id="glowA" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1040 72) rotate(135) scale(210 180)">
+      <stop stop-color="#7CC8FF" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#7CC8FF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowB" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(196 520) rotate(25) scale(220 180)">
+      <stop stop-color="#F3C36E" stop-opacity=".26"/>
+      <stop offset="1" stop-color="#F3C36E" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="pill" x1="140" y1="110" x2="330" y2="110" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F3C36E"/>
+      <stop offset="1" stop-color="#7CC8FF"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" rx="36" fill="#07121B"/>
+  <rect x="18" y="18" width="1164" height="594" rx="28" fill="url(#bg)" stroke="rgba(143,166,195,0.22)"/>
+  <rect x="18" y="18" width="1164" height="594" rx="28" fill="url(#glowA)"/>
+  <rect x="18" y="18" width="1164" height="594" rx="28" fill="url(#glowB)"/>
+
+  <rect x="84" y="76" width="254" height="40" rx="20" fill="rgba(243,195,110,0.12)" stroke="rgba(243,195,110,0.2)"/>
+  <circle cx="114" cy="96" r="4" fill="url(#pill)"/>
+  <text x="132" y="102" fill="#F3C36E" font-family="Manrope, Segoe UI, sans-serif" font-size="16" font-weight="800" letter-spacing="2.4">MANAGED CODE / OPEN SPEC</text>
+
+  <text x="84" y="185" fill="#F4F7FB" font-family="Georgia, serif" font-size="96" font-weight="700">TPS Format</text>
+  <text x="84" y="270" fill="#F4F7FB" font-family="Georgia, serif" font-size="96" font-weight="700">Specification</text>
+  <text x="84" y="330" fill="#F3C36E" font-family="Manrope, Segoe UI, sans-serif" font-size="28" font-weight="800" letter-spacing="6">TELEPROMPTERSCRIPT</text>
+
+  <text x="84" y="404" fill="#D8E3F1" font-family="Manrope, Segoe UI, sans-serif" font-size="30" font-weight="600">
+    <tspan x="84" dy="0">Markdown-first teleprompter format with timing,</tspan>
+    <tspan x="84" dy="42">pacing, emotion, and styling metadata.</tspan>
+  </text>
+
+  <rect x="84" y="488" width="248" height="56" rx="28" fill="rgba(8,17,28,0.72)" stroke="rgba(124,200,255,0.18)"/>
+  <text x="118" y="523" fill="#F4F7FB" font-family="Manrope, Segoe UI, sans-serif" font-size="22" font-weight="800">Actor + RSVP Profiles</text>
+
+  <rect x="350" y="488" width="260" height="56" rx="28" fill="rgba(8,17,28,0.72)" stroke="rgba(124,200,255,0.18)"/>
+  <text x="384" y="523" fill="#F4F7FB" font-family="Manrope, Segoe UI, sans-serif" font-size="22" font-weight="800">Structured Script Metadata</text>
+
+  <rect x="840" y="490" width="250" height="52" rx="26" fill="rgba(8,17,28,0.58)" stroke="rgba(143,166,195,0.12)"/>
+  <text x="876" y="523" fill="#8FA6C3" font-family="Manrope, Segoe UI, sans-serif" font-size="22" font-weight="700">tps.managed-code.com</text>
+</svg>

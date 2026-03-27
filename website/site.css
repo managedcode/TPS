@@ -361,6 +361,78 @@ pre code {
   align-items: start;
 }
 
+.answer-strip {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  background:
+    linear-gradient(180deg, rgba(10, 21, 34, 0.86), rgba(8, 17, 28, 0.74)),
+    rgba(8, 17, 28, 0.72);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+
+.answer-strip-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  align-items: end;
+  justify-content: space-between;
+  margin-bottom: 1.2rem;
+}
+
+.answer-strip-header h2 {
+  margin: 0;
+  max-width: 18ch;
+  color: var(--text);
+  font-family: "Fraunces", "Georgia", serif;
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.answer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.answer-card {
+  padding: 1.2rem 1.15rem;
+  border: 1px solid rgba(124, 200, 255, 0.1);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(180deg, rgba(14, 28, 45, 0.64), rgba(9, 18, 30, 0.84)),
+    rgba(10, 20, 33, 0.82);
+  box-shadow: var(--shadow-soft);
+}
+
+.answer-label {
+  margin: 0 0 0.8rem;
+  color: var(--accent-strong);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.answer-card h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.answer-answer {
+  margin: 0.85rem 0 0;
+  color: var(--text-soft);
+  font-size: 0.98rem;
+  line-height: 1.72;
+}
+
 .toc-card {
   top: 1rem;
   position: sticky;
@@ -746,6 +818,10 @@ pre code {
 }
 
 @media (max-width: 1120px) {
+  .answer-grid {
+    grid-template-columns: 1fr;
+  }
+
   .layout {
     grid-template-columns: 1fr;
   }
@@ -787,13 +863,19 @@ pre code {
 
   .hero-signals li,
   .hero-facts span,
-  .meta-chip {
+  .meta-chip,
+  .answer-strip-header h2 {
     width: 100%;
+    max-width: 100%;
     justify-content: flex-start;
   }
 
   .toc-list a {
     padding-left: 3rem;
+  }
+
+  .answer-strip {
+    padding: 1.25rem;
   }
 
   .content-card {
