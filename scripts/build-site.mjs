@@ -16,8 +16,10 @@ const siteUrl = "https://tps.managed-code.com/";
 const repoUrl = "https://github.com/managedcode/TPS";
 const readmeUrl = `${repoUrl}/blob/main/README.md`;
 const licenseUrl = `${repoUrl}/blob/main/LICENSE`;
-const socialImageUrl = `${siteUrl}social-card.svg`;
+const socialImageUrl = `${siteUrl}social-card.png`;
 const siteName = "TPS Format Specification";
+const socialImageWidth = 1200;
+const socialImageHeight = 630;
 const emotionStyles = {
   warm: { colorLabel: "Orange" },
   concerned: { colorLabel: "Red" },
@@ -116,7 +118,10 @@ const page = `<!DOCTYPE html>
   <meta property="og:site_name" content="${escapeHtml(siteName)}" />
   <meta property="og:url" content="${siteUrl}" />
   <meta property="og:image" content="${socialImageUrl}" />
-  <meta property="og:image:type" content="image/svg+xml" />
+  <meta property="og:image:secure_url" content="${socialImageUrl}" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="${socialImageWidth}" />
+  <meta property="og:image:height" content="${socialImageHeight}" />
   <meta property="og:image:alt" content="TPS Format Specification social preview" />
   <meta property="article:modified_time" content="${dateModifiedIso}" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -124,6 +129,7 @@ const page = `<!DOCTYPE html>
   <meta name="twitter:description" content="${escapeHtml(summary)}" />
   <meta name="twitter:image" content="${socialImageUrl}" />
   <meta name="twitter:image:alt" content="TPS Format Specification social preview" />
+  <link rel="image_src" href="${socialImageUrl}" />
   <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
   <script type="application/ld+json">${toJsonLd(structuredData)}</script>
   <style>${styles}</style>
