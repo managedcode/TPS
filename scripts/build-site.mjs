@@ -9,6 +9,7 @@ import markdownItAnchor from "markdown-it-anchor";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
 const readmePath = path.join(rootDir, "README.md");
+const versionPath = path.join(rootDir, "VERSION");
 const stylesPath = path.join(rootDir, "website", "site.css");
 const publicDir = path.join(rootDir, "public");
 const distDir = path.join(rootDir, "dist");
@@ -36,6 +37,7 @@ const emotionStyles = {
 };
 
 const readme = await readFile(readmePath, "utf8");
+const version = normalizeVersion(await readFile(versionPath, "utf8"));
 const styles = await readFile(stylesPath, "utf8");
 
 const md = new MarkdownIt({
@@ -69,6 +71,7 @@ const quickAnswers = buildQuickAnswers(summary);
 const keywords = buildKeywords();
 const buildDate = new Date();
 const dateModifiedIso = buildDate.toISOString();
+const releaseTag = `v${version}`;
 const structuredData = buildStructuredData({
   dateModifiedIso,
   keywords,
@@ -76,12 +79,14 @@ const structuredData = buildStructuredData({
   quickAnswers,
   readmeUrl,
   repoUrl,
+  releaseTag,
   sections,
   socialImageUrl,
   siteName,
   siteUrl,
   summary,
-  title
+  title,
+  version
 });
 const builtAt = new Intl.DateTimeFormat("en", {
   dateStyle: "long",
@@ -101,6 +106,7 @@ const page = `<!DOCTYPE html>
   <title>${escapeHtml(title)}</title>
   <meta name="description" content="${escapeHtml(summary)}" />
   <meta name="keywords" content="${escapeHtml(keywords.join(", "))}" />
+  <meta name="version" content="${escapeHtml(version)}" />
   <meta name="author" content="Managed Code" />
   <meta name="publisher" content="Managed Code" />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
@@ -186,6 +192,7 @@ const page = `<!DOCTYPE html>
       <article class="content-card" id="specification">
         <div class="content-meta" id="top">
           <span class="meta-chip">Source of truth <code>README.md</code></span>
+          <span class="meta-chip">Version ${escapeHtml(releaseTag)}</span>
           <span class="meta-chip">${stats.sectionCount} sections / ${stats.subsectionCount} subsections</span>
           <span class="meta-chip">Built ${escapeHtml(builtAt)} UTC</span>
         </div>
@@ -209,7 +216,7 @@ await writeFile(path.join(distDir, "sitemap.xml"), buildSitemapXml(siteUrl, date
 await writeFile(path.join(distDir, "robots.txt"), buildRobotsTxt(siteUrl), "utf8");
 await writeFile(
   path.join(distDir, "llms.txt"),
-  buildLlmsTxt({ licenseUrl, quickAnswers, readmeUrl, repoUrl, siteUrl, stats, summary, title }),
+  buildLlmsTxt({ licenseUrl, quickAnswers, readmeUrl, releaseTag, repoUrl, siteUrl, stats, summary, title, version }),
   "utf8"
 );
 
@@ -386,12 +393,14 @@ function buildStructuredData({
   quickAnswers,
   readmeUrl,
   repoUrl,
+  releaseTag,
   sections,
   socialImageUrl,
   siteName,
   siteUrl,
   summary,
-  title
+  title,
+  version
 }) {
   const primarySections = sections
     .filter((section) => section.depth === 2)
@@ -406,6 +415,7 @@ function buildStructuredData({
         url: siteUrl,
         name: siteName,
         description: summary,
+        version,
         inLanguage: "en",
         publisher: {
           "@type": "Organization",
@@ -419,6 +429,7 @@ function buildStructuredData({
         headline: title,
         description: summary,
         url: siteUrl,
+        version,
         mainEntityOfPage: siteUrl,
         isPartOf: {
           "@id": `${siteUrl}#website`
@@ -445,7 +456,7 @@ function buildStructuredData({
         dateModified: dateModifiedIso,
         inLanguage: "en",
         image: socialImageUrl,
-        sameAs: [repoUrl, readmeUrl],
+        sameAs: [repoUrl, readmeUrl, `${repoUrl}/releases/tag/${releaseTag}`],
         speakable: {
           "@type": "SpeakableSpecification",
           cssSelector: [".hero-summary", ".answer-answer"]
@@ -501,7 +512,7 @@ Sitemap: ${siteUrl}sitemap.xml
 `;
 }
 
-function buildLlmsTxt({ licenseUrl, quickAnswers, readmeUrl, repoUrl, siteUrl, stats, summary, title }) {
+function buildLlmsTxt({ licenseUrl, quickAnswers, readmeUrl, releaseTag, repoUrl, siteUrl, stats, summary, title, version }) {
   return `# ${title}
 
 > ${summary}
@@ -509,6 +520,8 @@ function buildLlmsTxt({ licenseUrl, quickAnswers, readmeUrl, repoUrl, siteUrl, s
 Canonical: ${siteUrl}
 Repository: ${repoUrl}
 Source of truth: ${readmeUrl}
+Version: ${version}
+Release tag: ${releaseTag}
 License: ${licenseUrl}
 
 ## Key Facts
@@ -551,4 +564,13 @@ function escapeHtml(value) {
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function normalizeVersion(value) {
+  const normalized = value.trim().replace(/^v/i, "");
+  if (!/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/.test(normalized)) {
+    throw new Error(`Invalid VERSION value: ${value.trim()}`);
+  }
+
+  return normalized;
 }
