@@ -1,0 +1,15 @@
+{
+  "name": "tps-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Build pipeline for the TPS documentation site.",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-site.mjs"
+  },
+  "dependencies": {
+    "highlight.js": "^11.11.1",
+    "markdown-it": "^14.1.0",
+    "markdown-it-anchor": "^9.2.0"
+  }
+}
