@@ -40,7 +40,9 @@ const tokens = md.parse(readme, {});
 const title = extractTitle(tokens) ?? "TPS Format Specification";
 const summary = extractSummary(tokens) ?? "Markdown-based teleprompter scripts with timing, pacing, emotion, and styling metadata.";
 const sections = extractSections(tokens);
-const articleHtml = md.render(readme);
+const stats = buildStats(readme, sections);
+const articleHtml = md.renderer.render(trimTitle(tokens), md.options, {});
+const heroTitle = buildHeroTitle(title);
 const builtAt = new Intl.DateTimeFormat("en", {
   dateStyle: "long",
   timeStyle: "short",
@@ -70,12 +72,23 @@ const page = `<!DOCTYPE html>
   <div class="page-shell">
     <header class="hero">
       <div class="hero-copy">
-        <span class="eyebrow">ManagedCode Format Spec</span>
-        <h1>${escapeHtml(title)}</h1>
+        <span class="eyebrow">Managed Code / Open Spec</span>
+        <p class="hero-kicker">A markdown-first teleprompter format built for natural delivery.</p>
+        ${heroTitle}
         <p class="hero-summary">${escapeHtml(summary)}</p>
+        <ul class="hero-signals" aria-label="Format highlights">
+          <li>Markdown-native authoring</li>
+          <li>Actor and RSVP reading profiles</li>
+          <li>Timing, pace, and emotion metadata</li>
+        </ul>
         <div class="hero-actions">
-          <a class="button button-primary" href="https://github.com/managedcode/TPS">Open Repository</a>
-          <a class="button button-secondary" href="https://github.com/managedcode/TPS/blob/main/README.md">View Raw README</a>
+          <a class="button button-primary" href="#specification">Read Specification</a>
+          <a class="button button-secondary" href="https://github.com/managedcode/TPS">Open Repository</a>
+        </div>
+        <div class="hero-facts">
+          <span><strong>${stats.sectionCount}</strong> major sections</span>
+          <span><strong>${stats.subsectionCount}</strong> deep-dive subsections</span>
+          <span><strong>${stats.wordCount.toLocaleString("en-US")}</strong> words of spec detail</span>
         </div>
       </div>
     </header>
@@ -86,6 +99,7 @@ const page = `<!DOCTYPE html>
           <p class="panel-label">Contents</p>
           <a href="#top">Back to top</a>
         </div>
+        <p class="toc-summary">Jump straight to the part of the format you need.</p>
         <nav aria-label="Table of contents">
           <ol class="toc-list">
             ${renderSections(sections)}
@@ -93,10 +107,11 @@ const page = `<!DOCTYPE html>
         </nav>
       </aside>
 
-      <article class="content-card">
+      <article class="content-card" id="specification">
         <div class="content-meta" id="top">
-          <span>Source of truth: <code>README.md</code></span>
-          <span>Last site build: ${escapeHtml(builtAt)} UTC</span>
+          <span class="meta-chip">Source of truth <code>README.md</code></span>
+          <span class="meta-chip">${stats.sectionCount} sections / ${stats.subsectionCount} subsections</span>
+          <span class="meta-chip">Built ${escapeHtml(builtAt)} UTC</span>
         </div>
         <div class="markdown-body">
           ${articleHtml}
@@ -177,6 +192,44 @@ function extractSections(tokenList) {
   }
 
   return sectionList;
+}
+
+function buildStats(markdown, sectionList) {
+  return {
+    sectionCount: sectionList.filter((section) => section.depth === 2).length,
+    subsectionCount: sectionList.filter((section) => section.depth === 3).length,
+    wordCount: markdown.match(/\b[\p{L}\p{N}][\p{L}\p{N}'-]*\b/gu)?.length ?? 0
+  };
+}
+
+function trimTitle(tokenList) {
+  if (
+    tokenList[0]?.type === "heading_open" &&
+    tokenList[0]?.tag === "h1" &&
+    tokenList[2]?.type === "heading_close"
+  ) {
+    return tokenList.slice(3);
+  }
+
+  return tokenList;
+}
+
+function buildHeroTitle(value) {
+  const match = value.match(/^(.*?)\s*\((.*?)\)\s*$/);
+  if (!match) {
+    return `<h1>${escapeHtml(value)}</h1>`;
+  }
+
+  const baseTitle = match[1].trim();
+  const subtitle = match[2].trim();
+  const [lead, ...rest] = baseTitle.split(/\s+/);
+  const titleTail = rest.join(" ");
+
+  if (!lead || !titleTail) {
+    return `<h1>${escapeHtml(baseTitle)}</h1><p class="hero-title-sub">${escapeHtml(subtitle)}</p>`;
+  }
+
+  return `<h1><span class="hero-title-mark">${escapeHtml(lead)}</span><span class="hero-title-main">${escapeHtml(titleTail)}</span></h1><p class="hero-title-sub">${escapeHtml(subtitle)}</p>`;
 }
 
 function renderSections(sectionList) {
