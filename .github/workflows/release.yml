@@ -53,8 +53,20 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "${{ steps.version.outputs.tag }}" \
-            --repo "$GITHUB_REPOSITORY" \
-            --target "$GITHUB_SHA" \
-            --title "TPS ${{ steps.version.outputs.tag }}" \
-            --generate-notes
+          for attempt in 1 2 3; do
+            if gh release create "${{ steps.version.outputs.tag }}" \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "TPS ${{ steps.version.outputs.tag }}" \
+              --generate-notes; then
+              exit 0
+            fi
+
+            if [ "$attempt" -eq 3 ]; then
+              echo "Failed to create GitHub release after $attempt attempts."
+              exit 1
+            fi
+
+            echo "Release creation failed on attempt $attempt. Retrying..."
+            sleep 5
+          done
