@@ -21,8 +21,7 @@ TPS bridges this gap: it is human-readable markdown that any text editor can ope
 1. **Markdown-compatible** — a `.tps` file renders reasonably in any markdown viewer.
 2. **Human-authorable** — no tooling required to write a valid script.
 3. **Hierarchical** — documents decompose into Segments → Blocks → Phrases → Words, each level inheriting and overriding properties.
-4. **Profile-aware** — the same format serves both natural Actor reading and rapid RSVP (Rapid Serial Visual Presentation) display.
-5. **Minimal yet extensible** — the core tag set is small; parsers ignore unknown tags gracefully.
+4. **Minimal yet extensible** — the core tag set is small; parsers ignore unknown tags gracefully.
 
 ## Glossary
 
@@ -35,7 +34,6 @@ TPS bridges this gap: it is human-readable markdown that any text editor can ope
 | **Phrase** | A sentence or thought within a block, delimited by sentence-ending punctuation or pause markers. |
 | **Word** | An individual token with optional per-word properties (color, emphasis, pause). |
 | **WPM** | Words Per Minute — the reading speed. |
-| **ORP** | Optimal Recognition Point — the character position in a word where the eye focuses (used in RSVP mode). |
 | **Edit Point** | A marker indicating a natural place to stop or start an editing session. |
 | **Emotion** | A predefined mood preset that controls visual styling (colors) and presentation hints. |
 
@@ -60,7 +58,7 @@ The front matter is a YAML block delimited by `---` lines at the very start of t
 ```yaml
 ---
 title: "Script Title"
-profile: Actor              # Actor (default) | RSVP
+profile: Actor              # Actor (default)
 duration: "10:00"           # Target duration MM:SS
 base_wpm: 140               # Default words per minute
 speed_offsets:              # Percentage offsets for speed tags relative to base_wpm
@@ -77,9 +75,9 @@ version: "1.0"
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `title` | string | — | Human-readable script title. |
-| `profile` | string | `Actor` | `Actor` for natural reading, `RSVP` for rapid visual display. |
+| `profile` | string | `Actor` | `Actor` for natural spoken reading from a teleprompter. |
 | `duration` | string | — | Target duration in `MM:SS` format. |
-| `base_wpm` | integer | 140 (Actor) / 300 (RSVP) | Default reading speed for the entire document. |
+| `base_wpm` | integer | 140 | Default reading speed (words per minute) for the entire document. |
 | `speed_offsets.xslow` | integer | -40 | Percentage offset for `[xslow]...[/xslow]` tags. Default -40 means 60% of base speed. |
 | `speed_offsets.slow` | integer | -20 | Percentage offset for `[slow]...[/slow]` tags. Default -20 means 80% of base speed. |
 | `speed_offsets.fast` | integer | 25 | Percentage offset for `[fast]...[/fast]` tags. Default 25 means 125% of base speed. |
@@ -314,7 +312,7 @@ All speed presets are **relative to base_wpm** — they apply a multiplier, not 
 
 Properties flow downward through the hierarchy. Each level can override its parent:
 
-1. **Front matter** sets document-level defaults (base_wpm, profile, speed_offsets).
+1. **Front matter** sets document-level defaults (base_wpm, speed_offsets).
 2. **Segment** overrides document defaults for WPM, emotion.
 3. **Block** overrides segment defaults for WPM, emotion.
 4. **Inline tags** override block defaults for the tagged span only.
@@ -329,7 +327,7 @@ For any word, the effective WPM is determined by (highest priority first):
 2. Block header WPM
 3. Segment header WPM
 4. `base_wpm` from front matter
-5. Profile default (Actor: 140, RSVP: 300)
+5. Default: 140 WPM
 
 ### Pause Handling
 
@@ -369,10 +367,6 @@ TPS is designed for **teleprompter use** — text is always rendered on a **dark
 4. **Emotion color schemes** (background, text, accent) are pre-defined per emotion. They are not raw hex values — they are tuned for the dark rendering context with appropriate alpha channels.
 5. **`highlight`** uses a semi-transparent yellow background overlay, not a text color change.
 
-### ORP Display (RSVP Mode)
-
-In RSVP mode, the current word is displayed large and centered with the **Optimal Recognition Point** (ORP) character highlighted in a contrasting color (typically the segment's accent color). Surrounding context words appear smaller and dimmer.
-
 ## WPM Guidelines
 
 ### Actor Profile (Spoken Reading)
@@ -396,40 +390,17 @@ The Actor profile targets natural spoken delivery — reading aloud from a telep
 - Use `[xfast]...[/xfast]` for rapid transitions or low-importance filler.
 - Add `/` pauses between clauses; `//` between sentences.
 
-### RSVP Profile (Visual Reading)
-
-RSVP displays one word at a time at high speed — used for speed-reading practice and silent content consumption.
-
-| Use Case | WPM Range | Recommendation |
-|----------|-----------|----------------|
-| Beginner RSVP reader | 200–280 | Comfortable starting point |
-| **Standard RSVP** | **280–400** | **Trained RSVP reader** |
-| Fast RSVP | 400–500 | Experienced user |
-| Expert RSVP | 500–600 | Maximum useful speed |
-
-**Default `base_wpm`: 300** — comfortable for most RSVP-trained users.
-
 ## Profiles and Validation
-
-### Profiles
-
-- **Actor** (default): natural spoken reading.
-    - base_wpm default: 140
-    - Allowed WPM: 90–200 (Recommended: 130–160)
-    - Segment/Block headers: single WPM value only
-- **RSVP**: rapid serial visual presentation (visual reading).
-    - base_wpm default: 300
-    - Allowed WPM: 150–600 (Recommended: 280–400)
-    - Segment/Block headers: single integer WPM
 
 ### Validation Requirements
 
-| Rule | Actor | RSVP |
-|------|-------|------|
-| WPM error range | < 80 or > 220 | < 150 or > 600 |
-| WPM warning range | < 90 or > 200 | < 200 or > 500 |
-| Segment/Block WPM | Single integer | Single integer |
-| Inline speed | Integer, respects profile range | Integer, respects profile range |
+| Rule | Value |
+|------|-------|
+| WPM error range | < 80 or > 220 |
+| WPM warning range | < 90 or > 200 |
+| Recommended WPM | 130–160 |
+| Segment/Block WPM | Single integer |
+| Inline speed | Integer, respects allowed range |
 
 Additional validation:
 - Emotions must be from the predefined set (see table above).
