@@ -1186,7 +1186,7 @@ function buildExamplesIndexPage(examples, css) {
   <meta name="theme-color" content="#faf8f4">
   <link rel="canonical" href="${siteUrl}examples/">
   <meta property="og:title" content="TPS Examples">
-  <meta property="og:description" content="Interactive TPS format examples with editor and teleprompter views.">
+  <meta property="og:description" content="Interactive TPS format examples with teleprompter and raw source views.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="${siteUrl}examples/">
   <meta property="og:image" content="${socialImageUrl}">
@@ -1217,7 +1217,7 @@ function buildExamplesIndexPage(examples, css) {
     <h1>TPS Examples</h1>
     <p class="example-meta">
       <a href="../">&larr; Back to spec</a> &middot;
-      Interactive examples showing how TPS scripts look in an editor and teleprompter.
+      Interactive examples showing how TPS scripts look in a teleprompter.
     </p>
     <div class="ai-buttons">
       ${renderAiButtons()}
