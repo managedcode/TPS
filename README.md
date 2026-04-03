@@ -16,6 +16,30 @@ TPS bridges this gap: it is human-readable markdown that any text editor can ope
 - **Teleprompter app developers** — engineers who parse and render TPS files in real-time reading applications.
 - **Content producers** — video/podcast teams who need structured, reviewable scripts with edit points and timing hints.
 
+## SDK
+
+TPS now includes a `ManagedCode.Tps` SDK workspace for parsing, validation, compilation, and playback.
+
+- **SDK catalog page:** [tps.managed-code.com/sdk](https://tps.managed-code.com/sdk/)
+- **TypeScript SDK:** [SDK/ts](https://github.com/managedcode/TPS/tree/main/SDK/ts)
+- **JavaScript SDK:** [SDK/js](https://github.com/managedcode/TPS/tree/main/SDK/js)
+- **.NET SDK:** [SDK/dotnet](https://github.com/managedcode/TPS/tree/main/SDK/dotnet)
+
+Each active SDK exposes the same core contract:
+
+- **Constants catalog** — TPS keywords, tags, metadata keys, emotions, and diagnostics
+- **Validation API** — actionable TPS format diagnostics
+- **Parser API** — TPS document model generation
+- **Compiler API** — JSON-friendly timed state machine generation
+- **Player API** — presentation model resolution at runtime
+
+Additional SDK documentation:
+
+- **Workspace overview:** [SDK/README.md](https://github.com/managedcode/TPS/blob/main/SDK/README.md)
+- **TypeScript docs:** [SDK/ts/README.md](https://github.com/managedcode/TPS/blob/main/SDK/ts/README.md)
+- **JavaScript docs:** [SDK/js/README.md](https://github.com/managedcode/TPS/blob/main/SDK/js/README.md)
+- **.NET docs:** [SDK/dotnet/README.md](https://github.com/managedcode/TPS/blob/main/SDK/dotnet/README.md)
+
 ## Design Goals
 
 1. **Markdown-compatible** — a `.tps` file renders reasonably in any markdown viewer.
