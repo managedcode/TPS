@@ -1296,37 +1296,107 @@ function buildExamplesIndexPage(examples, css) {
 
 function buildSdkIndexPage(runtimes, css) {
   const sdkUrl = `${siteUrl}sdk/`;
-  const runtimeSummaries = {
-    typescript: "Typed reference implementation for TPS constants, validation, parsing, compilation, and player behavior.",
-    javascript: "Built JavaScript runtime package for consumers plus parity tests against the compiled artifact.",
-    dotnet: ".NET SDK and xUnit suite under the ManagedCode.Tps prefix.",
-    flutter: "Reserved workspace for a future Flutter TPS runtime.",
-    swift: "Reserved workspace for a future Swift TPS runtime.",
-    java: "Reserved workspace for a future Java TPS runtime."
+  const runtimeIcons = {
+    typescript: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5" fill="#3178C6"/><path d="M7.8 8.2h8.4v2H13v6.1h-2.4v-6.1H7.8v-2Zm7.2 0h6.2v1.9h-1.8c-.7 0-1.1.2-1.1.7 0 .4.3.7 1.2 1l.6.2c1.6.5 2.3 1.3 2.3 2.6 0 1.7-1.4 2.8-3.7 2.8-1.3 0-2.5-.3-3.5-.9v-2.1c1 .7 2.1 1 3.1 1 .8 0 1.2-.2 1.2-.7 0-.4-.3-.6-1.1-.9l-.7-.2c-1.7-.5-2.4-1.4-2.4-2.7 0-1.6 1.3-2.8 3.6-2.8.9 0 1.9.2 2.8.5v2c-.9-.4-1.8-.6-2.6-.6-.8 0-1.2.2-1.2.6 0 .3.3.5 1.1.8l.8.2c1.8.6 2.5 1.4 2.5 2.8 0 1.8-1.4 2.9-3.8 2.9-1.4 0-2.6-.3-3.7-.9v-2.2c1.1.8 2.3 1.2 3.5 1.2.8 0 1.2-.3 1.2-.7 0-.4-.3-.6-1.2-.9l-.8-.2c-1.7-.5-2.4-1.3-2.4-2.6 0-1.7 1.4-2.8 3.7-2.8.9 0 1.8.1 2.7.4V8.2H15Z" fill="#fff"/></svg>',
+    javascript: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5" fill="#F7DF1E"/><path d="M13.1 8.1h2.3v6.6c0 2-.9 3.1-2.9 3.1-.9 0-1.6-.2-2.3-.7l.6-1.8c.4.3.8.4 1.2.4.7 0 1.1-.4 1.1-1.4V8.1Zm4 8.7.7-1.8c.7.5 1.6.8 2.4.8 1 0 1.5-.3 1.5-.9 0-.5-.4-.8-1.6-1.2l-.4-.1c-1.8-.6-2.8-1.5-2.8-3 0-1.8 1.4-3 3.6-3 1.1 0 2.1.2 3 .7l-.7 1.8c-.8-.4-1.6-.6-2.3-.6-.9 0-1.4.3-1.4.8 0 .5.4.7 1.6 1.1l.4.1c1.9.6 2.8 1.5 2.8 3.1 0 1.9-1.5 3.1-3.9 3.1-1.3 0-2.6-.3-3.5-.9Z" fill="#1F2328"/></svg>',
+    dotnet: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5" fill="#68217A"/><text x="12" y="15" text-anchor="middle" font-size="8.2" font-weight="700" fill="#fff" font-family="ui-sans-serif, system-ui, -apple-system, sans-serif">C#</text></svg>',
+    flutter: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5" fill="#EAF4FF"/><path d="M7 14.7 13.9 8h3.2l-6.9 6.7H7Zm3.2 3.3 3.7-3.6h3.2L13.4 18h-3.2Zm0-3.4 1.6-1.5 5.3 5.1h-3.2l-3.7-3.6Z" fill="#47C5FB"/><path d="M10.2 14.6 13.9 18h3.2l-5.3-5.1-1.6 1.7Z" fill="#00569E"/></svg>',
+    swift: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5" fill="#F05138"/><path d="M17.7 15.5c-.5.3-1 .5-1.5.6-1 .2-2-.1-2.8-.7-1-.7-1.8-1.7-2.7-2.7.5.4 1 .8 1.6 1.1 1.2.7 2.3 1 3.4.9-1-.4-2-.9-3-1.6-1.5-1-2.6-2.1-3.3-3.3.9.8 2 1.5 3.1 2.1-.8-.7-1.5-1.5-2-2.4-.5-.8-.8-1.6-.9-2.3.8 1 1.8 2 3 2.8 1.2.9 2.5 1.6 3.8 2.1.1-.2.2-.5.2-.8 0-1.1-.5-2.1-1.4-2.9 1.4.7 2.5 2 2.8 3.5.2 1.1 0 2.3-.6 3.3.5.3.9.7 1.2 1.3-.4-.3-.7-.5-.9-.6Z" fill="#fff2e8"/></svg>',
+    java: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5" fill="#F5F1EA"/><path d="M13.6 6.8c1 .8-1.2 1.4-.4 2.4.4.5 1.2.7 1.2 1.6 0 .7-.5 1.3-1.4 1.8.5-.6.6-1.1.4-1.5-.3-.5-.9-.7-1.1-1.3-.3-.8.3-1.5 1.3-3Z" fill="#EA2D2E"/><path d="M9.3 15.2h5.8c.6 0 1-.4 1-1v-.2h1v.2c0 1.1-.9 2-2 2H9.3c-1.1 0-2-.9-2-2V11h1v3.2c0 .6.4 1 1 1Z" fill="#3A75B0"/><path d="M9.5 11.4h6v.9h-6v-.9Zm.8 1.7h4.4v.8h-4.4v-.8Z" fill="#3A75B0"/></svg>'
+  };
+  const runtimeDetails = {
+    typescript: {
+      summary: "Canonical typed source and source of truth for the TPS runtime contract.",
+      chips: ["Source Of Truth"],
+      facts: [
+        { label: "State", valueHtml: "Active reference runtime used to define TPS behavior across the SDK workspace." },
+        { label: "Contract", valueHtml: "<code>TpsSpec</code>, <code>TpsKeywords</code>, <code>validateTps</code>, <code>parseTps</code>, <code>compileTps</code>, <code>TpsPlayer</code>." },
+        { label: "Verification", valueHtml: "<code>build:tps</code> for compile output and <code>test:types</code> for type-checked parity." },
+        { label: "Workspace", valueHtml: "<code>SDK/ts</code> emits the runtime consumed by <code>SDK/js/lib</code>." }
+      ]
+    },
+    javascript: {
+      summary: "Consumer JavaScript artifact generated from the TypeScript runtime and tested as built output.",
+      chips: ["Generated Artifact"],
+      facts: [
+        { label: "State", valueHtml: "Active consumer runtime with CI verification and separate coverage gating." },
+        { label: "Contract", valueHtml: "Package <code>managedcode.tps</code> exports the same API surface from <code>lib/index.js</code>." },
+        { label: "Verification", valueHtml: "<code>test:js</code> runs Node tests against built files and <code>coverage:js</code> enforces <strong>90%+</strong>." },
+        { label: "Workspace", valueHtml: "<code>SDK/js</code> contains the generated runtime, package metadata, and consumer-facing entry points." }
+      ]
+    },
+    dotnet: {
+      summary: "ManagedCode.Tps runtime for .NET consumers with xUnit parity tests and coverage thresholds.",
+      chips: ["ManagedCode.Tps", "net10.0"],
+      facts: [
+        { label: "State", valueHtml: "Active C# runtime with CI verification and separate coverage gating." },
+        { label: "Contract", valueHtml: "Namespace and package <code>ManagedCode.Tps</code> expose <code>TpsSpec</code>, <code>TpsRuntime.Validate/Parse/Compile</code>, and <code>TpsPlayer</code>." },
+        { label: "Verification", valueHtml: "<code>ManagedCode.Tps.slnx</code> builds and tests in CI, with a separate <strong>90%+</strong> coverage run." },
+        { label: "Workspace", valueHtml: "<code>SDK/dotnet</code> contains the runtime project plus <code>ManagedCode.Tps.Tests</code>." }
+      ]
+    },
+    flutter: {
+      summary: "Placeholder workspace only. No Flutter TPS runtime has been implemented yet.",
+      chips: ["Placeholder"],
+      facts: [
+        { label: "State", valueHtml: "Planned runtime only. No CI job runs for Flutter yet." },
+        { label: "Contract", valueHtml: "No parser, compiler, validator, or player implementation exists yet." },
+        { label: "Activation", valueHtml: "Add the real runtime, tests, and CI integration when Flutter work starts." },
+        { label: "Workspace", valueHtml: "<code>SDK/flutter</code> currently contains documentation scaffolding only." }
+      ]
+    },
+    swift: {
+      summary: "Placeholder workspace only. No Swift TPS runtime has been implemented yet.",
+      chips: ["Placeholder"],
+      facts: [
+        { label: "State", valueHtml: "Planned runtime only. No CI job runs for Swift yet." },
+        { label: "Contract", valueHtml: "No parser, compiler, validator, or player implementation exists yet." },
+        { label: "Activation", valueHtml: "Add the real runtime, tests, and CI integration when Swift work starts." },
+        { label: "Workspace", valueHtml: "<code>SDK/swift</code> currently contains documentation scaffolding only." }
+      ]
+    },
+    java: {
+      summary: "Placeholder workspace only. No Java TPS runtime has been implemented yet.",
+      chips: ["Placeholder"],
+      facts: [
+        { label: "State", valueHtml: "Planned runtime only. No CI job runs for Java yet." },
+        { label: "Contract", valueHtml: "No parser, compiler, validator, or player implementation exists yet." },
+        { label: "Activation", valueHtml: "Add the real runtime, tests, and CI integration when Java work starts." },
+        { label: "Workspace", valueHtml: "<code>SDK/java</code> currently contains documentation scaffolding only." }
+      ]
+    }
   };
   const runtimeCards = runtimes
     .map((runtime, index) => {
       const readmeUrl = `${repoUrl}/blob/main/${runtime.path}/README.md`;
       const codeUrl = `${repoUrl}/tree/main/${runtime.path}`;
       const statusLabel = runtime.enabled ? "Available" : "Planned";
+      const details = runtimeDetails[runtime.id] ?? {
+        summary: "TPS runtime workspace.",
+        chips: [],
+        facts: [
+          { label: "State", valueHtml: runtime.enabled ? "Active runtime." : "Planned runtime." },
+          { label: "Workspace", valueHtml: `<code>${escapeHtml(runtime.path)}</code>` }
+        ]
+      };
       const chips = [
         `<span class="meta-chip">${statusLabel}</span>`,
         `<span class="meta-chip">${escapeHtml(runtime.language)}</span>`,
+        ...details.chips.map(chip => `<span class="meta-chip">${escapeHtml(chip)}</span>`),
         runtime.enabled ? `<span class="meta-chip">CI</span>` : "",
         runtime.coverage ? `<span class="meta-chip">Coverage 90%+</span>` : ""
       ].filter(Boolean).join("");
-      const icons = [
-        '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2v20M4 7h16M4 17h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
-        '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-        '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 5h14v14H5z" stroke="currentColor" stroke-width="1.6"/><path d="M9 9h6M9 12h6M9 15h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>'
-      ];
-
-      return `<article class="answer-card reveal" id="sdk-${escapeHtml(runtime.id)}">
-        <div class="answer-icon">${icons[index % icons.length]}</div>
+      const facts = details.facts
+        .map(fact => `<div class="sdk-fact"><dt>${escapeHtml(fact.label)}</dt><dd>${fact.valueHtml}</dd></div>`)
+        .join("");
+      return `<article class="answer-card sdk-card" id="sdk-${escapeHtml(runtime.id)}">
+        <div class="answer-icon">${runtimeIcons[runtime.id] ?? runtimeIcons.typescript}</div>
         <div class="content-meta">${chips}</div>
         <h3>${escapeHtml(runtime.language)}</h3>
-        <p class="answer-answer">${escapeHtml(runtimeSummaries[runtime.id] ?? "TPS runtime workspace.")}</p>
-        <p class="answer-answer">Code path: <code>${escapeHtml(runtime.path)}</code></p>
+        <p class="sdk-summary">${escapeHtml(details.summary)}</p>
+        <dl class="sdk-facts">
+          ${facts}
+        </dl>
         <div class="hero-actions">
           <a class="button button-primary" href="${codeUrl}" target="_blank" rel="noopener">View Code</a>
           <a class="button button-secondary" href="${readmeUrl}" target="_blank" rel="noopener">README</a>
@@ -1379,7 +1449,7 @@ function buildSdkIndexPage(runtimes, css) {
     <h1>TPS SDKs</h1>
     <p class="example-meta">
       <a href="../">&larr; Back to spec</a> &middot;
-      Runtime catalog generated from <code>SDK/manifest.json</code>.
+      Runtime catalog for the current TPS SDK workspace.
     </p>
     <p class="example-desc">Each TPS SDK exposes the same contract: constants, validation, parser, compiler, and player APIs. Use this page to jump directly into the implementation folders in the repository. Need terminology? Open the <a href="../glossary/">TPS glossary</a>.</p>
 
@@ -1394,7 +1464,7 @@ function buildSdkIndexPage(runtimes, css) {
     </div>
 
     <div class="examples-info-box">
-      <p>Active runtimes participate in build and test CI, while runtimes with a coverage command also pass the separate <strong>90%+</strong> coverage pipeline.</p>
+      <p>Active runtimes are implemented and verified in CI. Planned runtimes are placeholders only until real code and tests are added.</p>
     </div>
   </div>
 
