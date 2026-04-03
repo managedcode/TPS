@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "docsRoot": "SDK/docs",
+  "fixturesRoot": "SDK/fixtures",
+  "runtimes": [
+    {
+      "id": "typescript",
+      "language": "TypeScript",
+      "path": "SDK/ts",
+      "enabled": true,
+      "build": "npm --prefix SDK/js run build:tps",
+      "test": "npm --prefix SDK/js run test:types"
+    },
+    {
+      "id": "javascript",
+      "language": "JavaScript",
+      "path": "SDK/js",
+      "enabled": true,
+      "build": "npm --prefix SDK/js run build:tps",
+      "test": "npm --prefix SDK/js run test:js",
+      "coverage": "npm --prefix SDK/js run coverage:js"
+    },
+    {
+      "id": "dotnet",
+      "language": "C#",
+      "path": "SDK/dotnet",
+      "enabled": true,
+      "build": "dotnet build SDK/dotnet/ManagedCode.Tps.slnx -warnaserror --no-restore",
+      "test": "dotnet test SDK/dotnet/ManagedCode.Tps.slnx --no-build --no-restore",
+      "coverage": "dotnet test SDK/dotnet/ManagedCode.Tps.slnx --no-build --no-restore /p:CollectCoverage=true /p:CoverletOutputFormat=json /p:ThresholdType=line%2Cbranch%2Cmethod /p:Threshold=90"
+    },
+    {
+      "id": "flutter",
+      "language": "Flutter",
+      "path": "SDK/flutter",
+      "enabled": false
+    },
+    {
+      "id": "swift",
+      "language": "Swift",
+      "path": "SDK/swift",
+      "enabled": false
+    },
+    {
+      "id": "java",
+      "language": "Java",
+      "path": "SDK/java",
+      "enabled": false
+    }
+  ]
+}

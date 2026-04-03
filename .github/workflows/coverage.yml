@@ -1,0 +1,52 @@
+name: Coverage
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - "codex/**"
+  pull_request:
+
+jobs:
+  coverage-matrix:
+    name: Coverage Matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - id: matrix
+        run: echo "matrix=$(node SDK/scripts/runtime-matrix.mjs --coverage --compact)" >> "$GITHUB_OUTPUT"
+
+  coverage:
+    name: Coverage ${{ matrix.runtime.language }}
+    needs: coverage-matrix
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: ${{ fromJson(needs.coverage-matrix.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - run: npm ci --prefix SDK/js
+      - run: dotnet restore SDK/dotnet/ManagedCode.Tps.slnx
+      - run: ${{ matrix.runtime.build }}
+      - run: ${{ matrix.runtime.coverage }}
+      - name: Coverage Policy
+        run: |
+          {
+            echo "## Coverage Policy"
+            echo ""
+            echo "- JavaScript: minimum 90% statements, branches, functions, and lines"
+            echo "- C#: minimum 90% line, branch, and method coverage"
+          } >> "$GITHUB_STEP_SUMMARY"

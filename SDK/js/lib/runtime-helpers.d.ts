@@ -1,0 +1,23 @@
+export declare function normalizeValue(value: string | undefined | null): string | undefined;
+export declare function isLegacyMetadataKey(key: string): boolean;
+export declare function isKnownEmotion(value: string | undefined): boolean;
+export declare function resolveEmotion(candidate: string | undefined, fallback?: string): string;
+export declare function resolvePalette(emotion: string | undefined): {
+    accent: string;
+    text: string;
+    background: string;
+};
+export declare function resolveBaseWpm(metadata: Record<string, string>): number;
+export declare function resolveSpeedOffsets(metadata: Record<string, string>): Record<string, number>;
+export declare function resolveSpeedMultiplier(tag: string, speedOffsets: Record<string, number>): number | undefined;
+export declare function tryParseAbsoluteWpm(tag: string): number | undefined;
+export declare function isTimingToken(value: string): boolean;
+export declare function isSentenceEndingPunctuation(text: string): boolean;
+export declare function tryResolvePauseMilliseconds(argument: string | undefined): number | undefined;
+export declare function calculateWordDurationMs(word: string, effectiveWpm: number): number;
+export declare function calculateOrpIndex(word: string): number;
+export declare function resolveEffectiveWpm(inheritedWpm: number, speedOverride: number | undefined, speedMultiplier: number | undefined): number;
+export declare function isKnownInlineTag(tag: string): boolean;
+export declare function buildInvalidWpmMessage(value: string): string;
+export declare function isInvalidWpm(value: number): boolean;
+export declare function isValidationErrorCode(code: string): boolean;

@@ -1,0 +1,50 @@
+{
+  "runtimeParity": {
+    "segmentName": "Call to Action",
+    "segmentEmotion": "motivational",
+    "segmentSpeaker": "Alex",
+    "blockName": "Closing Block",
+    "blockEmotion": "energetic",
+    "baseWpm": 140,
+    "wordChecks": {
+      "teleprompter": {
+        "speedOverride": 180,
+        "pronunciationGuide": "TELE-promp-ter",
+        "speaker": "Alex"
+      },
+      "carefully": {
+        "speedMultiplier": 0.8
+      },
+      "moment": {
+        "volumeLevel": "loud",
+        "deliveryMode": "building",
+        "isHighlight": true
+      },
+      "announcement": {
+        "stressText": "me"
+      },
+      "development": {
+        "stressGuide": "de-VE-lop-ment"
+      }
+    },
+    "controlChecks": {
+      "pauseDurationMs": 2000,
+      "editPointPriority": "high"
+    }
+  },
+  "invalidDiagnostics": {
+    "unknown-tag.tps": [
+      "unknown-tag"
+    ],
+    "mismatched-tags.tps": [
+      "mismatched-closing-tag",
+      "unclosed-tag"
+    ],
+    "invalid-pause.tps": [
+      "invalid-pause"
+    ],
+    "header-parameter.tps": [
+      "invalid-header-parameter"
+    ]
+  }
+}

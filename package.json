@@ -5,7 +5,17 @@
   "description": "Build pipeline for the TPS documentation site.",
   "type": "module",
   "scripts": {
-    "build": "node scripts/build-site.mjs"
+    "build": "npm run build:site && npm run build:sdk",
+    "build:site": "node scripts/build-site.mjs",
+    "build:sdk": "npm --prefix SDK/js run build",
+    "build:tps": "npm --prefix SDK/js run build:tps",
+    "test": "npm run test:sdk",
+    "test:sdk": "npm --prefix SDK/js run test",
+    "test:js": "npm --prefix SDK/js run test:js",
+    "test:types": "npm --prefix SDK/js run test:types",
+    "coverage:js": "npm --prefix SDK/js run coverage:js",
+    "sdk:matrix": "npm --prefix SDK/js run sdk:matrix",
+    "sdk:coverage-matrix": "npm --prefix SDK/js run sdk:coverage-matrix"
   },
   "dependencies": {
     "highlight.js": "^11.11.1",

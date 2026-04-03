@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/dotnet/">
+    <Project Path="tests/ManagedCode.Tps.Compiler.Tests/ManagedCode.Tps.Compiler.Tests.csproj" />
+    <Project Path="src/ManagedCode.Tps.Compiler/ManagedCode.Tps.Compiler.csproj" />
+  </Folder>
+</Solution>
