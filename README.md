@@ -35,7 +35,7 @@ TPS bridges this gap: it is human-readable markdown that any text editor can ope
 | **Word** | An individual token with optional per-word properties (emphasis, volume, pause). |
 | **WPM** | Words Per Minute — the reading speed. |
 | **Edit Point** | A marker indicating a natural place to stop or start an editing session. |
-| **Emotion** | A predefined mood preset that controls visual styling (colors) and presentation hints. |
+| **Emotion** | A predefined delivery style that controls tone, energy, and visual presentation. |
 
 ## File Structure
 
@@ -241,36 +241,43 @@ A breath mark indicates where the speaker should take a breath. Unlike pauses, b
 [pronunciation:KAM-uhl]camel[/pronunciation]    # Simple guide
 ```
 
-#### Stress Marks
+#### Syllable Stress
 
-Three ways to mark word stress, from simplest to most detailed:
-
-**Inline tag** — wrap the stressed part of a word with `[stress]`:
+**Inline wrap** — wrap the stressed part of a word:
 
 ```markdown
 develop[stress]me[/stress]nt        # Stress on "me"
 [stress]in[/stress]frastructure     # Stress on "in"
 ```
 
-The simplest approach. The tag can wrap a single letter or a syllable — whatever part needs emphasis. Renderers should visually distinguish the stressed portion (e.g., underline, bold, or color).
+The tag can wrap a single letter or a syllable. Renderers should visually distinguish the stressed portion (e.g., larger font size, underline, or bold).
 
-**Inline accent** — place an acute accent (`´`) on the stressed vowel directly in the word:
-
-```markdown
-developmént                          # Stress on the "e" in "-ment"
-ínfrastructure                       # Stress on the first "i"
-```
-
-No tags needed — the accent is visible in the text itself. Parsers should recognize acute-accented vowels (`á`, `é`, `í`, `ó`, `ú`) as stress markers. The renderer may display the accent or strip it after applying visual stress.
-
-**Stress guide tag** — for full syllable breakdown when the reader needs more guidance:
+**Stress guide** — full syllable breakdown with a parameter:
 
 ```markdown
 [stress:de-VE-lop-ment]development[/stress]
 [stress:IN-fra-struc-ture]infrastructure[/stress]
 ```
 
-The guide string uses hyphens to separate syllables. The stressed syllable is written in **UPPERCASE**; unstressed syllables are lowercase. Renderers should display the stress guide as a tooltip, subtitle, or overlay — not replace the word itself.
+Hyphens separate syllables. The stressed syllable is **UPPERCASE**, unstressed are lowercase. Renderers should display the guide as a tooltip or overlay — not replace the word. Use this for complex or unfamiliar words where the reader needs the full pronunciation map.
+
+#### Delivery Mode Tags
+
+```markdown
+[sarcasm]Oh, that went really well[/sarcasm]         # Say the opposite of what you mean
+[aside]By the way, we also support webhooks[/aside]  # Parenthetical, "to the audience"
+[rhetorical]Isn't that exactly what we need?[/rhetorical]  # Question delivered as statement
+[building]Each phrase gets bigger. And bigger. And BIGGER.[/building]  # Gradually rising energy
+```
+
+Delivery mode tags describe **how** to deliver a passage, beyond emotion and volume:
+
+| Tag | Delivery | Use when |
+|-----|----------|----------|
+| `[sarcasm]` | Say it straight, but mean the opposite. Deadpan or exaggerated. | Comedy, skepticism, irony. |
+| `[aside]` | Step out of the main narrative. Lower energy, more intimate. | Parenthetical comments, tangents, notes to audience. |
+| `[rhetorical]` | Deliver as a statement with question syntax. No rising intonation. | Rhetorical questions that don't expect answers. |
+| `[building]` | Start at lower energy, gradually increase through the passage. | Reveals, motivational build-ups, crescendo moments. |
 
 ## Keyword Reference
 
@@ -303,6 +310,15 @@ Renderers map each emotion to a visual style (colors, background, text treatment
 | `soft` | Quieter, gentler delivery |
 | `whisper` | Whispered, intimate delivery |
 
+### Delivery Modes
+
+| Keyword | Delivery | Use when |
+|---------|----------|----------|
+| `sarcasm` | Say it straight, but mean the opposite. Deadpan or exaggerated. | Comedy, skepticism, irony. |
+| `aside` | Step out of the main narrative. Lower energy, more intimate. | Parenthetical comments, tangents, notes to audience. |
+| `rhetorical` | Deliver as a statement with question syntax. No rising intonation. | Rhetorical questions that don't expect answers. |
+| `building` | Start at lower energy, gradually increase through the passage. | Reveals, motivational build-ups, crescendo moments. |
+
 ### Inline Tags
 
 | Tag | Syntax | Description |
@@ -326,11 +342,14 @@ Renderers map each emotion to a visual style (colors, background, text treatment
 | **Whisper** | `[whisper]text[/whisper]` | Whispered delivery |
 | **Phonetic** | `[phonetic:IPA]text[/phonetic]` | IPA pronunciation guide |
 | **Pronunciation** | `[pronunciation:guide]text[/pronunciation]` | Simple pronunciation guide |
-| **Stress (wrap)** | `develop[stress]me[/stress]nt` | Wrap stressed part of a word |
-| **Stress (accent)** | `developmént` | Acute accent on stressed vowel |
-| **Stress (guide)** | `[stress:de-VE-lop-ment]text[/stress]` | Full syllable breakdown (UPPERCASE = stressed) |
+| **Stress (wrap)** | `develop[stress]me[/stress]nt` | Stressed part of a word |
+| **Stress (guide)** | `[stress:de-VE-lop-ment]word[/stress]` | Full syllable breakdown |
 | **Breath** | `[breath]` | Natural breath point (no added time) |
-| **Emotion** | `[warm]text[/warm]`, `[urgent]...[/urgent]`, etc. | Inline emotion/delivery override (see Emotions table) |
+| **Sarcasm** | `[sarcasm]text[/sarcasm]` | Deadpan/ironic delivery |
+| **Aside** | `[aside]text[/aside]` | Parenthetical, "to the audience" |
+| **Rhetorical** | `[rhetorical]text[/rhetorical]` | Question delivered as statement |
+| **Building** | `[building]text[/building]` | Gradually rising energy/crescendo |
+| **Emotion** | `[warm]text[/warm]`, `[urgent]...[/urgent]`, etc. | Inline emotion override (see Emotions table) |
 
 ### Speed Presets
 
@@ -400,9 +419,13 @@ For any word, the effective WPM is determined by (highest priority first):
 
 When emotion changes between segments or blocks, renderers should apply a smooth visual transition (recommended: 3-second fade between color schemes).
 
-### Inline Emotion Precedence
+### Tag Precedence
 
-When inline emotion tags are nested, the **innermost tag wins** for the enclosed span. Block-level emotion serves as the default styling; inline emotion tags override it for their span only.
+**Emotion:** When inline emotion tags are nested, the **innermost tag wins** for the enclosed span. Block-level emotion serves as the default styling; inline emotion tags override it for their span only.
+
+**Volume vs. emotion:** Volume and emotion are **independent dimensions**. `[soft]` inside an `Urgent` block means: deliver with urgent tone but at lower volume. They do not conflict — volume controls loudness, emotion controls tone.
+
+**Delivery modes** (`[sarcasm]`, `[aside]`, `[rhetorical]`, `[building]`) override the current emotion for their span. They are specialized delivery instructions that take priority over the block emotion.
 
 ### Phrase Boundaries
 
@@ -411,7 +434,9 @@ A **phrase** is a unit of text delimited by:
 - Pause markers: `/`, `//`, `[pause:...]`
 - Block or segment boundaries
 
-Phrases are the smallest unit for timing calculation. Words within a phrase are counted for WPM computation using whitespace tokenization: each whitespace-separated token counts as one word. Hyphenated words (e.g., `state-of-the-art`) count as one word. Tags and tag syntax are not counted.
+Phrases are the smallest unit for timing calculation.
+
+**WPM word counting** is performed on **clean text** — after all tags and markup are stripped. The parser first removes all tag syntax (`[tag]`, `[/tag]`, `[tag:param]`), then joins any text fragments split by mid-word tags (e.g., `develop[stress]me[/stress]nt` → `development`), then counts words using whitespace tokenization. Each whitespace-separated token in the clean text counts as one word. Hyphenated words (e.g., `state-of-the-art`) count as one word.
 
 ### Tag Nesting
 
@@ -439,9 +464,57 @@ If a TPS file has no `##` segment headers, the entire content (after front matte
 
 Plain markdown `## Title` and `### Title` headers (without `[...]` brackets) are also recognized as segments and blocks respectively, with default (neutral) emotion and inherited WPM.
 
-## Rendering Context
+## Rendering Principles
 
-TPS is designed for **teleprompter use** — text is always rendered on a **dark background** (typically near-black: `#1A1B2E` or similar). All color choices, contrast ratios, and visibility rules assume this context.
+A TPS file is **source markup**, not display output. The teleprompter application **must** process the markup and present clean, styled text to the reader. The reader should never see raw tags like `[emphasis]` or `[slow]` on screen.
+
+### Tag Visibility
+
+All tags (`[emphasis]`, `[slow]`, `[loud]`, `[sarcasm]`, etc.) are **invisible in the rendered output**. The renderer applies their effects visually:
+
+- `[emphasis]word[/emphasis]` → the word appears **bold** or in a distinct color
+- `[slow]text[/slow]` → text may appear with a pacing indicator or wider spacing
+- `[loud]text[/loud]` → text appears larger or bolder
+- `[whisper]text[/whisper]` → text appears smaller or lighter
+- `[sarcasm]text[/sarcasm]` → text styled with a distinct visual cue (e.g., italic + indicator)
+- `[building]text[/building]` → text may gradually increase in size or intensity
+- `[breath]` → a small visual indicator (e.g., a subtle mark or gap)
+- Segment/block headers → rendered as section dividers, not raw markdown
+
+The reader sees only the spoken text with visual styling applied. Tags are commands for the renderer, not content for the speaker.
+
+### Content Restrictions
+
+TPS scripts contain **spoken text only**. Do not include:
+- URLs or hyperlinks — these are not spoken content
+- Code blocks or technical syntax — rewrite as spoken language
+- Images or embedded media references
+- Raw data tables — narrate the data instead
+
+### Rendering Context
+
+TPS is designed for **teleprompter use** — text is always rendered on a **dark background** (typically near-black: `#1A1B2E` or similar). All visual choices assume this context.
+
+### Visual Rendering Hints
+
+Renderers should use **text size, letter spacing, weight, and animation** to communicate delivery cues without the reader needing to see tags. Recommended visual mappings:
+
+| Tag | Font size | Letter spacing | Weight | Other |
+|-----|-----------|---------------|--------|-------|
+| `[loud]` | Larger (120–140%) | Normal | Bold | — |
+| `[soft]` | Smaller (80–90%) | Normal | Light | Lower opacity |
+| `[whisper]` | Smaller (70–80%) | Wider (+1–2px) | Light | Italic or distinct style |
+| `[emphasis]` | Normal | Normal | Bold | — |
+| `[stress]` (wrap) | Larger on stressed part | Normal | Bold | Underline or distinct color |
+| `[stress:...]` (guide) | Normal | Normal | Normal | Tooltip/overlay with syllable guide |
+| `[slow]` | Normal | Wider (+1–2px) | Normal | Stretches word visually |
+| `[fast]` | Normal | Tighter (-0.5–1px) | Normal | Compresses word visually |
+| `[building]` | Gradually increasing | Normal | Gradually bolder | Animated size ramp |
+| `[sarcasm]` | Normal | Normal | Normal | Italic + visual indicator |
+| `[aside]` | Smaller (85–90%) | Normal | Light | Dimmed or offset |
+| `[highlight]` | Normal | Normal | Normal | Background overlay |
+
+These are **recommendations**, not requirements. Renderers may adapt the visual treatment to their platform. The key principle: the reader should **feel** the delivery instruction from the visual presentation alone.
 
 ### Dark Background Rules
 
@@ -449,7 +522,6 @@ TPS is designed for **teleprompter use** — text is always rendered on a **dark
 2. **Minimum contrast** — all styled text must produce at least **WCAG AA 4.5:1** contrast ratio against the dark background.
 3. **Emotion color schemes** (background, text, accent) are pre-defined per emotion and tuned for the dark rendering context.
 4. **`highlight`** uses a semi-transparent yellow background overlay, not a text color change.
-5. **Volume indicators** — `[loud]` text should be visually larger or bolder; `[soft]` and `[whisper]` should be visually smaller or lighter.
 
 ## WPM Guidelines
 
@@ -498,9 +570,23 @@ Additional validation:
 ### Casing, Whitespace, Escaping
 
 - Tags are case-insensitive; canonical form is lower-case (e.g., `[emphasis]`).
-- `WPM` suffix is uppercase by convention (e.g., `140WPM`).
+- `WPM` suffix is uppercase by convention (e.g., `140WPM`). `140wpm` is also valid — parsers should normalize.
 - Parameters inside headers are trimmed; `140 WPM` normalizes to `140WPM`.
 - Escape reserved characters in plain text with backslash: `\[`, `\]`, `\|`, `\/`, `\*`, `\\`.
+- Escape sequences apply **only in plain text**, not inside tag parameters or header parameters.
+
+### Error Handling
+
+Parsers should handle invalid input gracefully:
+
+- **Unknown tag:** Treat as plain text (display the brackets and content literally).
+- **Unknown emotion keyword:** Parse error. Reject the keyword and use the inherited emotion.
+- **Unclosed tag:** Implicitly close at the end of the current block (see Tag Nesting).
+- **Closing tag without opening:** Ignore the closing tag.
+- **Invalid WPM** (< 80 or > 220): Parse error. Use the inherited WPM value.
+- **Malformed pause** (e.g., `[pause:abc]`): Treat as plain text.
+- **Cross-nested tags:** Parse error. The parser should close tags in order and report a warning.
+- **Duplicate parameters in headers** (e.g., two WPM values): Use the last one.
 
 ## Complete Example
 
@@ -530,7 +616,7 @@ will be a [emphasis]transformative moment[/emphasis] for our company. //
 ### [Purpose Block|145WPM]
 [emphasis]Today[/emphasis], / we're not just launching a product – / [breath]
 we're introducing a [highlight]solution[/highlight] that will [emphasis]revolutionize[/emphasis] /
-how our customers interact with [stress:tech-NO-lo-gy]technology[/stress]. //
+how our customers interact with tech[stress]no[/stress]logy. //
 
 ## [Problem|135WPM|Concerned]
 
@@ -541,7 +627,7 @@ Our industry has been [emphasis]struggling[/emphasis] with a fundamental problem
 [edit_point:high]
 
 According to recent studies, /
-[slow][emphasis]73% of users abandon[/emphasis] applications within the first three interactions[/slow] /
+[slow][emphasis]73% of users a[stress]ban[/stress]don[/emphasis] applications within the first three interactions[/slow] /
 due to [highlight]complexity and poor user experience[/highlight]. //
 
 ### [Impact Block]
@@ -552,8 +638,8 @@ costing businesses [loud][emphasis]billions[/emphasis] in revenue[/loud] annuall
 
 ### [Introduction Block]
 That's where our [emphasis]new platform[/emphasis] comes in. /
-We've developed a local-first téleprompter workflow that /
-[highlight]simplifies complex processes[/highlight] and [emphasis]enhances user experiénce[/emphasis]. //
+[building]We've developed a local-first teleprompter workflow that /
+[highlight]simplifies complex processes[/highlight] and [emphasis]enhances user experience[/emphasis].[/building] //
 
 ### [Benefits Block|150WPM|Excited]
 With our solution, / you can expect a [emphasis]50% reduction[/emphasis] in user abandonment /
@@ -561,7 +647,7 @@ and a [emphasis]30% increase[/emphasis] in engagement. //
 
 [pause:1s]
 
-[soft]Full details are available in the handout.[/soft] /
+[aside]Full details are available in the handout.[/aside] /
 [highlight]Thank you[/highlight] for your time. //
 
 [edit_point:medium]
@@ -574,7 +660,7 @@ The [`examples/`](examples/) directory contains sample TPS files demonstrating t
 | File | Description |
 |------|-------------|
 | [`basic.tps`](examples/basic.tps) | Minimal valid TPS file — front matter, title, segments, blocks, pauses, emphasis, simple headers, escape sequences. |
-| [`advanced.tps`](examples/advanced.tps) | All format features — speed controls, volume, stress marks, breath marks, emotions, pronunciation, edit points, tag nesting. |
+| [`advanced.tps`](examples/advanced.tps) | All format features — speed, volume, delivery modes, syllable stress, breath marks, emotions, pronunciation, edit points, tag nesting. |
 | [`multi-segment.tps`](examples/multi-segment.tps) | Multi-segment script with varying speed, emotion, and delivery cues across segments. |
 
 ## File Extension

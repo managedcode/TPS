@@ -53,17 +53,13 @@ And a five-second pause for dramatic effect. //
 [soft]And this part should be quieter, / more intimate.[/soft] /
 [whisper]This is a secret.[/whisper] //
 
-### [Stress and Accent]
+### [Syllable Stress]
 
-Wrap the stressed part of a word: /
-This is a cri[stress]ti[/stress]cal point. /
+Mark stress by wrapping the stressed part: /
+This is a [stress]cri[/stress]tical point. /
 The [stress]em[/stress]phasis changes [stress]mea[/stress]ning. //
 
-Or use an inline accent on the vowel: /
-This is a critícal point. /
-The émphasis changes méaning. //
-
-Or use the stress tag for full syllable guidance: /
+For complex words, / use the full syllable guide: /
 [stress:de-VE-lop-ment]development[/stress] /
 [stress:IN-fra-struc-ture]infrastructure[/stress]. //
 
@@ -71,6 +67,16 @@ Or use the stress tag for full syllable guidance: /
 
 Long passages need breath marks / [breath] so the reader knows where to breathe /
 without running out of air. //
+
+### [Delivery Modes]
+
+[sarcasm]Oh, that went really well.[/sarcasm] //
+
+[aside]By the way, we also support webhooks.[/aside] //
+
+[rhetorical]Isn't that exactly what we needed?[/rhetorical] //
+
+[building]We started small. / Then we grew. / Then we exploded.[/building] //
 
 ## [Emotion and Emphasis|Warm]
 

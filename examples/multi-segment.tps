@@ -60,13 +60,13 @@ The teleprompter can adjust styling and pacing / based on these cues. //
 
 ### [Rising Tension|150WPM|Urgent]
 
-[fast]Now the pace picks up. /
+[building]Now the pace picks up. /
 Things are getting intense. /
-The reader needs to feel the urgency.[/fast] //
+The reader needs to feel the urgency.[/building] //
 
 [slow]And then we slow down / for the emotional beat.[/slow] //
 
-[highlight]Contrast in pacing / is what makes a script engáging.[/highlight] //
+[highlight]Contrast in pacing / is what makes a script en[stress]ga[/stress]ging.[/highlight] //
 
 [edit_point:high]
 
@@ -91,6 +91,6 @@ And we end on a [emphasis]motivational[/emphasis] note. //
 Three moods. /
 One script.[/slow] //
 
-[soft][highlight]That is how you structure a long TPS document.[/highlight][/soft] //
+[aside]That is how you structure a long TPS document.[/aside] //
 
 [edit_point]
