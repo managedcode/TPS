@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "tps-site",
-      "runtimeExecutable": "/usr/local/bin/node",
-      "runtimeArgs": ["/opt/homebrew/bin/npx", "serve", "dist", "-l", "3456", "--no-clipboard"],
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["/Users/ksemenenko/Developer/TPS/.claude/serve.sh"],
       "port": 3456
     }
   ]

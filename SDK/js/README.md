@@ -23,6 +23,7 @@ Imports come from `SDK/js/lib/index.js` and mirror the TS contract:
 - `parseTps(source)`
 - `compileTps(source)`
 - `TpsPlayer`
+- `TpsPlayer.enumerateStates(stepMs)`
 
 ## Technical Structure
 
@@ -35,12 +36,14 @@ Imports come from `SDK/js/lib/index.js` and mirror the TS contract:
 1. Rebuild `lib/` whenever TypeScript source changes.
 2. Run JS tests against the built artifact.
 3. Run coverage when changing runtime behavior or JS-facing tests.
+4. Regenerate example snapshots if compiled output or player checkpoints intentionally changed.
 
 ## Local Commands
 
 - `npm --prefix SDK/js run build:tps`
 - `npm --prefix SDK/js run test:js`
 - `npm --prefix SDK/js run coverage:js`
+- `npm --prefix SDK/js run generate:example-snapshots`
 
 ## When To Edit This Folder
 

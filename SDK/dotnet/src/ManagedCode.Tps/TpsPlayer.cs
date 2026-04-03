@@ -75,6 +75,24 @@ public sealed class TpsPlayer
 
     public PlayerState Seek(int elapsedMs) => GetState(elapsedMs);
 
+    public IEnumerable<PlayerState> EnumerateStates(int stepMs = 100)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stepMs);
+
+        if (Script.TotalDurationMs == 0)
+        {
+            yield return GetState(0);
+            yield break;
+        }
+
+        for (var elapsedMs = 0; elapsedMs < Script.TotalDurationMs; elapsedMs += stepMs)
+        {
+            yield return GetState(elapsedMs);
+        }
+
+        yield return GetState(Script.TotalDurationMs);
+    }
+
     private CompiledWord? FindCurrentWord(int elapsedMs)
     {
         if (Script.Words.Count == 0)

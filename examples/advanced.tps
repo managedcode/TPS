@@ -45,13 +45,19 @@ A two-second pause above. /
 
 And a five-second pause for dramatic effect. //
 
-## [Delivery Controls|Professional]
+## [Delivery Controls|Professional|Speaker:Host]
 
-### [Volume]
+### [Volume|Speaker:Guest]
 
 [loud]This part should be delivered with more projection.[/loud] /
 [soft]And this part should be quieter, / more intimate.[/soft] /
 [whisper]This is a secret.[/whisper] //
+
+### [Relative Speed Extremes|Focused|Speaker:Jordan]
+
+[xslow]This opening should feel deliberate and very slow.[/xslow] /
+[normal]Now we are back at the base pace.[/normal] /
+[xfast]This ending should move rapidly.[/xfast] //
 
 ### [Syllable Stress]
 
@@ -78,7 +84,7 @@ without running out of air. //
 
 [building]We started small. / Then we grew. / Then we exploded.[/building] //
 
-## [Emotion and Emphasis|Warm]
+## [Emotion and Emphasis|Warm|1:30-2:30]
 
 ### [Inline Emotions]
 

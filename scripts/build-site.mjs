@@ -1359,10 +1359,19 @@ function buildSdkIndexPage(runtimes, css) {
       ]
     }
   };
+  const runtimeColors = {
+    typescript: { accent: '#3178C6', soft: 'rgba(49,120,198,0.08)', border: 'rgba(49,120,198,0.18)' },
+    javascript: { accent: '#F0DB4F', soft: 'rgba(240,219,79,0.10)', border: 'rgba(240,219,79,0.22)' },
+    dotnet: { accent: '#68217A', soft: 'rgba(104,33,122,0.08)', border: 'rgba(104,33,122,0.18)' },
+    flutter: { accent: '#47C5FB', soft: 'rgba(71,197,251,0.08)', border: 'rgba(71,197,251,0.15)' },
+    swift: { accent: '#F05138', soft: 'rgba(240,81,56,0.08)', border: 'rgba(240,81,56,0.15)' },
+    java: { accent: '#EA2D2E', soft: 'rgba(234,45,46,0.08)', border: 'rgba(234,45,46,0.15)' }
+  };
   const renderRuntimeCard = runtime => {
       const readmeUrl = `${repoUrl}/blob/main/${runtime.path}/README.md`;
       const codeUrl = `${repoUrl}/tree/main/${runtime.path}`;
       const statusLabel = runtime.enabled ? "Available" : "Planned";
+      const colors = runtimeColors[runtime.id] ?? runtimeColors.typescript;
       const details = runtimeDetails[runtime.id] ?? {
         summary: "TPS runtime workspace.",
         chips: [],
@@ -1372,26 +1381,34 @@ function buildSdkIndexPage(runtimes, css) {
         ]
       };
       const chips = [
-        `<span class="meta-chip">${statusLabel}</span>`,
-        `<span class="meta-chip">${escapeHtml(runtime.language)}</span>`,
-        ...details.chips.map(chip => `<span class="meta-chip">${escapeHtml(chip)}</span>`),
-        runtime.enabled ? `<span class="meta-chip">CI</span>` : "",
-        runtime.coverage ? `<span class="meta-chip">Coverage 90%+</span>` : ""
+        `<span class="sdk-chip sdk-chip--status ${runtime.enabled ? 'sdk-chip--active' : 'sdk-chip--planned'}">${statusLabel}</span>`,
+        `<span class="sdk-chip">${escapeHtml(runtime.language)}</span>`,
+        ...details.chips.map(chip => `<span class="sdk-chip">${escapeHtml(chip)}</span>`),
+        runtime.enabled ? `<span class="sdk-chip sdk-chip--ci">CI</span>` : "",
+        runtime.coverage ? `<span class="sdk-chip sdk-chip--coverage">90%+ Coverage</span>` : ""
       ].filter(Boolean).join("");
       const facts = details.facts
         .map(fact => `<div class="sdk-fact"><dt>${escapeHtml(fact.label)}</dt><dd>${fact.valueHtml}</dd></div>`)
         .join("");
-      return `<article class="answer-card sdk-card" id="sdk-${escapeHtml(runtime.id)}">
-        <div class="answer-icon">${runtimeIcons[runtime.id] ?? runtimeIcons.typescript}</div>
-        <div class="content-meta">${chips}</div>
-        <h3>${escapeHtml(runtime.language)}</h3>
-        <p class="sdk-summary">${escapeHtml(details.summary)}</p>
-        <dl class="sdk-facts">
-          ${facts}
-        </dl>
-        <div class="hero-actions">
-          <a class="button button-primary" href="${codeUrl}" target="_blank" rel="noopener">View Code</a>
-          <a class="button button-secondary" href="${readmeUrl}" target="_blank" rel="noopener">README</a>
+      return `<article class="sdk-card" id="sdk-${escapeHtml(runtime.id)}" style="--sdk-accent:${colors.accent};--sdk-soft:${colors.soft};--sdk-border:${colors.border}">
+        <div class="sdk-card-head">
+          <div class="sdk-icon">${runtimeIcons[runtime.id] ?? runtimeIcons.typescript}</div>
+          <div class="sdk-card-title">
+            <h3>${escapeHtml(runtime.language)}</h3>
+            <p class="sdk-summary">${escapeHtml(details.summary)}</p>
+          </div>
+        </div>
+        <div class="sdk-chips">${chips}</div>
+        <dl class="sdk-facts">${facts}</dl>
+        <div class="sdk-card-actions">
+          <a class="button button-primary" href="${codeUrl}" target="_blank" rel="noopener">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="4 6 8 2 12 6"/><line x1="8" y1="2" x2="8" y2="11"/><path d="M3 10v2a2 2 0 002 2h6a2 2 0 002-2v-2"/></svg>
+            View Code
+          </a>
+          <a class="button button-secondary" href="${readmeUrl}" target="_blank" rel="noopener">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 3h4l2 2h6v8H2V3z"/></svg>
+            README
+          </a>
         </div>
       </article>`;
     };
@@ -1438,48 +1455,79 @@ function buildSdkIndexPage(runtimes, css) {
     </div>
   </nav>
 
-  <div class="example-page">
-    <h1>TPS SDKs</h1>
-    <p class="example-meta">
-      <a href="../">&larr; Back to spec</a> &middot;
-      Runtime catalog for the current TPS SDK workspace.
-    </p>
-    <p class="example-desc">Each TPS SDK exposes the same contract: constants, validation, parser, compiler, and player APIs. Use this page to jump directly into the implementation folders in the repository. Need terminology? Open the <a href="../glossary/">TPS glossary</a>.</p>
+  <div class="page-shell">
+    <header class="hero-copy">
+      <span class="eyebrow">SDK Runtime Catalog</span>
+      <p class="hero-kicker">ManagedCode.Tps</p>
+      <h1 class="hero-title"><span class="hero-title-main">TPS SDKs</span></h1>
+      <p class="hero-story">Every TPS SDK exposes the same contract: <em>constants</em>, <em>validation</em>, <em>parser</em>, <em>compiler</em>, and <em>player</em> APIs. Jump directly into the implementation code or check the <a href="../glossary/">glossary</a> for terminology.</p>
+      <ul class="hero-signals">
+        <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M6 8.5l1.5 1.5L10 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>3 active runtimes with CI</li>
+        <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M8 5v3l2.5 1.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>3 planned runtimes reserved</li>
+        <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M8 3v10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>90%+ coverage gate enforced</li>
+      </ul>
+      <div class="hero-actions">
+        <a class="button button-primary" href="${repoUrl}/tree/main/SDK" target="_blank" rel="noopener">Browse SDK Workspace</a>
+        <a class="button button-secondary" href="../">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to Spec
+        </a>
+      </div>
+      <div class="hero-facts">
+        <span><strong>3</strong> active SDKs</span>
+        <span><strong>3</strong> planned SDKs</span>
+        <span><strong>90%+</strong> coverage gate</span>
+        <span><strong>5</strong> API layers per runtime</span>
+      </div>
+    </header>
 
-    <div class="sdk-sections">
-      <section class="answer-strip sdk-section">
-        <div class="answer-strip-header">
-          <p class="panel-label">Active SDKs</p>
-          <h2>Implemented Today</h2>
-        </div>
-        <p class="sdk-section-copy">Current runtimes with real implementations you can use now.</p>
-        <div class="sdk-grid">
-          ${activeCards}
-        </div>
-      </section>
+    <section class="answer-strip reveal" aria-labelledby="active-sdks-title">
+      <div class="answer-strip-header">
+        <p class="panel-label">Active SDKs</p>
+        <h2 id="active-sdks-title">Implemented Today</h2>
+      </div>
+      <p class="sdk-section-copy">Production-ready runtimes with full CI, test suites, and coverage gating.</p>
+      <div class="sdk-grid sdk-grid--active">
+        ${activeCards}
+      </div>
+    </section>
 
-      <section class="answer-strip sdk-section">
-        <div class="answer-strip-header">
-          <p class="panel-label">Planned SDKs</p>
-          <h2>Reserved Next</h2>
-        </div>
-        <p class="sdk-section-copy">Reserved folders for future runtimes. These are not implemented yet.</p>
-        <div class="sdk-grid">
-          ${plannedCards}
-        </div>
-      </section>
-    </div>
+    <section class="answer-strip reveal" aria-labelledby="planned-sdks-title">
+      <div class="answer-strip-header">
+        <p class="panel-label">Planned SDKs</p>
+        <h2 id="planned-sdks-title">Coming Next</h2>
+      </div>
+      <p class="sdk-section-copy">Reserved workspaces for future runtime implementations.</p>
+      <div class="sdk-grid sdk-grid--planned">
+        ${plannedCards}
+      </div>
+    </section>
 
-    <div class="examples-info-box">
-      <p>Active runtimes are available now. Planned runtimes are placeholders until real code is added.</p>
-    </div>
+    <footer class="site-footer">
+      <span>Copyright &copy; <a href="https://www.managed-code.com/" target="_blank" rel="noopener">Managed Code</a></span>
+      <span>Licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>
+      <span><a href="${repoUrl}">Repository</a></span>
+    </footer>
   </div>
 
-  <footer class="site-footer examples-index-footer">
-    <span>Copyright &copy; <a href="https://www.managed-code.com/" target="_blank" rel="noopener">Managed Code</a></span>
-    <span>Licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>
-    <span><a href="${repoUrl}">Repository</a></span>
-  </footer>
+  <script>
+  (function(){
+    var reveals = document.querySelectorAll('.reveal');
+    if ('IntersectionObserver' in window && reveals.length) {
+      var io = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+          if (e.isIntersecting) {
+            e.target.classList.add('revealed');
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      reveals.forEach(function(el) { io.observe(el); });
+    } else {
+      reveals.forEach(function(el) { el.classList.add('revealed'); });
+    }
+  })();
+  </script>
 </body>
 </html>`;
 }

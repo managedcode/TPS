@@ -39,7 +39,7 @@ The TypeScript runtime is the canonical implementation. The JavaScript runtime i
 
 | Folder | Purpose | Edit Here When | Main Commands |
 |--------|---------|----------------|---------------|
-| `SDK/ts` | canonical runtime source | changing TPS behavior or runtime contract | `npm --prefix SDK/js run build:tps`, `npm --prefix SDK/js run test:types` |
+| `SDK/ts` | canonical runtime source | changing TPS behavior or runtime contract | `npm --prefix SDK/js run build:tps`, `npm --prefix SDK/js run test:typescript` |
 | `SDK/js` | JavaScript package and Node validation | changing JS packaging or JS-specific tests | `npm --prefix SDK/js run test:js`, `npm --prefix SDK/js run coverage:js` |
 | `SDK/dotnet` | C# runtime and tests | changing .NET API or .NET behavior | `dotnet build SDK/dotnet/ManagedCode.Tps.slnx -warnaserror --no-restore`, `dotnet test SDK/dotnet/ManagedCode.Tps.slnx --no-build --no-restore` |
 | `SDK/flutter` | placeholder | starting Flutter implementation | define runtime structure, tests, and workflow |
@@ -64,12 +64,21 @@ Each compiled word carries timing and authoring-derived metadata such as emphasi
 2. Rebuild the JS runtime from the TS source.
 3. Run the runtime-specific tests for the SDK you changed.
 4. If behavior changes, keep parity across active runtimes and shared fixtures.
+5. Regenerate example snapshots when the compiled output or player states intentionally change.
 
 ## Local Verification
 
-- TypeScript: `npm --prefix SDK/js run test:types`
+- TypeScript: `npm --prefix SDK/js run test:typescript`
 - JavaScript: `npm --prefix SDK/js run coverage:js`
 - C#: `dotnet test SDK/dotnet/ManagedCode.Tps.slnx --no-build --no-restore /p:CollectCoverage=true /p:CoverletOutputFormat=json /p:ThresholdType=line%2Cbranch%2Cmethod /p:Threshold=90`
+
+## Shared Example Snapshots
+
+`SDK/fixtures/examples/*.snapshot.json` are cross-runtime integration fixtures generated from the documented `examples/*.tps` files. Active runtimes must compile those examples into the same normalized state machine shape and produce the same checkpointed player states.
+
+Regenerate them with:
+
+- `npm --prefix SDK/js run generate:example-snapshots`
 
 ## GitHub Workflows
 

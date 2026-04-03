@@ -20,6 +20,7 @@ This is the project to change when the .NET API, serialization behavior, or .NET
 - `TpsRuntime.Parse(source)`
 - `TpsRuntime.Compile(source)`
 - `TpsPlayer`
+- `TpsPlayer.EnumerateStates(stepMs)`
 
 ## Project Layout
 
@@ -38,6 +39,7 @@ This is the project to change when the .NET API, serialization behavior, or .NET
 1. Update `src/ManagedCode.Tps/` for runtime or API changes.
 2. Keep behavior aligned with the active TPS contract used by the TS/JS SDKs.
 3. Run build, tests, and coverage checks after changes.
+4. Keep example snapshot parity with the shared fixtures under `SDK/fixtures/examples`.
 
 ## Local Commands
 

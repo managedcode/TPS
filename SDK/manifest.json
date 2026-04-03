@@ -9,7 +9,7 @@
       "path": "SDK/ts",
       "enabled": true,
       "build": "npm --prefix SDK/js run build:tps",
-      "test": "npm --prefix SDK/js run test:types"
+      "test": "npm --prefix SDK/js run test:typescript"
     },
     {
       "id": "javascript",

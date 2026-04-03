@@ -49,6 +49,19 @@ export class TpsPlayer {
     seek(elapsedMs) {
         return this.getState(elapsedMs);
     }
+    *enumerateStates(stepMs = 100) {
+        if (!Number.isFinite(stepMs) || stepMs <= 0) {
+            throw new RangeError("stepMs must be greater than 0.");
+        }
+        if (this.script.totalDurationMs === 0) {
+            yield this.getState(0);
+            return;
+        }
+        for (let elapsedMs = 0; elapsedMs < this.script.totalDurationMs; elapsedMs += stepMs) {
+            yield this.getState(elapsedMs);
+        }
+        yield this.getState(this.script.totalDurationMs);
+    }
     findCurrentWord(elapsedMs) {
         if (this.script.words.length === 0) {
             return undefined;

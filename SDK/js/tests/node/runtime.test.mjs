@@ -5,6 +5,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { compileTps, parseTps, TpsKeywords, TpsPlayer, TpsSpec, validateTps } from "../../lib/index.js";
+import { buildExampleSnapshot, EXAMPLE_FILES, loadExampleSnapshot } from "../../../scripts/example-snapshot-utils.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "../../../..");
@@ -159,11 +160,24 @@ test("player exposes phrase-based presentation and completion state", () => {
 });
 
 test("accepts the documented example scripts without diagnostics", () => {
-  for (const example of ["basic.tps", "advanced.tps", "multi-segment.tps"]) {
+  for (const example of EXAMPLE_FILES) {
     const result = compileTps(readFileSync(path.join(rootDir, "examples", example), "utf8"));
     assert.equal(result.ok, true, example);
     assert.deepEqual(result.diagnostics, [], example);
     assert.ok(result.script.words.length > 0, example);
+  }
+});
+
+test("matches shared compiled and player snapshots for documented examples", () => {
+  for (const example of EXAMPLE_FILES) {
+    const source = readFileSync(path.join(rootDir, "examples", example), "utf8");
+    const result = compileTps(source);
+    assert.equal(result.ok, true, example);
+    assert.deepEqual(
+      buildExampleSnapshot(example, result.script, script => new TpsPlayer(script)),
+      loadExampleSnapshot(rootDir, example),
+      example
+    );
   }
 });
 
@@ -177,4 +191,16 @@ test("handles empty content and malformed front matter", () => {
   const invalidFrontMatter = compileTps("---\ntitle: Broken");
   assert.equal(invalidFrontMatter.ok, false);
   assert.equal(invalidFrontMatter.diagnostics[0].code, "invalid-front-matter");
+});
+
+test("enumerates player states across the playback timeline", () => {
+  const { script } = compileTps(readFixture("valid", "runtime-parity.tps"));
+  const player = new TpsPlayer(script);
+  const states = Array.from(player.enumerateStates(Math.max(1, Math.round(script.totalDurationMs / 4))));
+
+  assert.ok(states.length >= 2);
+  assert.equal(states[0].elapsedMs, 0);
+  assert.equal(states.at(-1)?.elapsedMs, script.totalDurationMs);
+  assert.equal(states.at(-1)?.isComplete, true);
+  assert.throws(() => Array.from(player.enumerateStates(0)), /stepMs/i);
 });

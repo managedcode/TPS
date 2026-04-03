@@ -18,6 +18,7 @@ This project defines the runtime contract that the JavaScript package follows an
 - `parseTps(source)`
 - `compileTps(source)`
 - `TpsPlayer`
+- `TpsPlayer.enumerateStates(stepMs)`
 
 ## Technical Scope
 
@@ -40,12 +41,14 @@ This project defines the runtime contract that the JavaScript package follows an
 
 1. Edit files in `src/` when TPS behavior or the public contract changes.
 2. Rebuild the generated JS runtime after TS changes.
-3. Run the TypeScript checks before touching downstream runtimes.
+3. Run the TypeScript checks and source-level integration tests before touching downstream runtimes.
+4. Regenerate example snapshots if the compiled output or player checkpoints intentionally changed.
 
 ## Local Commands
 
 - `npm --prefix SDK/js run build:tps`
-- `npm --prefix SDK/js run test:types`
+- `npm --prefix SDK/js run test:typescript`
+- `npm --prefix SDK/js run generate:example-snapshots`
 
 ## Relationship To Other SDKs
 

@@ -32,5 +32,4 @@ jobs:
         with:
           node-version: 22
       - run: npm ci --prefix SDK/js
-      - run: npm --prefix SDK/js run build:tps
-      - run: npm --prefix SDK/js run test:types
+      - run: npm --prefix SDK/js run test:typescript

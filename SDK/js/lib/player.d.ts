@@ -7,5 +7,6 @@ export declare class TpsPlayer {
     constructor(script: CompiledScript);
     getState(elapsedMs: number): PlayerState;
     seek(elapsedMs: number): PlayerState;
+    enumerateStates(stepMs?: number): IterableIterator<PlayerState>;
     private findCurrentWord;
 }
