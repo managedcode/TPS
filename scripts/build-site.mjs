@@ -107,7 +107,7 @@ const page = `<!DOCTYPE html>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>${escapeHtml(title)}</title>
+  <title>${escapeHtml(title)} — Open Teleprompter Script Format</title>
   <meta name="description" content="${escapeHtml(summary)}" />
   <meta name="keywords" content="${escapeHtml(keywords.join(", "))}" />
   <meta name="version" content="${escapeHtml(version)}" />
@@ -155,7 +155,7 @@ const page = `<!DOCTYPE html>
           <path d="M7 9h14M7 14h10M7 19h12" stroke="#faf8f4" stroke-width="2.2" stroke-linecap="round"/>
           <defs><linearGradient id="nav-grad" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#b8963e"/><stop offset="1" stop-color="#d4a847"/></linearGradient></defs>
         </svg>
-        <span>TPS</span>
+        <span>TPS Format</span>
       </a>
       <div class="nav-links">
         <a href="#specification">Spec</a>
@@ -173,17 +173,17 @@ const page = `<!DOCTYPE html>
     <header class="hero">
       <div class="hero-copy">
         <div class="hero-glow" aria-hidden="true"></div>
-        <span class="eyebrow">Managed Code / Open Spec</span>
-        <p class="hero-kicker">A markdown-first teleprompter format built for natural delivery.</p>
-        ${heroTitle}
-        <p class="hero-summary">${escapeHtml(summary)}</p>
+        <span class="eyebrow">Open Spec</span>
+        <h1 class="hero-title"><span class="hero-title-mark">TPS</span><span class="hero-title-main">Format Specification</span></h1>
+        <p class="hero-title-sub">TelePrompterScript</p>
+        <p class="hero-story">Plain text tells you <em>what</em> to say. But a speaker needs to know <em>how</em> to say it &mdash; where to pause, when to slow down, how to shift from concern to confidence. Existing formats ignore delivery entirely. TPS fixes that: it embeds pace, emotion, and timing directly into readable markdown.</p>
         <ul class="hero-signals" aria-label="Format highlights">
-          <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3h12M2 7h8M2 11h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Markdown-native authoring</li>
-          <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="6" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M3 14c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Actor reading profile</li>
-          <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.6"/><path d="M8 4v4l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Timing, pace, and emotion metadata</li>
+          <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3h12M2 7h8M2 11h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Write in any text editor &mdash; it's just markdown</li>
+          <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.6"/><path d="M8 4v4l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Control pacing: 140 WPM default, per-segment speed overrides</li>
+          <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2a6 6 0 100 12A6 6 0 008 2z" stroke="currentColor" stroke-width="1.6"/><path d="M6 8.5l1.5 1.5L10 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>12 emotion presets: warm, urgent, calm, focused, and more</li>
         </ul>
         <div class="hero-actions">
-          <a class="button button-primary" href="#specification">Read Specification</a>
+          <a class="button button-primary" href="#specification">Read the Spec</a>
           <a class="button button-secondary" href="https://prompter.one" target="_blank" rel="noopener">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 2l10 6-10 6V2z" fill="currentColor"/></svg>
             Try Prompter One
@@ -319,6 +319,14 @@ const page = `<!DOCTYPE html>
       }, { threshold: 0.12 });
       reveals.forEach(function(el) { io.observe(el); });
     }
+
+    // All external links open in new tabs
+    document.querySelectorAll('a[href^="http"]').forEach(function(a) {
+      if (a.hostname !== location.hostname) {
+        a.setAttribute('target', '_blank');
+        a.setAttribute('rel', 'noopener');
+      }
+    });
   })();
   </script>
 </body>
@@ -414,7 +422,49 @@ function buildStats(markdown, sectionList) {
 }
 
 function enhanceArticleHtml(html) {
-  return decorateEmotionTable(html);
+  let result = decorateEmotionTable(html);
+  result = highlightTpsCodeBlocks(result);
+  return result;
+}
+
+function highlightTpsCodeBlocks(html) {
+  // Highlight TPS syntax inside plain code blocks (no language specified)
+  return html.replace(/<pre class="hljs"><code>([\s\S]*?)<\/code><\/pre>/g, (match, code) => {
+    // Only process blocks that look like TPS content
+    if (!code.includes("[") && !code.includes("##") && !code.includes("---")) return match;
+    let t = code;
+    // Front matter delimiters
+    t = t.replace(/^(---)\s*$/gm, '<span style="color:var(--text-faint)">$1</span>');
+    // YAML keys in front matter
+    t = t.replace(/^(\w+)(:)/gm, '<span style="color:var(--tps-purple);font-weight:600">$1</span><span style="color:var(--text-faint)">$2</span>');
+    // String values
+    t = t.replace(/(&quot;[^&]*&quot;)/g, '<span style="color:var(--tps-green)">$1</span>');
+    // Segment headers ## [...]
+    t = t.replace(/(## \[[^\]]+\])/g, '<span style="color:var(--gold-accent,#C4A060);font-weight:700">$1</span>');
+    // Block headers ### [...]
+    t = t.replace(/(### \[[^\]]+\])/g, '<span style="color:var(--tps-blue);font-weight:700">$1</span>');
+    // H1 title
+    t = t.replace(/^(# .+)$/gm, '<span style="font-weight:700">$1</span>');
+    // TPS tags [tag]...[/tag]
+    t = t.replace(/(\[(?:emphasis|highlight|stress|loud|soft|whisper|slow|fast|xslow|xfast|normal|sarcasm|aside|rhetorical|building)\])/g, '<span style="color:var(--tps-purple)">$1</span>');
+    t = t.replace(/(\[\/(?:emphasis|highlight|stress|loud|soft|whisper|slow|fast|xslow|xfast|normal|sarcasm|aside|rhetorical|building)\])/g, '<span style="color:var(--tps-purple)">$1</span>');
+    // Pause tags
+    t = t.replace(/(\[pause:[^\]]+\])/g, '<span style="color:var(--tps-red);font-weight:600">$1</span>');
+    t = t.replace(/(\[edit_point[^\]]*\])/g, '<span style="color:var(--tps-red);font-weight:600">$1</span>');
+    t = t.replace(/(\[breath\])/g, '<span style="color:var(--tps-teal)">$1</span>');
+    // WPM tags
+    t = t.replace(/(\[\d+WPM\])/g, '<span style="color:var(--tps-orange);font-weight:600">$1</span>');
+    t = t.replace(/(\[\/\d+WPM\])/g, '<span style="color:var(--tps-orange)">$1</span>');
+    // Pronunciation/phonetic
+    t = t.replace(/(\[(?:phonetic|pronunciation):[^\]]+\])/g, '<span style="color:var(--tps-cyan)">$1</span>');
+    t = t.replace(/(\[\/(?:phonetic|pronunciation)\])/g, '<span style="color:var(--tps-cyan)">$1</span>');
+    // Comments (# at position after spaces)
+    t = t.replace(/( {2,})(#.*)$/gm, '$1<span style="color:var(--text-faint);font-style:italic">$2</span>');
+    // Emotion names in segment headers
+    t = t.replace(/(\|)(Warm|Concerned|Focused|Motivational|Neutral|Urgent|Happy|Excited|Sad|Calm|Energetic|Professional)(\||\])/gi,
+      '$1<span style="color:var(--emo-' + '$2'.toLowerCase() + ',var(--tps-orange))">$2</span>$3');
+    return `<pre class="hljs"><code>${t}</code></pre>`;
+  });
 }
 
 function decorateEmotionTable(html) {
@@ -704,12 +754,7 @@ function normalizeVersion(value) {
 
 /* ── AI button helpers ── */
 
-function renderAiButtons(prompt) {
-  const q = prompt || `Explain the TPS (TelePrompterScript) format specification. TPS is a markdown-based file format for teleprompter scripts with hierarchical segments, blocks, phrases, inline timing/pacing markers, emotion tags, speed controls, and delivery cues. The full spec is at ${siteUrl} — help me understand how to write and parse TPS files.`;
-  const chatgptUrl = `https://chatgpt.com/?q=${encodeURIComponent(q)}`;
-  const claudeUrl = `https://claude.ai/new?q=${encodeURIComponent(q)}`;
-  const geminiUrl = `https://gemini.google.com/app?q=${encodeURIComponent(q)}`;
-
+function buildAiButtonsHtml(chatgptUrl, claudeUrl, geminiUrl) {
   return `<a class="ai-btn ai-btn-chatgpt" href="${chatgptUrl}" target="_blank" rel="noopener">
   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M22.282 9.821a5.985 5.985 0 00-.516-4.91 6.046 6.046 0 00-6.51-2.9A6.065 6.065 0 0011.782.5a6.035 6.035 0 00-5.736 4.128 5.988 5.988 0 00-3.998 2.9 6.043 6.043 0 00.743 7.097 5.98 5.98 0 00.51 4.911 6.051 6.051 0 006.515 2.9A5.985 5.985 0 0013.282 24a6.04 6.04 0 005.74-4.122 5.993 5.993 0 003.998-2.9 6.04 6.04 0 00-.738-7.157z"/></svg>
   Ask ChatGPT
@@ -724,9 +769,97 @@ function renderAiButtons(prompt) {
 </a>`;
 }
 
+function renderAiButtons(prompt) {
+  const q = prompt || buildMainPagePrompt();
+  return buildAiButtonsHtml(
+    `https://chatgpt.com/?q=${encodeURIComponent(q)}`,
+    `https://claude.ai/new?q=${encodeURIComponent(q)}`,
+    `https://gemini.google.com/app?q=${encodeURIComponent(q)}`
+  );
+}
+
+function buildMainPagePrompt() {
+  return [
+    `I want to learn about the TPS (TelePrompterScript) format.`,
+    ``,
+    `TPS is an open-source, markdown-based file format designed for teleprompter scripts. It was created by Managed Code (https://www.managed-code.com/).`,
+    ``,
+    `Key concepts:`,
+    `- Scripts are organized hierarchically: Segments (## headers) → Blocks (### headers) → Phrases → Words`,
+    `- Each level can set its own WPM (words per minute) speed and emotion`,
+    `- Inline markers control delivery: [pause:2s], [emphasis], [highlight], [loud], [soft], [whisper], speed tags like [slow]...[/slow], [fast]...[/fast]`,
+    `- 12 emotion presets (warm, concerned, focused, motivational, neutral, urgent, happy, excited, sad, calm, energetic, professional) control visual styling and delivery tone`,
+    `- Front matter (YAML) sets document-level defaults: title, base_wpm, speed_offsets, author, duration`,
+    ``,
+    `Resources:`,
+    `- Full specification: ${siteUrl}`,
+    `- Interactive examples: ${siteUrl}examples/`,
+    `- GitHub repository: ${repoUrl}`,
+    `- Prompter One (open-source editor & teleprompter implementing TPS): https://prompter.one`,
+    `- Prompter One source code: https://github.com/managedcode/PrompterOne`,
+    ``,
+    `Please explain:`,
+    `1. What problem does TPS solve compared to plain text, SubRip (.srt), or WebVTT?`,
+    `2. How is a TPS file structured (front matter, segments, blocks, inline markers)?`,
+    `3. How do emotions and speed controls work?`,
+    `4. How would I write my first TPS script for a 2-minute presentation?`,
+  ].join("\n");
+}
+
 function buildExampleAiPrompt(ex) {
   const title = ex.meta.title || ex.file;
-  return `I'm looking at a TPS (TelePrompterScript) example called "${title}". TPS is a markdown-based teleprompter script format. The full spec is at ${siteUrl}. Here is the example file:\n\n${ex.content}\n\nExplain how this TPS file works — break down the structure, segments, blocks, inline markers, speed controls, emotions, and any other TPS features used.`;
+  const segments = [];
+  const blocks = [];
+  const features = new Set();
+
+  for (const line of ex.body.split("\n")) {
+    const segMatch = line.match(/^##\s+(?:\[([^\]]+)\]|(.+))$/);
+    if (segMatch) {
+      const params = (segMatch[1] || segMatch[2]).split("|").map(s => s.trim());
+      segments.push(params.join(" | "));
+    }
+    const blkMatch = line.match(/^###\s+(?:\[([^\]]+)\]|(.+))$/);
+    if (blkMatch) blocks.push((blkMatch[1] || blkMatch[2]).split("|")[0].trim());
+
+    if (/\[pause:/.test(line)) features.add("timed pauses [pause:Ns]");
+    if (/\[emphasis\]/.test(line)) features.add("emphasis tags");
+    if (/\[highlight\]/.test(line)) features.add("highlight markers");
+    if (/\[slow\]|\[fast\]|\[xslow\]|\[xfast\]/.test(line)) features.add("speed controls (slow/fast/xslow/xfast)");
+    if (/\[\d+WPM\]/.test(line)) features.add("absolute WPM speed overrides");
+    if (/\[loud\]|\[soft\]|\[whisper\]/.test(line)) features.add("volume tags (loud/soft/whisper)");
+    if (/\[edit_point/.test(line)) features.add("edit points");
+    if (/\[stress/.test(line)) features.add("syllable stress marks");
+    if (/\[phonetic:|\[pronunciation:/.test(line)) features.add("pronunciation guides");
+    if (/\[breath\]/.test(line)) features.add("breath marks");
+    if (/\[sarcasm\]|\[aside\]|\[rhetorical\]|\[building\]/.test(line)) features.add("delivery mode tags");
+    if (/\*\*[^*]+\*\*/.test(line)) features.add("markdown bold emphasis");
+    if (/ \/ | \/\//.test(line)) features.add("short/medium pause markers (/ and //)");
+  }
+
+  return [
+    `I'm studying a TPS (TelePrompterScript) example called "${title}".`,
+    `TPS is an open-source markdown-based teleprompter format. Full spec: ${siteUrl}`,
+    ``,
+    `This example has ${segments.length} segment(s) and ${blocks.length} block(s):`,
+    ``,
+    `Segments: ${segments.join("; ")}`,
+    `Blocks: ${blocks.join(", ")}`,
+    ``,
+    `TPS features used in this file:`,
+    ...[...features].map(f => `- ${f}`),
+    ``,
+    `Here is the complete file:`,
+    ``,
+    "```",
+    ex.content,
+    "```",
+    ``,
+    `Please explain this TPS file block by block:`,
+    `1. What does the front matter configure?`,
+    `2. Walk through each segment — what emotion and speed does it set, and why?`,
+    `3. Inside each block — what inline markers are used and what effect do they have on delivery?`,
+    `4. How would a teleprompter app (like Prompter One: https://prompter.one) render this script visually?`,
+  ].join("\n");
 }
 
 /* ── Example helpers ── */
@@ -769,10 +902,10 @@ function renderExampleCards(examples) {
 }
 
 function buildExamplePage(ex, css) {
-  const editorHtml = highlightTpsEditor(ex.content);
+
   const prompterHtml = renderTpsPrompter(ex.body, ex.meta);
   const title = ex.meta.title || ex.file;
-  const exDesc = `TPS example: ${title}. A teleprompter script demonstrating the TPS format with editor, teleprompter, and raw source views.`;
+  const exDesc = `TPS example: ${title}. A teleprompter script demonstrating the TPS format with teleprompter and raw source views.`;
   const exUrl = `${siteUrl}examples/${ex.slug}.html`;
   const exAiPrompt = buildExampleAiPrompt(ex);
 
@@ -820,7 +953,7 @@ function buildExamplePage(ex, css) {
     <div class="nav-inner">
       <a class="nav-logo" href="../">
         <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="8" fill="url(#ng)"/><path d="M7 9h14M7 14h10M7 19h12" stroke="#faf8f4" stroke-width="2.2" stroke-linecap="round"/><defs><linearGradient id="ng" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#b8963e"/><stop offset="1" stop-color="#d4a847"/></linearGradient></defs></svg>
-        <span>TPS</span>
+        <span>TPS Format</span>
       </a>
       <div class="nav-links">
         <a href="../#specification">Spec</a>
@@ -835,33 +968,26 @@ function buildExamplePage(ex, css) {
   </nav>
 
   <div class="example-page">
-    <h1>${escapeHtml(title)}</h1>
+    <h1>${escapeHtml(title)} <small>— TPS Example</small></h1>
     <p class="example-meta">
       <a href="../">&larr; Back to spec</a> &middot;
       <a href="https://github.com/managedcode/TPS/blob/main/examples/${escapeHtml(ex.file)}" target="_blank" rel="noopener">View source on GitHub</a> &middot;
-      ${ex.meta.base_wpm ? `${escapeHtml(ex.meta.base_wpm)} WPM` : "140 WPM"} &middot;
-      ${ex.meta.duration ? escapeHtml(ex.meta.duration) : "—"}
+      ${ex.meta.base_wpm ? `${escapeHtml(ex.meta.base_wpm)} WPM` : "140 WPM"} base speed &middot;
+      ${ex.meta.duration ? `${escapeHtml(ex.meta.duration)} duration` : ""}
     </p>
+    <p class="example-desc">${escapeHtml(exDesc)}</p>
 
     <div class="ai-buttons" style="margin-bottom:1rem;">
       ${renderAiButtons(exAiPrompt)}
     </div>
 
-    <div class="example-tabs">
-      <button class="example-tab active" onclick="showTab('editor',this)">Editor View</button>
-      <button class="example-tab" onclick="showTab('prompter',this)">Teleprompter View</button>
-      <button class="example-tab" onclick="showTab('source',this)">Raw Source</button>
-    </div>
+    <h2>Teleprompter View</h2>
+    <p class="example-section-desc">How <a href="https://prompter.one" target="_blank" rel="noopener">Prompter One</a> renders this script for the speaker &mdash; dark background, emotion-colored segments, emphasis underlines, pause markers, and a spotlight reading zone.</p>
+    <div class="prompter-view">${prompterHtml}</div>
 
-    <div class="example-panel active" id="panel-editor">
-      <div class="editor-view"><pre>${editorHtml}</pre></div>
-    </div>
-    <div class="example-panel" id="panel-prompter">
-      <div class="prompter-view">${prompterHtml}</div>
-    </div>
-    <div class="example-panel" id="panel-source">
-      <pre style="padding:1rem;border:1px solid var(--line);border-radius:var(--radius-lg);background:var(--bg-warm);color:var(--text);font-size:0.85rem;line-height:1.6;white-space:pre-wrap;word-wrap:break-word;"><code>${escapeHtml(ex.content)}</code></pre>
-    </div>
+    <h2>Raw Source</h2>
+    <p class="example-section-desc">The complete <code>.tps</code> file &mdash; valid markdown you can open in any text editor.</p>
+    <pre style="padding:1rem;border:1px solid var(--line);border-radius:var(--radius-lg);background:var(--bg-warm);color:var(--text);font-size:0.85rem;line-height:1.6;white-space:pre-wrap;word-wrap:break-word;"><code>${escapeHtml(ex.content)}</code></pre>
   </div>
 
   <footer class="site-footer" style="max-width:960px;margin:1rem auto 2rem;padding:0 1rem;">
@@ -881,33 +1007,6 @@ function buildExamplePage(ex, css) {
 </html>`;
 }
 
-function highlightTpsEditor(content) {
-  return content
-    .split("\n")
-    .map(line => {
-      const eLine = escapeHtml(line);
-      // front matter delimiters
-      if (/^---\s*$/.test(line)) return `<span class="ed-frontmatter">${eLine}</span>`;
-      // front matter key: value
-      if (/^\w+:/.test(line) && content.indexOf("---") === 0) return `<span class="ed-frontmatter">${eLine}</span>`;
-      // H1 title
-      if (/^# /.test(line)) return `<strong>${eLine}</strong>`;
-      // H2 segment
-      if (/^## /.test(line)) return `<span class="ed-segment">${eLine}</span>`;
-      // H3 block
-      if (/^### /.test(line)) return `<span class="ed-block">${eLine}</span>`;
-      // Highlight tags
-      return eLine
-        .replace(/(\[(?:pause|edit_point)[^\]]*\])/g, '<span class="ed-pause">$1</span>')
-        .replace(/(\[(?:emphasis|highlight|stress|phonetic|pronunciation|breath|loud|soft|whisper|slow|fast|xslow|xfast|normal|sarcasm|aside|rhetorical|building|warm|urgent|calm|focused)\])/g, '<span class="ed-tag">$1</span>')
-        .replace(/(\[\/(?:emphasis|highlight|stress|phonetic|pronunciation|loud|soft|whisper|slow|fast|xslow|xfast|normal|sarcasm|aside|rhetorical|building|warm|urgent|calm|focused)\])/g, '<span class="ed-tag">$1</span>')
-        .replace(/(\[\d+WPM\])/g, '<span class="ed-tag">$1</span>')
-        .replace(/(\[\/\d+WPM\])/g, '<span class="ed-tag">$1</span>')
-        .replace(/(?<!\w)(\*\*[^*]+\*\*)/g, '<span class="ed-emphasis">$1</span>')
-        .replace(/(?<!\w)(\*[^*]+\*)/g, '<span class="ed-emphasis">$1</span>');
-    })
-    .join("\n");
-}
 
 function renderTpsPrompter(body, meta) {
   const emotions = ["warm","concerned","focused","motivational","neutral","urgent","happy","excited","sad","calm","energetic","professional"];
@@ -922,35 +1021,80 @@ function renderTpsPrompter(body, meta) {
     const raw = textBuffer.join(" ").trim();
     textBuffer = [];
     if (!raw) return "";
-    let t = escapeHtml(raw);
-    t = t.replace(/\[emphasis\](.*?)\[\/emphasis\]/g, '<span class="pt-emphasis">$1</span>');
-    t = t.replace(/\[highlight\](.*?)\[\/highlight\]/g, '<span class="pt-highlight">$1</span>');
-    t = t.replace(/\[loud\](.*?)\[\/loud\]/g, '<span class="pt-loud">$1</span>');
-    t = t.replace(/\[soft\](.*?)\[\/soft\]/g, '<span class="pt-soft">$1</span>');
-    t = t.replace(/\[whisper\](.*?)\[\/whisper\]/g, '<span class="pt-whisper">$1</span>');
-    t = t.replace(/\[slow\](.*?)\[\/slow\]/g, '<span class="pt-slow">$1</span>');
-    t = t.replace(/\[fast\](.*?)\[\/fast\]/g, '<span class="pt-fast">$1</span>');
-    t = t.replace(/\[xslow\](.*?)\[\/xslow\]/g, '<span class="pt-slow">$1</span>');
-    t = t.replace(/\[xfast\](.*?)\[\/xfast\]/g, '<span class="pt-fast">$1</span>');
-    t = t.replace(/\[normal\](.*?)\[\/normal\]/g, '$1');
-    t = t.replace(/\[sarcasm\](.*?)\[\/sarcasm\]/g, '<em>$1</em>');
-    t = t.replace(/\[aside\](.*?)\[\/aside\]/g, '<span class="pt-soft">$1</span>');
-    t = t.replace(/\[rhetorical\](.*?)\[\/rhetorical\]/g, '<em>$1</em>');
-    t = t.replace(/\[building\](.*?)\[\/building\]/g, '<span class="pt-emphasis">$1</span>');
-    t = t.replace(/\[stress(?::([^\]]*))?\](.*?)\[\/stress\]/g, '<span class="pt-emphasis">$2</span>');
-    t = t.replace(/\[pronunciation:[^\]]+\](.*?)\[\/pronunciation\]/g, '<span class="pt-emphasis">$1</span>');
-    t = t.replace(/\[phonetic:[^\]]+\](.*?)\[\/phonetic\]/g, '<span class="pt-emphasis">$1</span>');
-    t = t.replace(/\[\d+WPM\](.*?)\[\/\d+WPM\]/g, '$1');
-    t = t.replace(/\[breath\]/g, ' ');
-    t = t.replace(/\[pause:\d+[ms]*s?\]/g, '<span class="pt-pause">&hellip;</span>');
-    t = t.replace(/\[edit_point(?::\w+)?\]/g, '<span class="pt-edit-point">&#9670; edit point</span>');
-    t = t.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-    t = t.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-    t = t.replace(/ \/\/ /g, '<span class="pt-pause">&middot;&middot;</span> ');
-    t = t.replace(/ \/ /g, '<span class="pt-pause">&middot;</span> ');
-    // clean up remaining tags
-    t = t.replace(/\[\/?(?:warm|urgent|calm|focused|concerned|motivational|excited|happy|sad|energetic|professional|neutral)\]/g, '');
-    return `<p class="prompter-text">${t}</p>`;
+
+    // Process TPS tags on raw text BEFORE HTML escaping
+    let t = raw;
+
+    // Remove all paired TPS tags, keeping only inner text with styling
+    // Use placeholder tokens to avoid HTML escaping issues
+    const PH = "\x00"; // placeholder prefix
+    const spans = [];
+    function span(cls, content) {
+      const idx = spans.length;
+      spans.push(`<span class="${cls}">${escapeHtml(content)}</span>`);
+      return `${PH}${idx}${PH}`;
+    }
+    function spanRaw(html) {
+      const idx = spans.length;
+      spans.push(html);
+      return `${PH}${idx}${PH}`;
+    }
+
+    // Paired tags — process innermost first
+    t = t.replace(/\[emphasis\](.*?)\[\/emphasis\]/g, (_, c) => span("pt-emphasis", c));
+    t = t.replace(/\[highlight\](.*?)\[\/highlight\]/g, (_, c) => span("pt-highlight", c));
+    t = t.replace(/\[loud\](.*?)\[\/loud\]/g, (_, c) => span("pt-loud", c));
+    t = t.replace(/\[soft\](.*?)\[\/soft\]/g, (_, c) => span("pt-soft", c));
+    t = t.replace(/\[whisper\](.*?)\[\/whisper\]/g, (_, c) => span("pt-whisper", c));
+    t = t.replace(/\[slow\](.*?)\[\/slow\]/g, (_, c) => span("pt-slow", c));
+    t = t.replace(/\[fast\](.*?)\[\/fast\]/g, (_, c) => span("pt-fast", c));
+    t = t.replace(/\[xslow\](.*?)\[\/xslow\]/g, (_, c) => span("pt-xslow", c));
+    t = t.replace(/\[xfast\](.*?)\[\/xfast\]/g, (_, c) => span("pt-xfast", c));
+    t = t.replace(/\[normal\](.*?)\[\/normal\]/g, "$1");
+    t = t.replace(/\[sarcasm\](.*?)\[\/sarcasm\]/g, (_, c) => span("pt-soft", c));
+    t = t.replace(/\[aside\](.*?)\[\/aside\]/g, (_, c) => span("pt-soft", c));
+    t = t.replace(/\[rhetorical\](.*?)\[\/rhetorical\]/g, (_, c) => span("pt-emphasis", c));
+    t = t.replace(/\[building\](.*?)\[\/building\]/g, (_, c) => span("pt-emphasis", c));
+    t = t.replace(/\[stress(?::([^\]]*))?\](.*?)\[\/stress\]/g, (_, _g, c) => span("pt-emphasis", c));
+    t = t.replace(/\[pronunciation:[^\]]+\](.*?)\[\/pronunciation\]/g, (_, c) => span("pt-emphasis", c));
+    t = t.replace(/\[phonetic:[^\]]+\](.*?)\[\/phonetic\]/g, (_, c) => span("pt-emphasis", c));
+    t = t.replace(/\[\d+WPM\](.*?)\[\/\d+WPM\]/g, "$1");
+
+    // Standalone markers
+    t = t.replace(/\[breath\]/g, " ");
+    t = t.replace(/\[pause:\d+[ms]*s?\]/g, () => spanRaw('<span class="pt-pause-long"></span>'));
+    t = t.replace(/\[edit_point(?::\w+)?\]/g, () => spanRaw('<span class="pt-edit-point">&#9670; edit point</span>'));
+
+    // Emotion tags (opening/closing)
+    t = t.replace(/\[\/?(?:warm|urgent|calm|focused|concerned|motivational|excited|happy|sad|energetic|professional|neutral)\]/g, "");
+
+    // Markdown emphasis
+    t = t.replace(/\*\*([^*]+)\*\*/g, (_, c) => span("pt-loud", c));
+    t = t.replace(/\*([^*]+)\*/g, (_, c) => span("pt-emphasis", c));
+
+    // Pause slashes — MUST come after tag processing
+    // // = medium pause, / = short pause
+    t = t.replace(/ \/\/ ?/g, () => spanRaw(' <span class="pt-pause-med"></span> '));
+    t = t.replace(/ \/ ?/g, () => spanRaw(' <span class="pt-pause-dot"></span> '));
+    // Handle line-ending slashes
+    t = t.replace(/\/\/$/g, () => spanRaw('<span class="pt-pause-med"></span>'));
+    t = t.replace(/\/$/g, () => spanRaw('<span class="pt-pause-dot"></span>'));
+
+    // Now escape the remaining plain text and restore spans
+    const parts = t.split(new RegExp(`${PH}(\\d+)${PH}`));
+    let result = "";
+    for (let i = 0; i < parts.length; i++) {
+      if (i % 2 === 0) {
+        result += escapeHtml(parts[i]);
+      } else {
+        result += spans[parseInt(parts[i], 10)];
+      }
+    }
+
+    // Clean up any remaining raw brackets that slipped through
+    result = result.replace(/\[[^\]]*\]/g, "");
+
+    return result.trim() ? `<p class="prompter-text">${result.trim()}</p>` : "";
   }
 
   function closeSegment() {
@@ -995,4 +1139,102 @@ function renderTpsPrompter(body, meta) {
 
   closeSegment();
   return `<div class="prompter-inner">${html}</div>`;
+}
+
+function buildExamplesIndexPage(examples, css) {
+  const descriptions = {
+    basic: "Front matter, segments, blocks, pauses, emphasis, and escape sequences.",
+    advanced: "Speed controls, volume, stress marks, breath marks, emotions, pronunciation, edit points.",
+    "multi-segment": "Three-act script with varying speed, emotion, and delivery cues."
+  };
+
+  const cards = examples.map(ex => {
+    const desc = descriptions[ex.slug] || "";
+    return `<a class="example-link" href="${ex.slug}.html">
+      <strong>${escapeHtml(ex.meta.title || ex.file)}</strong>
+      <span>${escapeHtml(desc)}</span>
+      <div style="margin-top:0.5rem;display:flex;gap:0.3rem;flex-wrap:wrap;">
+        <span class="example-badge">Editor</span>
+        <span class="example-badge">Teleprompter</span>
+        <span class="example-badge">Source</span>
+      </div>
+    </a>`;
+  }).join("");
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TPS Examples — TelePrompterScript</title>
+  <meta name="description" content="Interactive TPS format examples showing teleprompter and raw source views for basic, advanced, and multi-segment teleprompter scripts.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#faf8f4">
+  <link rel="canonical" href="${siteUrl}examples/">
+  <meta property="og:title" content="TPS Examples">
+  <meta property="og:description" content="Interactive TPS format examples with editor and teleprompter views.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="${siteUrl}examples/">
+  <meta property="og:image" content="${socialImageUrl}">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <style>${css}</style>
+</head>
+<body>
+  <nav class="top-nav scrolled">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../">
+        <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="8" fill="url(#ng)"/><path d="M7 9h14M7 14h10M7 19h12" stroke="#faf8f4" stroke-width="2.2" stroke-linecap="round"/><defs><linearGradient id="ng" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#8B7355"/><stop offset="1" stop-color="#C4A060"/></linearGradient></defs></svg>
+        <span>TPS Format</span>
+      </a>
+      <div class="nav-links">
+        <a href="../#specification">Spec</a>
+        <a href="../">Home</a>
+        <a href="https://prompter.one" target="_blank" rel="noopener">Prompter One</a>
+        <a class="nav-gh" href="https://github.com/managedcode/TPS" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="example-page">
+    <h1>TPS Examples</h1>
+    <p class="example-meta">
+      <a href="../">&larr; Back to spec</a> &middot;
+      Interactive examples showing how TPS scripts look in an editor and teleprompter.
+    </p>
+    <div class="ai-buttons" style="margin-bottom:1.2rem;">
+      ${renderAiButtons()}
+    </div>
+    <div class="prompter-view" style="margin-bottom:1.2rem;">
+      <div class="prompter-inner">
+        <div class="prompter-segment emo-warm">
+          <div class="prompter-segment-name"><span class="seg-dot"></span>DEMO &middot; WARM</div>
+          <p class="prompter-text">Every great presentation starts with a story. <span class="pt-pause-dot"></span> TPS lets you <span class="pt-emphasis">write that story</span> in plain markdown <span class="pt-pause-dot"></span> while embedding everything a teleprompter needs: <span class="pt-pause-med"></span> pace, <span class="pt-pause-dot"></span> emotion, <span class="pt-pause-dot"></span> and timing.</p>
+        </div>
+        <div class="prompter-segment emo-focused">
+          <div class="prompter-segment-name"><span class="seg-dot"></span>FEATURES &middot; FOCUSED</div>
+          <p class="prompter-text"><span class="pt-emphasis">Twelve emotions.</span> <span class="pt-pause-dot"></span> Speed from <span class="pt-slow">84 WPM</span> to <span class="pt-fast">210 WPM.</span> <span class="pt-pause-med"></span> <span class="pt-highlight">Highlights</span>, <span class="pt-loud">volume control</span>, <span class="pt-soft">whispers</span>, breath marks, and edit points.</p>
+        </div>
+      </div>
+    </div>
+
+    <h2>Choose an Example</h2>
+    <div class="examples-grid" style="margin-top:0.5rem;">
+      ${cards}
+    </div>
+
+    <div style="margin-top:1.5rem;padding:1rem;border:1px solid var(--line);border-radius:var(--radius-lg);background:var(--bg-warm);">
+      <p style="margin:0;color:var(--text-secondary);font-size:0.88rem;line-height:1.6;">Each example shows two views: the <strong>Teleprompter View</strong> (how <a href="https://prompter.one" target="_blank" rel="noopener">Prompter One</a> renders it for reading) and the <strong>Raw Source</strong> (the <code>.tps</code> file you can copy and use).</p>
+    </div>
+  </div>
+
+  <footer class="site-footer" style="max-width:960px;margin:1.5rem auto 2rem;padding:0 1rem;">
+    <span>Copyright &copy; <a href="https://www.managed-code.com/" target="_blank" rel="noopener">Managed Code</a></span>
+    <span>Licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>
+  </footer>
+</body>
+</html>`;
 }
