@@ -304,8 +304,8 @@ pre code {
   border-radius: var(--radius-md);
   background: var(--gold-light); color: var(--gold);
 }
-.answer-card:nth-child(2) .answer-icon { background: var(--purple-light); color: var(--purple); }
-.answer-card:nth-child(3) .answer-icon { background: var(--blue-light); color: var(--blue); }
+.answer-card:nth-child(2) .answer-icon { background: rgba(124,58,237,0.08); color: var(--tps-purple); }
+.answer-card:nth-child(3) .answer-icon { background: rgba(37,99,235,0.08); color: var(--tps-blue); }
 .answer-card h3 { margin: 0; font-size: 1rem; font-weight: 700; }
 .answer-answer { margin: 0.45rem 0 0; color: var(--text-secondary); font-size: 0.88rem; line-height: 1.65; }
 
@@ -667,22 +667,19 @@ pre code {
 .example-panel { display: none; padding: 1.25rem 0; }
 .example-panel.active { display: block; }
 
-/* Editor view */
-.editor-view {
-  border: 1px solid var(--line); border-radius: var(--radius-lg);
-  background: var(--bg-card); overflow: hidden;
+.example-raw-source {
+  padding: 1rem; border: 1px solid var(--line); border-radius: var(--radius-lg);
+  background: var(--bg-warm); color: var(--text);
+  font-size: 0.85rem; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word;
 }
-.editor-view pre {
-  margin: 0; padding: 1.2rem; border-radius: 0;
-  background: var(--bg-card); color: var(--text);
-  font-size: 0.88rem; line-height: 1.7; white-space: pre-wrap; word-wrap: break-word;
+.example-footer { max-width: 960px; margin: 1rem auto 2rem; padding: 0 1rem; }
+.examples-index-footer { max-width: 960px; margin: 1.5rem auto 2rem; padding: 0 1rem; }
+.examples-info-box {
+  margin-top: 1.5rem; padding: 1rem;
+  border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--bg-warm);
 }
-.editor-view .ed-frontmatter { color: var(--muted); }
-.editor-view .ed-segment { color: var(--gold); font-weight: 700; }
-.editor-view .ed-block { color: var(--blue); font-weight: 700; }
-.editor-view .ed-tag { color: var(--purple); }
-.editor-view .ed-pause { color: var(--red); font-weight: 700; }
-.editor-view .ed-emphasis { color: var(--green); font-style: italic; }
+.examples-info-box p { margin: 0; color: var(--text-secondary); font-size: 0.88rem; line-height: 1.6; }
+.example-tags { margin-top: 0.5rem; display: flex; gap: 0.3rem; flex-wrap: wrap; }
 
 /* Prompter view — PrompterOne style */
 .prompter-view {

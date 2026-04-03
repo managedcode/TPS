@@ -274,7 +274,7 @@ const page = `<!DOCTYPE html>
   </div>
 
   <button class="back-to-top" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 16V4m0 0l-5 5m5-5l5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 16V4m0 0l-5 5m5-5l5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </button>
 
   <script>
@@ -341,7 +341,7 @@ for (const ex of tpsExamples) {
 
 await writeFile(path.join(distDir, "examples", "index.html"), buildExamplesIndexPage(tpsExamples, styles), "utf8");
 
-await writeFile(path.join(distDir, "sitemap.xml"), buildSitemapXml(siteUrl, dateModifiedIso), "utf8");
+await writeFile(path.join(distDir, "sitemap.xml"), buildSitemapXml(siteUrl, dateModifiedIso, tpsExamples), "utf8");
 await writeFile(path.join(distDir, "robots.txt"), buildRobotsTxt(siteUrl), "utf8");
 await writeFile(
   path.join(distDir, "llms.txt"),
@@ -668,7 +668,14 @@ function renderQuickAnswers(entries) {
     .join("");
 }
 
-function buildSitemapXml(siteUrl, dateModifiedIso) {
+function buildSitemapXml(siteUrl, dateModifiedIso, examples = []) {
+  const exampleUrls = examples.map(ex => `  <url>
+    <loc>${siteUrl}examples/${ex.slug}.html</loc>
+    <lastmod>${dateModifiedIso}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>`).join("\n");
+
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -677,6 +684,13 @@ function buildSitemapXml(siteUrl, dateModifiedIso) {
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
+  <url>
+    <loc>${siteUrl}examples/</loc>
+    <lastmod>${dateModifiedIso}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+${exampleUrls}
 </urlset>
 `;
 }
@@ -756,15 +770,15 @@ function normalizeVersion(value) {
 
 function buildAiButtonsHtml(chatgptUrl, claudeUrl, geminiUrl) {
   return `<a class="ai-btn ai-btn-chatgpt" href="${chatgptUrl}" target="_blank" rel="noopener">
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M22.282 9.821a5.985 5.985 0 00-.516-4.91 6.046 6.046 0 00-6.51-2.9A6.065 6.065 0 0011.782.5a6.035 6.035 0 00-5.736 4.128 5.988 5.988 0 00-3.998 2.9 6.043 6.043 0 00.743 7.097 5.98 5.98 0 00.51 4.911 6.051 6.051 0 006.515 2.9A5.985 5.985 0 0013.282 24a6.04 6.04 0 005.74-4.122 5.993 5.993 0 003.998-2.9 6.04 6.04 0 00-.738-7.157z"/></svg>
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22.282 9.821a5.985 5.985 0 00-.516-4.91 6.046 6.046 0 00-6.51-2.9A6.065 6.065 0 0011.782.5a6.035 6.035 0 00-5.736 4.128 5.988 5.988 0 00-3.998 2.9 6.043 6.043 0 00.743 7.097 5.98 5.98 0 00.51 4.911 6.051 6.051 0 006.515 2.9A5.985 5.985 0 0013.282 24a6.04 6.04 0 005.74-4.122 5.993 5.993 0 003.998-2.9 6.04 6.04 0 00-.738-7.157z"/></svg>
   Ask ChatGPT
 </a>
 <a class="ai-btn ai-btn-claude" href="${claudeUrl}" target="_blank" rel="noopener">
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M4.709 15.955l4.397-10.986a.469.469 0 01.862-.008l4.5 10.994h-2.033l-1.14-2.824H7.853l-1.122 2.824H4.709zm6.063-4.506l-1.727-4.43-1.78 4.43h3.507zM14.953 15.955V4.577h1.86v11.378h-1.86z"/></svg>
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.709 15.955l4.397-10.986a.469.469 0 01.862-.008l4.5 10.994h-2.033l-1.14-2.824H7.853l-1.122 2.824H4.709zm6.063-4.506l-1.727-4.43-1.78 4.43h3.507zM14.953 15.955V4.577h1.86v11.378h-1.86z"/></svg>
   Ask Claude
 </a>
 <a class="ai-btn ai-btn-gemini" href="${geminiUrl}" target="_blank" rel="noopener">
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 0C12 6.627 6.627 12 0 12c6.627 0 12 5.373 12 12 0-6.627 5.373-12 12-12-6.627 0-12-5.373-12-12z" fill="url(#gem-g)"/><defs><linearGradient id="gem-g" x1="0" y1="0" x2="24" y2="24"><stop stop-color="#4285F4"/><stop offset=".5" stop-color="#9B72CB"/><stop offset="1" stop-color="#D96570"/></linearGradient></defs></svg>
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 0C12 6.627 6.627 12 0 12c6.627 0 12 5.373 12 12 0-6.627 5.373-12 12-12-6.627 0-12-5.373-12-12z" fill="url(#gem-g)"/><defs><linearGradient id="gem-g" x1="0" y1="0" x2="24" y2="24"><stop stop-color="#4285F4"/><stop offset=".5" stop-color="#9B72CB"/><stop offset="1" stop-color="#D96570"/></linearGradient></defs></svg>
   Ask Gemini
 </a>`;
 }
@@ -952,7 +966,7 @@ function buildExamplePage(ex, css) {
   <nav class="top-nav scrolled">
     <div class="nav-inner">
       <a class="nav-logo" href="../">
-        <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="8" fill="url(#ng)"/><path d="M7 9h14M7 14h10M7 19h12" stroke="#faf8f4" stroke-width="2.2" stroke-linecap="round"/><defs><linearGradient id="ng" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#b8963e"/><stop offset="1" stop-color="#d4a847"/></linearGradient></defs></svg>
+        <svg width="24" height="24" viewBox="0 0 28 28" fill="none" aria-hidden="true"><rect width="28" height="28" rx="8" fill="url(#ng)"/><path d="M7 9h14M7 14h10M7 19h12" stroke="#faf8f4" stroke-width="2.2" stroke-linecap="round"/><defs><linearGradient id="ng" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#b8963e"/><stop offset="1" stop-color="#d4a847"/></linearGradient></defs></svg>
         <span>TPS Format</span>
       </a>
       <div class="nav-links">
@@ -960,7 +974,7 @@ function buildExamplePage(ex, css) {
         <a href="../">Home</a>
         <a href="https://prompter.one" target="_blank" rel="noopener">Prompter One</a>
         <a class="nav-gh" href="https://github.com/managedcode/TPS" target="_blank" rel="noopener">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
           GitHub
         </a>
       </div>
@@ -977,7 +991,7 @@ function buildExamplePage(ex, css) {
     </p>
     <p class="example-desc">${escapeHtml(exDesc)}</p>
 
-    <div class="ai-buttons" style="margin-bottom:1rem;">
+    <div class="ai-buttons">
       ${renderAiButtons(exAiPrompt)}
     </div>
 
@@ -987,10 +1001,10 @@ function buildExamplePage(ex, css) {
 
     <h2>Raw Source</h2>
     <p class="example-section-desc">The complete <code>.tps</code> file &mdash; valid markdown you can open in any text editor.</p>
-    <pre style="padding:1rem;border:1px solid var(--line);border-radius:var(--radius-lg);background:var(--bg-warm);color:var(--text);font-size:0.85rem;line-height:1.6;white-space:pre-wrap;word-wrap:break-word;"><code>${escapeHtml(ex.content)}</code></pre>
+    <pre class="example-raw-source"><code>${escapeHtml(ex.content)}</code></pre>
   </div>
 
-  <footer class="site-footer" style="max-width:960px;margin:1rem auto 2rem;padding:0 1rem;">
+  <footer class="site-footer example-footer">
     <span>Copyright &copy; Managed Code</span>
     <span>Licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>
   </footer>
@@ -1153,7 +1167,7 @@ function buildExamplesIndexPage(examples, css) {
     return `<a class="example-link" href="${ex.slug}.html">
       <strong>${escapeHtml(ex.meta.title || ex.file)}</strong>
       <span>${escapeHtml(desc)}</span>
-      <div style="margin-top:0.5rem;display:flex;gap:0.3rem;flex-wrap:wrap;">
+      <div class="example-tags">
         <span class="example-badge">Editor</span>
         <span class="example-badge">Teleprompter</span>
         <span class="example-badge">Source</span>
@@ -1184,7 +1198,7 @@ function buildExamplesIndexPage(examples, css) {
   <nav class="top-nav scrolled">
     <div class="nav-inner">
       <a class="nav-logo" href="../">
-        <svg width="24" height="24" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="8" fill="url(#ng)"/><path d="M7 9h14M7 14h10M7 19h12" stroke="#faf8f4" stroke-width="2.2" stroke-linecap="round"/><defs><linearGradient id="ng" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#8B7355"/><stop offset="1" stop-color="#C4A060"/></linearGradient></defs></svg>
+        <svg width="24" height="24" viewBox="0 0 28 28" fill="none" aria-hidden="true"><rect width="28" height="28" rx="8" fill="url(#ng)"/><path d="M7 9h14M7 14h10M7 19h12" stroke="#faf8f4" stroke-width="2.2" stroke-linecap="round"/><defs><linearGradient id="ng" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#8B7355"/><stop offset="1" stop-color="#C4A060"/></linearGradient></defs></svg>
         <span>TPS Format</span>
       </a>
       <div class="nav-links">
@@ -1192,7 +1206,7 @@ function buildExamplesIndexPage(examples, css) {
         <a href="../">Home</a>
         <a href="https://prompter.one" target="_blank" rel="noopener">Prompter One</a>
         <a class="nav-gh" href="https://github.com/managedcode/TPS" target="_blank" rel="noopener">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
           GitHub
         </a>
       </div>
@@ -1205,10 +1219,10 @@ function buildExamplesIndexPage(examples, css) {
       <a href="../">&larr; Back to spec</a> &middot;
       Interactive examples showing how TPS scripts look in an editor and teleprompter.
     </p>
-    <div class="ai-buttons" style="margin-bottom:1.2rem;">
+    <div class="ai-buttons">
       ${renderAiButtons()}
     </div>
-    <div class="prompter-view" style="margin-bottom:1.2rem;">
+    <div class="prompter-view">
       <div class="prompter-inner">
         <div class="prompter-segment emo-warm">
           <div class="prompter-segment-name"><span class="seg-dot"></span>DEMO &middot; WARM</div>
@@ -1222,16 +1236,16 @@ function buildExamplesIndexPage(examples, css) {
     </div>
 
     <h2>Choose an Example</h2>
-    <div class="examples-grid" style="margin-top:0.5rem;">
+    <div class="examples-grid">
       ${cards}
     </div>
 
-    <div style="margin-top:1.5rem;padding:1rem;border:1px solid var(--line);border-radius:var(--radius-lg);background:var(--bg-warm);">
-      <p style="margin:0;color:var(--text-secondary);font-size:0.88rem;line-height:1.6;">Each example shows two views: the <strong>Teleprompter View</strong> (how <a href="https://prompter.one" target="_blank" rel="noopener">Prompter One</a> renders it for reading) and the <strong>Raw Source</strong> (the <code>.tps</code> file you can copy and use).</p>
+    <div class="examples-info-box">
+      <p>Each example shows two views: the <strong>Teleprompter View</strong> (how <a href="https://prompter.one" target="_blank" rel="noopener">Prompter One</a> renders it for reading) and the <strong>Raw Source</strong> (the <code>.tps</code> file you can copy and use).</p>
     </div>
   </div>
 
-  <footer class="site-footer" style="max-width:960px;margin:1.5rem auto 2rem;padding:0 1rem;">
+  <footer class="site-footer examples-index-footer">
     <span>Copyright &copy; <a href="https://www.managed-code.com/" target="_blank" rel="noopener">Managed Code</a></span>
     <span>Licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>
   </footer>
