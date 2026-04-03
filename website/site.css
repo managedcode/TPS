@@ -349,6 +349,24 @@ pre code {
   margin-top: auto;
   padding-top: 1rem;
 }
+.sdk-sections {
+  display: grid;
+  gap: 1rem;
+}
+.sdk-section {
+  margin-top: 0;
+}
+.sdk-section-copy {
+  margin: 0 0 0.95rem;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+.sdk-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
 
 /* ── Layout ── */
 .layout {
@@ -813,6 +831,7 @@ pre code {
 /* ── Responsive ── */
 @media (max-width: 1000px) {
   .answer-grid { grid-template-columns: 1fr; }
+  .sdk-grid { grid-template-columns: 1fr; }
   .layout { grid-template-columns: 1fr; }
   .toc-card { position: static; max-height: none; }
 }

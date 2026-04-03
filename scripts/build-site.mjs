@@ -1306,68 +1306,60 @@ function buildSdkIndexPage(runtimes, css) {
   };
   const runtimeDetails = {
     typescript: {
-      summary: "Canonical typed source and source of truth for the TPS runtime contract.",
-      chips: ["Source Of Truth"],
+      summary: "Reference TPS runtime and source of truth for cross-SDK behavior.",
+      chips: ["Reference"],
       facts: [
-        { label: "State", valueHtml: "Active reference runtime used to define TPS behavior across the SDK workspace." },
-        { label: "Contract", valueHtml: "<code>TpsSpec</code>, <code>TpsKeywords</code>, <code>validateTps</code>, <code>parseTps</code>, <code>compileTps</code>, <code>TpsPlayer</code>." },
-        { label: "Verification", valueHtml: "<code>build:tps</code> for compile output and <code>test:types</code> for type-checked parity." },
-        { label: "Workspace", valueHtml: "<code>SDK/ts</code> emits the runtime consumed by <code>SDK/js/lib</code>." }
+        { label: "Status", valueHtml: "Active runtime used as the reference implementation." },
+        { label: "Workspace", valueHtml: "<code>SDK/ts</code>." }
       ]
     },
     javascript: {
-      summary: "Consumer JavaScript artifact generated from the TypeScript runtime and tested as built output.",
-      chips: ["Generated Artifact"],
+      summary: "Built JavaScript runtime for consumers, generated from the TypeScript source.",
+      chips: ["Package"],
       facts: [
-        { label: "State", valueHtml: "Active consumer runtime with CI verification and separate coverage gating." },
-        { label: "Contract", valueHtml: "Package <code>managedcode.tps</code> exports the same API surface from <code>lib/index.js</code>." },
-        { label: "Verification", valueHtml: "<code>test:js</code> runs Node tests against built files and <code>coverage:js</code> enforces <strong>90%+</strong>." },
-        { label: "Workspace", valueHtml: "<code>SDK/js</code> contains the generated runtime, package metadata, and consumer-facing entry points." }
+        { label: "Status", valueHtml: "Active consumer runtime with CI and coverage gating." },
+        { label: "Package", valueHtml: "<code>managedcode.tps</code>." },
+        { label: "Workspace", valueHtml: "<code>SDK/js</code>." }
       ]
     },
     dotnet: {
-      summary: "ManagedCode.Tps runtime for .NET consumers with xUnit parity tests and coverage thresholds.",
-      chips: ["ManagedCode.Tps", "net10.0"],
+      summary: "ManagedCode.Tps runtime for .NET consumers.",
+      chips: ["ManagedCode.Tps", "C#"],
       facts: [
-        { label: "State", valueHtml: "Active C# runtime with CI verification and separate coverage gating." },
-        { label: "Contract", valueHtml: "Namespace and package <code>ManagedCode.Tps</code> expose <code>TpsSpec</code>, <code>TpsRuntime.Validate/Parse/Compile</code>, and <code>TpsPlayer</code>." },
-        { label: "Verification", valueHtml: "<code>ManagedCode.Tps.slnx</code> builds and tests in CI, with a separate <strong>90%+</strong> coverage run." },
-        { label: "Workspace", valueHtml: "<code>SDK/dotnet</code> contains the runtime project plus <code>ManagedCode.Tps.Tests</code>." }
+        { label: "Status", valueHtml: "Active C# runtime with CI and coverage gating." },
+        { label: "Namespace", valueHtml: "<code>ManagedCode.Tps</code>." },
+        { label: "Workspace", valueHtml: "<code>SDK/dotnet</code>." }
       ]
     },
     flutter: {
       summary: "Placeholder workspace only. No Flutter TPS runtime has been implemented yet.",
       chips: ["Placeholder"],
       facts: [
-        { label: "State", valueHtml: "Planned runtime only. No CI job runs for Flutter yet." },
-        { label: "Contract", valueHtml: "No parser, compiler, validator, or player implementation exists yet." },
-        { label: "Activation", valueHtml: "Add the real runtime, tests, and CI integration when Flutter work starts." },
-        { label: "Workspace", valueHtml: "<code>SDK/flutter</code> currently contains documentation scaffolding only." }
+        { label: "State", valueHtml: "Planned only. No implementation or CI yet." },
+        { label: "Next", valueHtml: "Add runtime code and tests when Flutter support starts." },
+        { label: "Workspace", valueHtml: "<code>SDK/flutter</code>." }
       ]
     },
     swift: {
       summary: "Placeholder workspace only. No Swift TPS runtime has been implemented yet.",
       chips: ["Placeholder"],
       facts: [
-        { label: "State", valueHtml: "Planned runtime only. No CI job runs for Swift yet." },
-        { label: "Contract", valueHtml: "No parser, compiler, validator, or player implementation exists yet." },
-        { label: "Activation", valueHtml: "Add the real runtime, tests, and CI integration when Swift work starts." },
-        { label: "Workspace", valueHtml: "<code>SDK/swift</code> currently contains documentation scaffolding only." }
+        { label: "State", valueHtml: "Planned only. No implementation or CI yet." },
+        { label: "Next", valueHtml: "Add runtime code and tests when Swift support starts." },
+        { label: "Workspace", valueHtml: "<code>SDK/swift</code>." }
       ]
     },
     java: {
       summary: "Placeholder workspace only. No Java TPS runtime has been implemented yet.",
       chips: ["Placeholder"],
       facts: [
-        { label: "State", valueHtml: "Planned runtime only. No CI job runs for Java yet." },
-        { label: "Contract", valueHtml: "No parser, compiler, validator, or player implementation exists yet." },
-        { label: "Activation", valueHtml: "Add the real runtime, tests, and CI integration when Java work starts." },
-        { label: "Workspace", valueHtml: "<code>SDK/java</code> currently contains documentation scaffolding only." }
+        { label: "State", valueHtml: "Planned only. No implementation or CI yet." },
+        { label: "Next", valueHtml: "Add runtime code and tests when Java support starts." },
+        { label: "Workspace", valueHtml: "<code>SDK/java</code>." }
       ]
     }
   };
-  const runtimeCards = runtimes
-    .map((runtime, index) => {
+  const renderRuntimeCard = runtime => {
       const readmeUrl = `${repoUrl}/blob/main/${runtime.path}/README.md`;
       const codeUrl = `${repoUrl}/tree/main/${runtime.path}`;
       const statusLabel = runtime.enabled ? "Available" : "Planned";
@@ -1402,8 +1394,9 @@ function buildSdkIndexPage(runtimes, css) {
           <a class="button button-secondary" href="${readmeUrl}" target="_blank" rel="noopener">README</a>
         </div>
       </article>`;
-    })
-    .join("");
+    };
+  const activeCards = runtimes.filter(runtime => runtime.enabled).map(renderRuntimeCard).join("");
+  const plannedCards = runtimes.filter(runtime => !runtime.enabled).map(renderRuntimeCard).join("");
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -1453,18 +1446,32 @@ function buildSdkIndexPage(runtimes, css) {
     </p>
     <p class="example-desc">Each TPS SDK exposes the same contract: constants, validation, parser, compiler, and player APIs. Use this page to jump directly into the implementation folders in the repository. Need terminology? Open the <a href="../glossary/">TPS glossary</a>.</p>
 
-    <div class="answer-strip">
-      <div class="answer-strip-header">
-        <p class="panel-label">SDK Catalog</p>
-        <h2>Available And Planned Runtimes</h2>
-      </div>
-      <div class="answer-grid">
-        ${runtimeCards}
-      </div>
+    <div class="sdk-sections">
+      <section class="answer-strip sdk-section">
+        <div class="answer-strip-header">
+          <p class="panel-label">Active SDKs</p>
+          <h2>Implemented Today</h2>
+        </div>
+        <p class="sdk-section-copy">Current runtimes with real implementations you can use now.</p>
+        <div class="sdk-grid">
+          ${activeCards}
+        </div>
+      </section>
+
+      <section class="answer-strip sdk-section">
+        <div class="answer-strip-header">
+          <p class="panel-label">Planned SDKs</p>
+          <h2>Reserved Next</h2>
+        </div>
+        <p class="sdk-section-copy">Reserved folders for future runtimes. These are not implemented yet.</p>
+        <div class="sdk-grid">
+          ${plannedCards}
+        </div>
+      </section>
     </div>
 
     <div class="examples-info-box">
-      <p>Active runtimes are implemented and verified in CI. Planned runtimes are placeholders only until real code and tests are added.</p>
+      <p>Active runtimes are available now. Planned runtimes are placeholders until real code is added.</p>
     </div>
   </div>
 

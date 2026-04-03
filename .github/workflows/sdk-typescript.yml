@@ -1,0 +1,36 @@
+name: SDK TypeScript
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - "codex/**"
+    paths:
+      - "SDK/ts/**"
+      - "SDK/js/**"
+      - "SDK/fixtures/**"
+      - ".github/workflows/sdk-typescript.yml"
+  pull_request:
+    paths:
+      - "SDK/ts/**"
+      - "SDK/js/**"
+      - "SDK/fixtures/**"
+      - ".github/workflows/sdk-typescript.yml"
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    name: Build And Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - run: npm ci --prefix SDK/js
+      - run: npm --prefix SDK/js run build:tps
+      - run: npm --prefix SDK/js run test:types
