@@ -433,6 +433,8 @@ function buildStats(markdown, sectionList) {
 function enhanceArticleHtml(html) {
   let result = decorateEmotionTable(html);
   result = highlightTpsCodeBlocks(result);
+  // Rewrite examples/*.tps links to examples/*.html for the website
+  result = result.replace(/href="examples\/([^"]+)\.tps"/g, 'href="examples/$1.html"');
   return result;
 }
 
