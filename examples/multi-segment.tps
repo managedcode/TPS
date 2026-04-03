@@ -53,8 +53,8 @@ Each segment can have its own [emphasis]speed[/emphasis] and [emphasis]emotion[/
 Notice the speed changed to 145 words per minute. /
 And the emotion shifted to [emphasis]concerned[/emphasis]. //
 
-This creates a different feel / for the reader and the audience. /
-The teleprompter can adjust colors and pacing / based on these cues. //
+This creates a different feel / for the reader and the audience. / [breath]
+The teleprompter can adjust styling and pacing / based on these cues. //
 
 [pause:2s]
 
@@ -66,7 +66,7 @@ The reader needs to feel the urgency.[/fast] //
 
 [slow]And then we slow down / for the emotional beat.[/slow] //
 
-[highlight]Contrast in pacing / is what makes a script engaging.[/highlight] //
+[highlight]Contrast in pacing / is what makes a script engáging.[/highlight] //
 
 [edit_point:high]
 
@@ -91,6 +91,6 @@ And we end on a [emphasis]motivational[/emphasis] note. //
 Three moods. /
 One script.[/slow] //
 
-[highlight]That is how you structure a long TPS document.[/highlight] //
+[soft][highlight]That is how you structure a long TPS document.[/highlight][/soft] //
 
 [edit_point]

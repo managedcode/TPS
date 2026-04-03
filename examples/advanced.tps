@@ -45,45 +45,53 @@ A two-second pause above. /
 
 And a five-second pause for dramatic effect. //
 
-## [Styling and Emotion|Warm]
+## [Delivery Controls|Professional]
 
-### [Inline Colors]
+### [Volume]
 
-Use colors to draw attention: /
-[red]red for warnings[/red], /
-[green]green for positive outcomes[/green], /
-[blue]blue for references[/blue], /
-[yellow]yellow for caution[/yellow]. //
+[loud]This part should be delivered with more projection.[/loud] /
+[soft]And this part should be quieter, / more intimate.[/soft] /
+[whisper]This is a secret.[/whisper] //
 
-### [Emotion Transitions|Neutral]
+### [Stress and Accent]
 
-This block starts neutral. /
-But you can apply [warm]inline emotion styling[/warm] to individual words / or [urgent]mark critical phrases[/urgent] within a neutral block. //
+Wrap the stressed part of a word: /
+This is a cri[stress]ti[/stress]cal point. /
+The [stress]em[/stress]phasis changes [stress]mea[/stress]ning. //
 
-### [Shifting Mood|Motivational]
+Or use an inline accent on the vowel: /
+This is a critícal point. /
+The émphasis changes méaning. //
 
-Now the mood shifts to motivational. /
-[emphasis]Emotion tags[/emphasis] hint at tone and color scheme / for the teleprompter display. //
+Or use the stress tag for full syllable guidance: /
+[stress:de-VE-lop-ment]development[/stress] /
+[stress:IN-fra-struc-ture]infrastructure[/stress]. //
 
-### [Urgency|Urgent]
+### [Breathing]
 
-[highlight]Breaking news or critical updates[/highlight] / use the urgent emotion. /
-The reader knows to change their delivery. //
+Long passages need breath marks / [breath] so the reader knows where to breathe /
+without running out of air. //
+
+## [Emotion and Emphasis|Warm]
+
+### [Inline Emotions]
+
+Block emotion is warm, / but you can override inline: /
+[urgent]this is critical[/urgent] / and back to warm. /
+Or shift to [calm]a more relaxed tone[/calm] for a moment. //
+
+### [Emphasis Levels]
+
+[emphasis]Standard emphasis[/emphasis] for important words. /
+Use [highlight]highlight[/highlight] for [emphasis]key ideas[/emphasis] that the reader must not miss. //
 
 ## [Special Markers|Professional]
 
-### [Pronunciation and Stress|Focused]
+### [Pronunciation|Focused]
 
 Some words need pronunciation guidance: /
 [pronunciation:ky-oo-arr-ess]CQRS[/pronunciation] /
 or [phonetic:ˌɛskjuːˈɛl]SQL[/phonetic]. //
-
-Mark word stress with uppercase syllables: /
-[stress:de-VE-lop-ment]development[/stress] /
-or [stress:IN-fra-struc-ture]infrastructure[/stress]. //
-
-For single-syllable stress on a specific letter: /
-[stress:rè-su-MÉ]résumé[/stress]. //
 
 ### [Edit Points]
 
@@ -102,4 +110,4 @@ And this is after a medium-priority one. //
 
 Tags can nest: /
 [slow][emphasis]slow and emphasized[/emphasis][/slow] /
-or [red][emphasis]red and emphasized[/emphasis][/red]. //
+or [loud][emphasis]loud and emphasized[/emphasis][/loud]. //

@@ -2,7 +2,7 @@
 
 ## What is TPS?
 
-TPS (TelePrompterScript) is a markdown-based file format for teleprompter scripts. It supports hierarchical content organization with precise timing, emotional cues, visual styling, and presentation instructions.
+TPS (TelePrompterScript) is a markdown-based file format for teleprompter scripts. It supports hierarchical content organization with precise timing, emotional cues, delivery instructions, and presentation control.
 
 ## Motivation
 
@@ -32,7 +32,7 @@ TPS bridges this gap: it is human-readable markdown that any text editor can ope
 | **Segment** | A major section (`##` header) — e.g., Intro, Problem, Solution. |
 | **Block** | A topic group (`###` header) within a segment. |
 | **Phrase** | A sentence or thought within a block, delimited by sentence-ending punctuation or pause markers. |
-| **Word** | An individual token with optional per-word properties (color, emphasis, pause). |
+| **Word** | An individual token with optional per-word properties (emphasis, volume, pause). |
 | **WPM** | Words Per Minute — the reading speed. |
 | **Edit Point** | A marker indicating a natural place to stop or start an editing session. |
 | **Emotion** | A predefined mood preset that controls visual styling (colors) and presentation hints. |
@@ -193,19 +193,38 @@ Inline markers are embedded within phrase text to control presentation.
 
 The **+/−** buttons on the reading page change the **base speed** for the current run. All relative speed tags (`[xslow]`, `[slow]`, `[fast]`, `[xfast]`) automatically scale with the new base, preserving their proportional relationship. For example, pressing **+** to increase from 140 to 150 WPM means `[slow]` changes from 112 to 120 WPM.
 
-#### Color Styling
+#### Volume
 
 ```markdown
-[red]warning text[/red]             # Color coding
-[highlight]key point[/highlight]    # Highlighting (yellow background)
+[loud]important announcement[/loud]       # Louder delivery
+[soft]gentle aside[/soft]                 # Softer, quieter delivery
+[whisper]secret or intimate[/whisper]     # Whispered delivery
 ```
+
+Volume tags control the **intended loudness** of delivery. Renderers should visually distinguish volume levels (e.g., larger/bolder text for `[loud]`, smaller/lighter for `[soft]`, styled differently for `[whisper]`).
+
+#### Highlighting
+
+```markdown
+[highlight]key point[/highlight]    # Visual highlighting (background overlay)
+```
+
+`highlight` is a visual formatting tag — it applies a semi-transparent background overlay to make text stand out on the teleprompter. It does not imply a specific delivery change.
 
 #### Emotion Styling
 
 ```markdown
 [warm]friendly greeting[/warm]      # Apply emotion-based styling inline
-[urgent]breaking news[/urgent]      # Emotion colors applied to text
+[urgent]breaking news[/urgent]      # Inline emotion override
 ```
+
+#### Breath Marks
+
+```markdown
+[breath]                            # Natural breath point
+```
+
+A breath mark indicates where the speaker should take a breath. Unlike pauses, breath marks do not add time — they guide the reader to breathe naturally at that point. Useful in long passages where phrasing might otherwise cause the reader to run out of air.
 
 #### Edit Points
 
@@ -224,56 +243,65 @@ The **+/−** buttons on the reading page change the **base speed** for the curr
 
 #### Stress Marks
 
+Three ways to mark word stress, from simplest to most detailed:
+
+**Inline tag** — wrap the stressed part of a word with `[stress]`:
+
 ```markdown
-[stress:de-VE-lop-ment]development[/stress]     # Stressed syllable in UPPERCASE
+develop[stress]me[/stress]nt        # Stress on "me"
+[stress]in[/stress]frastructure     # Stress on "in"
+```
+
+The simplest approach. The tag can wrap a single letter or a syllable — whatever part needs emphasis. Renderers should visually distinguish the stressed portion (e.g., underline, bold, or color).
+
+**Inline accent** — place an acute accent (`´`) on the stressed vowel directly in the word:
+
+```markdown
+developmént                          # Stress on the "e" in "-ment"
+ínfrastructure                       # Stress on the first "i"
+```
+
+No tags needed — the accent is visible in the text itself. Parsers should recognize acute-accented vowels (`á`, `é`, `í`, `ó`, `ú`) as stress markers. The renderer may display the accent or strip it after applying visual stress.
+
+**Stress guide tag** — for full syllable breakdown when the reader needs more guidance:
+
+```markdown
+[stress:de-VE-lop-ment]development[/stress]
 [stress:IN-fra-struc-ture]infrastructure[/stress]
 ```
 
-The guide string uses hyphens to separate syllables. The stressed syllable is written in **UPPERCASE**; unstressed syllables are lowercase. For words with secondary stress, use an acute accent on the vowel: `[stress:rè-su-MÉ]résumé[/stress]`.
-
-Renderers should display the stress guide as a tooltip, subtitle, or overlay — not replace the word itself.
+The guide string uses hyphens to separate syllables. The stressed syllable is written in **UPPERCASE**; unstressed syllables are lowercase. Renderers should display the stress guide as a tooltip, subtitle, or overlay — not replace the word itself.
 
 ## Keyword Reference
 
 ### Emotions (case-insensitive)
 
-| Keyword | Color | Emoji | Description |
-|---------|-------|-------|-------------|
-| `warm` | Orange | 😊 | Friendly, welcoming tone |
-| `concerned` | Red | 😟 | Worried, empathetic |
-| `focused` | Green | 🎯 | Concentrated, precise |
-| `motivational` | Purple | 💪 | Inspiring, encouraging |
-| `neutral` | Blue | 😐 | Default, balanced |
-| `urgent` | Bright Red | 🚨 | Critical, immediate attention |
-| `happy` | Yellow | 😄 | Joyful, positive |
-| `excited` | Pink | 🚀 | Enthusiastic, energetic |
-| `sad` | Indigo | 😢 | Melancholy, somber |
-| `calm` | Teal | 😌 | Peaceful, relaxed |
-| `energetic` | Orange-Red | ⚡ | High energy, dynamic |
-| `professional` | Navy | 💼 | Business-like, formal |
+Emotions are a **closed set** — parsers must reject unknown emotion keywords. Each emotion describes a **delivery style** that affects how the speaker reads the text: tone of voice, energy level, and pacing feel.
 
-### Colors (case-insensitive)
+| Keyword | Delivery | Typical pacing | Use when |
+|---------|----------|----------------|----------|
+| `neutral` | Even, balanced tone. No particular emotional coloring. | Steady | Default. Informational content, transitions. |
+| `warm` | Friendly, approachable. Slight smile in the voice. | Relaxed | Greetings, introductions, audience connection. |
+| `professional` | Formal, authoritative. Clear articulation. | Measured | Business content, reports, official statements. |
+| `focused` | Concentrated, precise. Each word matters. | Deliberate | Technical details, step-by-step instructions. |
+| `concerned` | Worried, empathetic. Lower energy, careful tone. | Slower | Problems, risks, bad news, sensitive topics. |
+| `urgent` | High alert, immediate attention. Tense, direct. | Faster | Breaking news, critical warnings, deadlines. |
+| `motivational` | Inspiring, encouraging. Building energy. | Building | Calls to action, closing statements, rallying. |
+| `excited` | Enthusiastic, high energy. Wider pitch range. | Faster | Announcements, reveals, good news. |
+| `happy` | Joyful, positive. Light and upbeat. | Relaxed | Celebrations, positive results, thank-yous. |
+| `sad` | Somber, reflective. Lower pitch, slower. | Slower | Loss, disappointment, memorial. |
+| `calm` | Peaceful, reassuring. Steady and even. | Slow | De-escalation, meditation, closing thoughts. |
+| `energetic` | Dynamic, high tempo. Punchy delivery. | Fast | Demos, action sequences, rapid-fire content. |
 
-Colors are **semantic names** — renderers map them to actual hex values appropriate for the rendering context. The hex codes below are reference values for a **dark background** (the default teleprompter rendering context).
+Renderers map each emotion to a visual style (colors, background, text treatment) appropriate for the rendering context. The exact visual representation is implementation-defined, but should be consistent and distinguishable.
 
-| Keyword | Dark-BG Hex | Visibility | Usage |
-|---------|-------------|------------|-------|
-| `red` | #FF6B6B | High | Warnings, emphasis |
-| `green` | #51CF66 | High | Positive, success |
-| `blue` | #74C0FC | High | Calm, informational |
-| `yellow` | #FFE066 | High | Caution, highlight |
-| `orange` | #FFA94D | High | Attention |
-| `purple` | #CC5DE8 | High | Creative, special |
-| `cyan` | #66D9E8 | High | Cool, tech |
-| `magenta` | #F783AC | High | Accent |
-| `pink` | #FAA2C1 | High | Soft emphasis |
-| `teal` | #38D9A9 | High | Professional |
-| `white` | #F8F9FA | High | Default text on dark BG |
-| `gray` | #ADB5BD | Medium | Subdued, secondary text |
+### Volume Levels
 
-> **Note:** `black` is **not a valid inline color** — it is invisible on the dark teleprompter background. Parsers should strip `[black]` tags and render the enclosed content unstyled (no color applied).
-
-`highlight` is a **formatting tag**, not a color — it applies a semi-transparent yellow **background overlay**: `[highlight]key point[/highlight]`.
+| Keyword | Description |
+|---------|-------------|
+| `loud` | Louder, more projected delivery |
+| `soft` | Quieter, gentler delivery |
+| `whisper` | Whispered, intimate delivery |
 
 ### Inline Tags
 
@@ -293,11 +321,16 @@ Colors are **semantic names** — renderers map them to actual hex values approp
 | **Speed (preset)** | `[xfast]text[/xfast]` | Extra fast: base × 1.5 |
 | **Speed (reset)** | `[normal]text[/normal]` | Reset to base speed: base × 1.0 |
 | **Edit point** | `[edit_point]` or `[edit_point:priority]` | Mark edit location |
+| **Loud** | `[loud]text[/loud]` | Louder, projected delivery |
+| **Soft** | `[soft]text[/soft]` | Quieter, gentler delivery |
+| **Whisper** | `[whisper]text[/whisper]` | Whispered delivery |
 | **Phonetic** | `[phonetic:IPA]text[/phonetic]` | IPA pronunciation guide |
 | **Pronunciation** | `[pronunciation:guide]text[/pronunciation]` | Simple pronunciation guide |
-| **Stress** | `[stress:SYL-la-ble]text[/stress]` | Syllable stress (UPPERCASE = stressed) |
-| **Color** | `[red]text[/red]`, `[green]...[/green]`, etc. | Apply color styling (see Colors table) |
-| **Emotion** | `[warm]text[/warm]`, `[urgent]...[/urgent]`, etc. | Apply emotion-based color styling (see Emotions table) |
+| **Stress (wrap)** | `develop[stress]me[/stress]nt` | Wrap stressed part of a word |
+| **Stress (accent)** | `developmént` | Acute accent on stressed vowel |
+| **Stress (guide)** | `[stress:de-VE-lop-ment]text[/stress]` | Full syllable breakdown (UPPERCASE = stressed) |
+| **Breath** | `[breath]` | Natural breath point (no added time) |
+| **Emotion** | `[warm]text[/warm]`, `[urgent]...[/urgent]`, etc. | Inline emotion/delivery override (see Emotions table) |
 
 ### Speed Presets
 
@@ -367,9 +400,9 @@ For any word, the effective WPM is determined by (highest priority first):
 
 When emotion changes between segments or blocks, renderers should apply a smooth visual transition (recommended: 3-second fade between color schemes).
 
-### Color and Emotion Precedence
+### Inline Emotion Precedence
 
-When inline color and emotion tags are nested, the **innermost tag wins** for the enclosed span. For example, `[warm][red]text[/red][/warm]` renders "text" in red, not the warm emotion color. Block-level emotion serves as the default styling; inline tags override it for their span only.
+When inline emotion tags are nested, the **innermost tag wins** for the enclosed span. Block-level emotion serves as the default styling; inline emotion tags override it for their span only.
 
 ### Phrase Boundaries
 
@@ -382,9 +415,9 @@ Phrases are the smallest unit for timing calculation. Words within a phrase are 
 
 ### Tag Nesting
 
-- Tags must be properly closed: `[red]text[/red]`.
-- Tags must not cross-nest: `[red][emphasis]text[/red][/emphasis]` is **invalid**.
-- Valid nesting: `[red][emphasis]text[/emphasis][/red]`.
+- Tags must be properly closed: `[loud]text[/loud]`.
+- Tags must not cross-nest: `[loud][emphasis]text[/loud][/emphasis]` is **invalid**.
+- Valid nesting: `[loud][emphasis]text[/emphasis][/loud]`.
 - If a tag is never closed, the parser should implicitly close it at the end of the current block.
 
 ### Nested Speed Resolution
@@ -412,11 +445,11 @@ TPS is designed for **teleprompter use** — text is always rendered on a **dark
 
 ### Dark Background Rules
 
-1. **Text base color** is white/light (`#F8F9FA` or similar). All inline colors must be **lighter variants** that contrast well against dark backgrounds.
-2. **`black` is not a valid inline color** — it would be invisible. Renderers should strip `[black]` tags and render the enclosed content unstyled.
-3. **Minimum contrast** — all color keywords must produce at least **WCAG AA 4.5:1** contrast ratio against the dark background.
-4. **Emotion color schemes** (background, text, accent) are pre-defined per emotion. They are not raw hex values — they are tuned for the dark rendering context with appropriate alpha channels.
-5. **`highlight`** uses a semi-transparent yellow background overlay, not a text color change.
+1. **Text base color** is white/light (`#F8F9FA` or similar).
+2. **Minimum contrast** — all styled text must produce at least **WCAG AA 4.5:1** contrast ratio against the dark background.
+3. **Emotion color schemes** (background, text, accent) are pre-defined per emotion and tuned for the dark rendering context.
+4. **`highlight`** uses a semi-transparent yellow background overlay, not a text color change.
+5. **Volume indicators** — `[loud]` text should be visually larger or bolder; `[soft]` and `[whisper]` should be visually smaller or lighter.
 
 ## WPM Guidelines
 
@@ -456,7 +489,7 @@ The Actor profile targets natural spoken delivery — reading aloud from a telep
 | Inline speed | Integer, respects allowed range |
 
 Additional validation:
-- Emotions must be from the predefined set (see table above).
+- Emotions must be from the predefined closed set (see Emotions table). Unknown emotion keywords are a parse error.
 - Timing calculations should not exceed target duration by > 20%.
 - All markup tags must be properly closed; no cross-nesting.
 - Edit points should be at phrase or block boundaries.
@@ -490,19 +523,19 @@ author: Jane Doe
 
 ### [Opening Block]
 Good morning everyone, / and [emphasis]welcome[/emphasis] to what I believe /
-will be a [green]transformative moment[/green] for our company. //
+will be a [emphasis]transformative moment[/emphasis] for our company. //
 
 [pause:2s]
 
 ### [Purpose Block|145WPM]
-[emphasis]Today[/emphasis], / we're not just launching a product – /
+[emphasis]Today[/emphasis], / we're not just launching a product – / [breath]
 we're introducing a [highlight]solution[/highlight] that will [emphasis]revolutionize[/emphasis] /
 how our customers interact with [stress:tech-NO-lo-gy]technology[/stress]. //
 
 ## [Problem|135WPM|Concerned]
 
 ### [Statistics Block|Neutral]
-But first, / let's address the [xslow][red]elephant in the room[/red][/xslow]. /
+But first, / let's address the [xslow]elephant in the room[/xslow]. /
 Our industry has been [emphasis]struggling[/emphasis] with a fundamental problem. //
 
 [edit_point:high]
@@ -513,22 +546,22 @@ due to [highlight]complexity and poor user experience[/highlight]. //
 
 ### [Impact Block]
 This affects [emphasis]millions[/emphasis] of people worldwide, /
-costing businesses [red]billions in revenue[/red] annually. //
+costing businesses [loud][emphasis]billions[/emphasis] in revenue[/loud] annually. //
 
 ## [Solution|Focused]
 
 ### [Introduction Block]
-That's where our [blue][emphasis]new platform[/emphasis][/blue] comes in. /
-We've developed a [green]local-first teleprompter workflow[/green] that /
-[highlight]simplifies complex processes[/highlight] and [emphasis]enhances user experience[/emphasis]. //
+That's where our [emphasis]new platform[/emphasis] comes in. /
+We've developed a local-first téleprompter workflow that /
+[highlight]simplifies complex processes[/highlight] and [emphasis]enhances user experiénce[/emphasis]. //
 
 ### [Benefits Block|150WPM|Excited]
-With our solution, / you can expect a [green][emphasis]50% reduction[/emphasis][/green] in user abandonment /
-and a [green][emphasis]30% increase[/emphasis][/green] in engagement. //
+With our solution, / you can expect a [emphasis]50% reduction[/emphasis] in user abandonment /
+and a [emphasis]30% increase[/emphasis] in engagement. //
 
 [pause:1s]
 
-[xfast]Full details are available in the handout.[/xfast] /
+[soft]Full details are available in the handout.[/soft] /
 [highlight]Thank you[/highlight] for your time. //
 
 [edit_point:medium]
@@ -540,9 +573,9 @@ The [`examples/`](examples/) directory contains sample TPS files demonstrating t
 
 | File | Description |
 |------|-------------|
-| [`basic.tps`](examples/basic.tps) | Minimal valid TPS file — front matter, title, segments, blocks, pauses, emphasis. |
-| [`advanced.tps`](examples/advanced.tps) | All format features — speed controls, inline WPM, colors, emotions, pronunciation, edit points, tag nesting. |
-| [`multi-segment.tps`](examples/multi-segment.tps) | Multi-segment script with varying speed and emotion across segments. |
+| [`basic.tps`](examples/basic.tps) | Minimal valid TPS file — front matter, title, segments, blocks, pauses, emphasis, simple headers, escape sequences. |
+| [`advanced.tps`](examples/advanced.tps) | All format features — speed controls, volume, stress marks, breath marks, emotions, pronunciation, edit points, tag nesting. |
+| [`multi-segment.tps`](examples/multi-segment.tps) | Multi-segment script with varying speed, emotion, and delivery cues across segments. |
 
 ## File Extension
 
