@@ -431,7 +431,7 @@ pre code {
 
 /* Tables */
 .markdown-body table {
-  display: block; width: 100%; overflow-x: auto;
+  display: table; width: 100%; overflow-x: auto;
   border-collapse: separate; border-spacing: 0;
   border: 1px solid #d5cfc4; border-radius: var(--radius-lg);
   background: var(--bg-card);

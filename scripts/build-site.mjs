@@ -553,7 +553,7 @@ function buildQuickAnswers(summary) {
   return [
     {
       question: "What is TPS?",
-      answer: `${summary} TPS keeps authoring human-readable while giving teleprompter software structured cues for timing, pacing, emotion, and styling.`
+      answer: "TPS (TelePrompterScript) is a markdown-based file format for teleprompter scripts with built-in timing, pacing, emotional cues, and delivery instructions."
     },
     {
       question: "Who is TPS for?",
@@ -561,7 +561,7 @@ function buildQuickAnswers(summary) {
     },
     {
       question: "What makes TPS different?",
-      answer: "Unlike plain markdown, SubRip, or WebVTT, TPS is built for teleprompter delivery: it adds hierarchical segments, inline pacing markers, emotion tags, edit points, and profile-aware rendering rules."
+      answer: "Unlike plain markdown, SubRip, or WebVTT, TPS is purpose-built for teleprompter delivery with hierarchical segments, pacing markers, emotion tags, and edit points."
     }
   ];
 }
