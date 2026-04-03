@@ -49,6 +49,10 @@ Script
             └── Words (with individual properties)
 ```
 
+### Title (`#` Level)
+
+An optional `#` header immediately after the front matter. It serves as the document title for display purposes. Parsers should treat it as metadata — it does not create a segment or affect WPM/emotion inheritance. If omitted, the `title` field from the front matter is used instead. If both are present, the `#` header takes precedence for display.
+
 ## Format Specification
 
 ### Front Matter (YAML)
@@ -94,22 +98,28 @@ Segments are major sections of the script.
 ## [SegmentName|120WPM|Emotion|Timing]
 ```
 
-All parameters after the name are optional and position-dependent, separated by `|`.
+All parameters after the name are optional, separated by `|`. Parameters are identified by format, not by position:
+
+- An integer (or integer + `WPM` suffix) → **WPM**
+- A known emotion keyword → **Emotion**
+- A time pattern (`MM:SS` or `MM:SS-MM:SS`) → **Timing**
+
+This means parameters can appear in any order and unneeded ones can simply be omitted — no empty `||` slots required.
 
 **Examples:**
-- `## [Intro|140WPM|Warm]`
-- `## [Urgent Update|150WPM|Urgent|0:30-1:10]`
-- `## [Overview||Neutral]` — inherits default WPM
+- `## [Intro|Warm]` — inherits base WPM, sets emotion
+- `## [Urgent Update|145WPM|Urgent|0:30-1:10]` — overrides WPM, sets emotion and timing
+- `## [Overview|Neutral]` — inherits WPM, sets emotion
 - `## [Simple Segment]` — name only, inherits everything
 
 **Segment Parameters:**
 
-| Position | Parameter | Format | Description |
-|----------|-----------|--------|-------------|
-| 1 | **Name** | free text | Human-readable label shown in editors. Required. |
-| 2 | **WPM** | `NNN` or `NNNWPM` | Integer speed override. Omit or leave empty to inherit. |
-| 3 | **Emotion** | preset name | Emotion preset (see table below). Defaults to `Neutral`. |
-| 4 | **Timing** | `MM:SS` or `MM:SS-MM:SS` | Duration hint. Stored for tooling; playback computes timing from word counts. |
+| Parameter | Format | Description |
+|-----------|--------|-------------|
+| **Name** | free text | Human-readable label shown in editors. Required (first value before the first `\|`). |
+| **WPM** | `NNN` or `NNNWPM` | Integer speed override. Omit to inherit. |
+| **Emotion** | preset name | Emotion preset (see table below). Omit to inherit (defaults to `Neutral` at document level). |
+| **Timing** | `MM:SS` or `MM:SS-MM:SS` | Duration hint. Stored for tooling; playback computes timing from word counts. |
 
 **Leading text:** Content between a segment header and its first block is preserved as introductory text that inherits the segment's speed and emotion.
 
@@ -122,17 +132,18 @@ Blocks are topic groups within a segment.
 ```
 
 **Examples:**
-- `### [Opening Block|140WPM]`
-- `### [Speed Variations|140WPM|Focused]`
-- `### [Happy Section]`
+- `### [Opening Block]` — inherits segment WPM and emotion
+- `### [Speed Variations|Focused]` — inherits WPM, overrides emotion
+- `### [Key Stats|130WPM]` — overrides WPM, inherits emotion
+- `### [Climax|150WPM|Urgent]` — overrides both
 
 **Block Parameters:**
 
-| Position | Parameter | Format | Description |
-|----------|-----------|--------|-------------|
-| 1 | **Name** | free text | Descriptive label. Required. |
-| 2 | **WPM** | `NNN` or `NNNWPM` | Integer speed override. Inherits segment WPM if omitted. |
-| 3 | **Emotion** | preset name | Emotion override. Inherits segment emotion if omitted. |
+| Parameter | Format | Description |
+|-----------|--------|-------------|
+| **Name** | free text | Descriptive label. Required (first value before the first `\|`). |
+| **WPM** | `NNN` or `NNNWPM` | Integer speed override. Inherits segment WPM if omitted. |
+| **Emotion** | preset name | Emotion override. Inherits segment emotion if omitted. |
 
 ### Inline Markers
 
@@ -158,7 +169,7 @@ Inline markers are embedded within phrase text to control presentation.
 #### Speed Changes
 
 ```markdown
-[180WPM]text here[/180WPM]    # Temporary absolute speed change
+[150WPM]text here[/150WPM]    # Temporary absolute speed change
 [xslow]very careful[/xslow]   # Relative: base_wpm × 0.6 (40% slower than base)
 [slow]important point[/slow]   # Relative: base_wpm × 0.8 (20% slower than base)
 [fast]quick mention[/fast]     # Relative: base_wpm × 1.25 (25% faster than base)
@@ -176,7 +187,7 @@ Inline markers are embedded within phrase text to control presentation.
 | `[fast]` | 1.25× | 175 |
 | `[xfast]` | 1.5× | 210 |
 
-**Note:** All relative speed tags are **relative to the base speed**, not absolute values. Tags stack multiplicatively when nested: `[xslow][slow]text[/slow][/xslow]` = base × 0.6 × 0.8 = 48% of base.
+**Note:** All relative speed tags are **relative to the base speed**, not absolute values. The multiplier is calculated as `1 + (offset / 100)`. For example, `slow` with offset `-20` → multiplier `1 + (-20/100)` = `0.8`. Tags stack multiplicatively when nested: `[xslow][slow]text[/slow][/xslow]` = base × 0.6 × 0.8 = 48% of base.
 
 #### Runtime Speed Control
 
@@ -210,6 +221,17 @@ The **+/−** buttons on the reading page change the **base speed** for the curr
 [phonetic:ˈkæməl]camel[/phonetic]              # IPA pronunciation
 [pronunciation:KAM-uhl]camel[/pronunciation]    # Simple guide
 ```
+
+#### Stress Marks
+
+```markdown
+[stress:de-VE-lop-ment]development[/stress]     # Stressed syllable in UPPERCASE
+[stress:IN-fra-struc-ture]infrastructure[/stress]
+```
+
+The guide string uses hyphens to separate syllables. The stressed syllable is written in **UPPERCASE**; unstressed syllables are lowercase. For words with secondary stress, use an acute accent on the vowel: `[stress:rè-su-MÉ]résumé[/stress]`.
+
+Renderers should display the stress guide as a tooltip, subtitle, or overlay — not replace the word itself.
 
 ## Keyword Reference
 
@@ -249,7 +271,7 @@ Colors are **semantic names** — renderers map them to actual hex values approp
 | `white` | #F8F9FA | High | Default text on dark BG |
 | `gray` | #ADB5BD | Medium | Subdued, secondary text |
 
-> **Note:** `black` is **not a valid inline color** — it is invisible on the dark teleprompter background. Parsers strip `[black]` tags and render content unstyled.
+> **Note:** `black` is **not a valid inline color** — it is invisible on the dark teleprompter background. Parsers should strip `[black]` tags and render the enclosed content unstyled (no color applied).
 
 `highlight` is a **formatting tag**, not a color — it applies a semi-transparent yellow **background overlay**: `[highlight]key point[/highlight]`.
 
@@ -264,14 +286,16 @@ Colors are **semantic names** — renderers map them to actual hex values approp
 | **Markdown emphasis** | `*text*` | Converted to emphasis level 1 |
 | **Strong emphasis** | `**text**` | Converted to emphasis level 2 |
 | **Highlight** | `[highlight]text[/highlight]` | Visual highlighting |
-| **Speed (absolute)** | `[NWPM]text[/NWPM]` | Temporary speed change |
+| **Speed (absolute)** | `[NWPM]text[/NWPM]` | Temporary absolute speed change (e.g., `[150WPM]`) |
 | **Speed (preset)** | `[xslow]text[/xslow]` | Extra slow: base × 0.6 |
 | **Speed (preset)** | `[slow]text[/slow]` | Slow: base × 0.8 |
 | **Speed (preset)** | `[fast]text[/fast]` | Fast: base × 1.25 |
 | **Speed (preset)** | `[xfast]text[/xfast]` | Extra fast: base × 1.5 |
+| **Speed (reset)** | `[normal]text[/normal]` | Reset to base speed: base × 1.0 |
 | **Edit point** | `[edit_point]` or `[edit_point:priority]` | Mark edit location |
 | **Phonetic** | `[phonetic:IPA]text[/phonetic]` | IPA pronunciation guide |
-| **Pronunciation** | `[pronunciation:guide]text[/pronunciation]` | Simple pronunciation |
+| **Pronunciation** | `[pronunciation:guide]text[/pronunciation]` | Simple pronunciation guide |
+| **Stress** | `[stress:SYL-la-ble]text[/stress]` | Syllable stress (UPPERCASE = stressed) |
 | **Color** | `[red]text[/red]`, `[green]...[/green]`, etc. | Apply color styling (see Colors table) |
 | **Emotion** | `[warm]text[/warm]`, `[urgent]...[/urgent]`, etc. | Apply emotion-based color styling (see Emotions table) |
 
@@ -301,7 +325,7 @@ All speed presets are **relative to base_wpm** — they apply a multiplier, not 
 |----------|--------|-------|
 | `\[` | `[` | Literal bracket in text |
 | `\]` | `]` | Literal bracket in text |
-| `\|` | `\|` | Literal pipe in segment/block names |
+| `\|` | `|` | Literal pipe in segment/block names |
 | `\/` | `/` | Literal slash (not a pause) |
 | `\*` | `*` | Literal asterisk (not emphasis) |
 | `\\` | `\` | Literal backslash |
@@ -319,11 +343,13 @@ Properties flow downward through the hierarchy. Each level can override its pare
 
 If a child omits a value, it inherits from its nearest ancestor.
 
+**Best practice:** Only specify WPM or emotion when they **differ** from the inherited value. If `base_wpm` is 140 and a segment runs at 140 WPM, omit the WPM parameter — `## [Intro|Warm]` not `## [Intro|140WPM|Warm]`. Similarly, if a block's emotion matches its parent segment, omit it — `### [Details]` not `### [Details|140WPM|Warm]`. Redundant declarations add noise and make overrides harder to spot.
+
 ### WPM Resolution
 
 For any word, the effective WPM is determined by (highest priority first):
 
-1. Inline speed tag (`[180WPM]...[/180WPM]`, `[xslow]`, `[slow]`, `[fast]`, `[xfast]`)
+1. Inline speed tag (`[150WPM]...[/150WPM]`, `[xslow]`, `[slow]`, `[normal]`, `[fast]`, `[xfast]`)
 2. Block header WPM
 3. Segment header WPM
 4. `base_wpm` from front matter
@@ -341,19 +367,44 @@ For any word, the effective WPM is determined by (highest priority first):
 
 When emotion changes between segments or blocks, renderers should apply a smooth visual transition (recommended: 3-second fade between color schemes).
 
+### Color and Emotion Precedence
+
+When inline color and emotion tags are nested, the **innermost tag wins** for the enclosed span. For example, `[warm][red]text[/red][/warm]` renders "text" in red, not the warm emotion color. Block-level emotion serves as the default styling; inline tags override it for their span only.
+
+### Phrase Boundaries
+
+A **phrase** is a unit of text delimited by:
+- Sentence-ending punctuation: `.` `?` `!`
+- Pause markers: `/`, `//`, `[pause:...]`
+- Block or segment boundaries
+
+Phrases are the smallest unit for timing calculation. Words within a phrase are counted for WPM computation using whitespace tokenization: each whitespace-separated token counts as one word. Hyphenated words (e.g., `state-of-the-art`) count as one word. Tags and tag syntax are not counted.
+
 ### Tag Nesting
 
 - Tags must be properly closed: `[red]text[/red]`.
 - Tags must not cross-nest: `[red][emphasis]text[/red][/emphasis]` is **invalid**.
 - Valid nesting: `[red][emphasis]text[/emphasis][/red]`.
+- If a tag is never closed, the parser should implicitly close it at the end of the current block.
+
+### Nested Speed Resolution
+
+When speed tags are nested, relative tags (`[slow]`, `[fast]`, etc.) stack multiplicatively against the **base speed** — not against each other:
+
+- `[slow]text[/slow]` = base × 0.8
+- `[xslow][slow]text[/slow][/xslow]` = base × 0.6 × 0.8 = base × 0.48
+
+When an absolute speed tag (`[150WPM]`) contains a relative tag, the absolute value becomes the new base for the inner tag:
+
+- `[150WPM][slow]text[/slow][/150WPM]` = 150 × 0.8 = 120 WPM
 
 ### Content Without Segments
 
 If a TPS file has no `##` segment headers, the entire content (after front matter) is treated as a single implicit segment with `Neutral` emotion and default WPM.
 
-### Simple Segment Headers
+### Simple Headers
 
-Plain markdown `## Title` headers (without `[...]` brackets) are also recognized as segments with default (neutral) emotion and inherited WPM.
+Plain markdown `## Title` and `### Title` headers (without `[...]` brackets) are also recognized as segments and blocks respectively, with default (neutral) emotion and inherited WPM.
 
 ## Rendering Context
 
@@ -362,7 +413,7 @@ TPS is designed for **teleprompter use** — text is always rendered on a **dark
 ### Dark Background Rules
 
 1. **Text base color** is white/light (`#F8F9FA` or similar). All inline colors must be **lighter variants** that contrast well against dark backgrounds.
-2. **`black` is not a valid inline color** — it would be invisible. Renderers should map `[black]` to `gray` or ignore it.
+2. **`black` is not a valid inline color** — it would be invisible. Renderers should strip `[black]` tags and render the enclosed content unstyled.
 3. **Minimum contrast** — all color keywords must produce at least **WCAG AA 4.5:1** contrast ratio against the dark background.
 4. **Emotion color schemes** (background, text, accent) are pre-defined per emotion. They are not raw hex values — they are tuned for the dark rendering context with appropriate alpha channels.
 5. **`highlight`** uses a semi-transparent yellow background overlay, not a text color change.
@@ -381,6 +432,8 @@ The Actor profile targets natural spoken delivery — reading aloud from a telep
 | Fast presentation (pitch, TED) | 170–200 | Experienced speakers only |
 
 **Default `base_wpm`: 140** — sits in the middle of the standard range. Most people read comfortably at 130–150 WPM from a teleprompter.
+
+**Duration formula:** `phrase_duration_ms = (word_count / effective_wpm) × 60000`. Total duration is the sum of all phrase durations plus all pause durations.
 
 **Advice for script authors:**
 - Start at 130 WPM for new speakers, increase gradually.
@@ -431,22 +484,24 @@ speed_offsets:
 author: Jane Doe
 ---
 
-## [Intro|140WPM|Warm]
+# Product Launch
 
-### [Opening Block|140WPM]
+## [Intro|Warm]
+
+### [Opening Block]
 Good morning everyone, / and [emphasis]welcome[/emphasis] to what I believe /
 will be a [green]transformative moment[/green] for our company. //
 
 [pause:2s]
 
-### [Purpose Block|150WPM]
+### [Purpose Block|145WPM]
 [emphasis]Today[/emphasis], / we're not just launching a product – /
 we're introducing a [highlight]solution[/highlight] that will [emphasis]revolutionize[/emphasis] /
-how our customers interact with technology. //
+how our customers interact with [stress:tech-NO-lo-gy]technology[/stress]. //
 
-## [Problem|150WPM|Concerned]
+## [Problem|135WPM|Concerned]
 
-### [Statistics Block|150WPM|Neutral]
+### [Statistics Block|Neutral]
 But first, / let's address the [xslow][red]elephant in the room[/red][/xslow]. /
 Our industry has been [emphasis]struggling[/emphasis] with a fundamental problem. //
 
@@ -456,18 +511,18 @@ According to recent studies, /
 [slow][emphasis]73% of users abandon[/emphasis] applications within the first three interactions[/slow] /
 due to [highlight]complexity and poor user experience[/highlight]. //
 
-### [Impact Block|140WPM]
+### [Impact Block]
 This affects [emphasis]millions[/emphasis] of people worldwide, /
 costing businesses [red]billions in revenue[/red] annually. //
 
-## [Solution|160WPM|Focused]
+## [Solution|Focused]
 
-### [Introduction Block|150WPM]
+### [Introduction Block]
 That's where our [blue][emphasis]new platform[/emphasis][/blue] comes in. /
 We've developed a [green]local-first teleprompter workflow[/green] that /
 [highlight]simplifies complex processes[/highlight] and [emphasis]enhances user experience[/emphasis]. //
 
-### [Benefits Block|160WPM|Excited]
+### [Benefits Block|150WPM|Excited]
 With our solution, / you can expect a [green][emphasis]50% reduction[/emphasis][/green] in user abandonment /
 and a [green][emphasis]30% increase[/emphasis][/green] in engagement. //
 
@@ -478,6 +533,16 @@ and a [green][emphasis]30% increase[/emphasis][/green] in engagement. //
 
 [edit_point:medium]
 ```
+
+## Examples
+
+The [`examples/`](examples/) directory contains sample TPS files demonstrating the format:
+
+| File | Description |
+|------|-------------|
+| [`basic.tps`](examples/basic.tps) | Minimal valid TPS file — front matter, title, segments, blocks, pauses, emphasis. |
+| [`advanced.tps`](examples/advanced.tps) | All format features — speed controls, inline WPM, colors, emotions, pronunciation, edit points, tag nesting. |
+| [`multi-segment.tps`](examples/multi-segment.tps) | Multi-segment script with varying speed and emotion across segments. |
 
 ## File Extension
 
