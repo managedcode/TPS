@@ -1,7 +1,7 @@
 using System.Globalization;
-using ManagedCode.Tps.Compiler.Models;
+using ManagedCode.Tps.Models;
 
-namespace ManagedCode.Tps.Compiler.Internal;
+namespace ManagedCode.Tps.Internal;
 
 internal static class TpsSupport
 {
@@ -102,10 +102,12 @@ internal static class TpsSupport
     }
 
     public static int ResolveBaseWpm(IReadOnlyDictionary<string, string> metadata) =>
-        metadata.TryGetValue(TpsSpec.FrontMatterKeys.BaseWpm, out var value) &&
-        int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed)
-            ? parsed
-            : TpsSpec.DefaultBaseWpm;
+        ClampWpm(
+            metadata.TryGetValue(TpsSpec.FrontMatterKeys.BaseWpm, out var value) &&
+            int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed)
+                ? parsed
+                : null,
+            TpsSpec.DefaultBaseWpm);
 
     public static Dictionary<string, int> ResolveSpeedOffsets(IReadOnlyDictionary<string, string> metadata) =>
         new(StringComparer.OrdinalIgnoreCase)
@@ -216,6 +218,16 @@ internal static class TpsSupport
         metadata.TryGetValue(key, out var value) && int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed)
             ? parsed
             : fallback;
+
+    private static int ClampWpm(int? candidate, int fallback)
+    {
+        if (candidate is not int value)
+        {
+            return fallback;
+        }
+
+        return Math.Min(Math.Max(value, TpsSpec.MinimumWpm), TpsSpec.MaximumWpm);
+    }
 
     private static bool IsTimeToken(string value) =>
         TimeSpan.TryParseExact(value.Trim(), ["m\\:ss", "mm\\:ss"], CultureInfo.InvariantCulture, out _);

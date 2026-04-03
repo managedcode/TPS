@@ -9,6 +9,7 @@ import markdownItAnchor from "markdown-it-anchor";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
 const readmePath = path.join(rootDir, "README.md");
+const glossaryPath = path.join(rootDir, "docs", "Glossary.md");
 const versionPath = path.join(rootDir, "VERSION");
 const sdkManifestPath = path.join(rootDir, "SDK", "manifest.json");
 const stylesPath = path.join(rootDir, "website", "site.css");
@@ -39,6 +40,7 @@ const emotionStyles = {
 };
 
 const readme = await readFile(readmePath, "utf8");
+const glossaryMarkdown = await readFile(glossaryPath, "utf8");
 const version = normalizeVersion(await readFile(versionPath, "utf8"));
 const sdkManifest = JSON.parse(await readFile(sdkManifestPath, "utf8"));
 const styles = await readFile(stylesPath, "utf8");
@@ -69,6 +71,7 @@ const summary = extractSummary(tokens) ?? "Markdown-based teleprompter scripts w
 const sections = extractSections(tokens);
 const stats = buildStats(readme, sections);
 const articleHtml = enhanceArticleHtml(md.renderer.render(trimTitle(tokens), md.options, {}));
+const glossaryHtml = enhanceArticleHtml(md.render(glossaryMarkdown));
 const heroTitle = buildHeroTitle(title);
 const quickAnswers = buildQuickAnswers(summary);
 const keywords = buildKeywords();
@@ -104,6 +107,7 @@ await rm(distDir, { recursive: true, force: true });
 await mkdir(distDir, { recursive: true });
 await mkdir(path.join(distDir, "examples"), { recursive: true });
 await mkdir(path.join(distDir, "sdk"), { recursive: true });
+await mkdir(path.join(distDir, "glossary"), { recursive: true });
 await cp(publicDir, distDir, { recursive: true });
 
 const page = `<!DOCTYPE html>
@@ -173,6 +177,7 @@ const page = `<!DOCTYPE html>
       <div class="nav-links">
         <a href="#specification">Spec</a>
         <a href="#complete-example">Example</a>
+        <a href="./glossary/">Glossary</a>
         <a href="./sdk/">SDK</a>
         <a href="https://github.com/managedcode/PrompterOne" target="_blank" rel="noopener">Prompter One</a>
         <a class="nav-gh" href="https://github.com/managedcode/TPS" target="_blank" rel="noopener">
@@ -356,6 +361,7 @@ for (const ex of tpsExamples) {
 
 await writeFile(path.join(distDir, "examples", "index.html"), buildExamplesIndexPage(tpsExamples, styles), "utf8");
 await writeFile(path.join(distDir, "sdk", "index.html"), buildSdkIndexPage(sdkRuntimes, styles), "utf8");
+await writeFile(path.join(distDir, "glossary", "index.html"), buildGlossaryPage(glossaryHtml, styles), "utf8");
 
 await writeFile(path.join(distDir, "sitemap.xml"), buildSitemapXml(siteUrl, dateModifiedIso, tpsExamples), "utf8");
 await writeFile(path.join(distDir, "robots.txt"), buildRobotsTxt(siteUrl), "utf8");
@@ -709,6 +715,12 @@ function buildSitemapXml(siteUrl, dateModifiedIso, examples = []) {
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>${siteUrl}glossary/</loc>
+    <lastmod>${dateModifiedIso}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>${siteUrl}sdk/</loc>
     <lastmod>${dateModifiedIso}</lastmod>
     <changefreq>weekly</changefreq>
@@ -995,6 +1007,7 @@ function buildExamplePage(ex, css) {
       </a>
       <div class="nav-links">
         <a href="../#specification">Spec</a>
+        <a href="../glossary/">Glossary</a>
         <a href="../sdk/">SDK</a>
         <a href="../">Home</a>
         <a href="https://prompter.one" target="_blank" rel="noopener">Prompter One</a>
@@ -1010,6 +1023,7 @@ function buildExamplePage(ex, css) {
     <h1>${escapeHtml(title)} <small>— TPS Example</small></h1>
     <p class="example-meta">
       <a href="../">&larr; Back to spec</a> &middot;
+      <a href="../glossary/">TPS glossary</a> &middot;
       <a href="https://github.com/managedcode/TPS/blob/main/examples/${escapeHtml(ex.file)}" target="_blank" rel="noopener">View source on GitHub</a> &middot;
       ${ex.meta.base_wpm ? `${escapeHtml(ex.meta.base_wpm)} WPM` : "140 WPM"} base speed &middot;
       ${ex.meta.duration ? `${escapeHtml(ex.meta.duration)} duration` : ""}
@@ -1228,6 +1242,7 @@ function buildExamplesIndexPage(examples, css) {
       </a>
       <div class="nav-links">
         <a href="../#specification">Spec</a>
+        <a href="../glossary/">Glossary</a>
         <a href="../sdk/">SDK</a>
         <a href="../">Home</a>
         <a href="https://prompter.one" target="_blank" rel="noopener">Prompter One</a>
@@ -1349,6 +1364,7 @@ function buildSdkIndexPage(runtimes, css) {
       <div class="nav-links">
         <a href="../#specification">Spec</a>
         <a href="../examples/">Examples</a>
+        <a href="../glossary/">Glossary</a>
         <a href="./">SDK</a>
         <a href="https://prompter.one" target="_blank" rel="noopener">Prompter One</a>
         <a class="nav-gh" href="${repoUrl}" target="_blank" rel="noopener">
@@ -1365,7 +1381,7 @@ function buildSdkIndexPage(runtimes, css) {
       <a href="../">&larr; Back to spec</a> &middot;
       Runtime catalog generated from <code>SDK/manifest.json</code>.
     </p>
-    <p class="example-desc">Each TPS SDK exposes the same contract: constants, validation, parser, compiler, and player APIs. Use this page to jump directly into the implementation folders in the repository.</p>
+    <p class="example-desc">Each TPS SDK exposes the same contract: constants, validation, parser, compiler, and player APIs. Use this page to jump directly into the implementation folders in the repository. Need terminology? Open the <a href="../glossary/">TPS glossary</a>.</p>
 
     <div class="answer-strip">
       <div class="answer-strip-header">
@@ -1380,6 +1396,73 @@ function buildSdkIndexPage(runtimes, css) {
     <div class="examples-info-box">
       <p>Active runtimes participate in build and test CI, while runtimes with a coverage command also pass the separate <strong>90%+</strong> coverage pipeline.</p>
     </div>
+  </div>
+
+  <footer class="site-footer examples-index-footer">
+    <span>Copyright &copy; <a href="https://www.managed-code.com/" target="_blank" rel="noopener">Managed Code</a></span>
+    <span>Licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>
+    <span><a href="${repoUrl}">Repository</a></span>
+  </footer>
+</body>
+</html>`;
+}
+
+function buildGlossaryPage(glossaryContentHtml, css) {
+  const glossaryUrl = `${siteUrl}glossary/`;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TPS Glossary — ManagedCode.Tps</title>
+  <meta name="description" content="Glossary of TPS specification, compiler, player, and SDK terminology.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#faf8f4">
+  <link rel="canonical" href="${glossaryUrl}">
+  <meta property="og:title" content="TPS Glossary">
+  <meta property="og:description" content="Core TPS format and SDK terminology.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="${glossaryUrl}">
+  <meta property="og:image" content="${socialImageUrl}">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <style>${css}</style>
+</head>
+<body>
+  <nav class="top-nav scrolled">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../">
+        <svg width="24" height="24" viewBox="0 0 28 28" fill="none" aria-hidden="true"><rect width="28" height="28" rx="8" fill="url(#ng)"/><path d="M7 9h14M7 14h10M7 19h12" stroke="#faf8f4" stroke-width="2.2" stroke-linecap="round"/><defs><linearGradient id="ng" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#8B7355"/><stop offset="1" stop-color="#C4A060"/></linearGradient></defs></svg>
+        <span>TPS Format</span>
+      </a>
+      <div class="nav-links">
+        <a href="../#specification">Spec</a>
+        <a href="../examples/">Examples</a>
+        <a href="./">Glossary</a>
+        <a href="../sdk/">SDK</a>
+        <a href="https://prompter.one" target="_blank" rel="noopener">Prompter One</a>
+        <a class="nav-gh" href="${repoUrl}" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="example-page">
+    <h1>TPS Glossary</h1>
+    <p class="example-meta">
+      <a href="../">&larr; Back to spec</a> &middot;
+      Terminology reference for TPS format and SDK work.
+    </p>
+    <p class="example-desc">Use this page as the canonical term list for the TPS specification, compiler/runtime model, and the <code>ManagedCode.Tps</code> SDK workspace.</p>
+
+    <article class="content-card">
+      <div class="markdown-body">
+        ${glossaryContentHtml}
+      </div>
+    </article>
   </div>
 
   <footer class="site-footer examples-index-footer">

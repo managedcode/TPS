@@ -1,7 +1,7 @@
 using System.Text.Json;
-using ManagedCode.Tps.Compiler.Models;
+using ManagedCode.Tps.Models;
 
-namespace ManagedCode.Tps.Compiler.Tests;
+namespace ManagedCode.Tps.Tests;
 
 public sealed class TpsRuntimeTests
 {
@@ -25,6 +25,9 @@ public sealed class TpsRuntimeTests
 
         Assert.Equal("Invalid header", diagnostic.Message);
         Assert.Equal("Fix it", diagnostic.Suggestion);
+
+        var serializedDiagnostic = JsonSerializer.Serialize(diagnostic);
+        Assert.Contains("\"Severity\":\"error\"", serializedDiagnostic, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -73,6 +76,24 @@ public sealed class TpsRuntimeTests
     }
 
     [Fact]
+    public void ParseAndCompile_ExposeReadOnlyCollections()
+    {
+        var parsed = TpsRuntime.Parse("## [Signal]\n### [Body]\nReady.");
+        var compiled = TpsRuntime.Compile("## [Signal]\n### [Body]\nReady.");
+
+        Assert.False(parsed.Document.Metadata is Dictionary<string, string>);
+        Assert.False(parsed.Document.Segments is List<TpsSegment>);
+        Assert.False(parsed.Document.Segments[0].Blocks is List<TpsBlock>);
+
+        Assert.False(compiled.Script.Metadata is Dictionary<string, string>);
+        Assert.False(compiled.Script.Segments is List<CompiledSegment>);
+        Assert.False(compiled.Script.Words is List<CompiledWord>);
+        Assert.False(compiled.Script.Segments[0].Blocks is List<CompiledBlock>);
+        Assert.False(compiled.Script.Segments[0].Blocks[0].Phrases is List<CompiledPhrase>);
+        Assert.False(compiled.Script.Segments[0].Blocks[0].Words is List<CompiledWord>);
+    }
+
+    [Fact]
     public void Compile_Examples_AreAcceptedWithoutDiagnostics()
     {
         foreach (var example in new[] { "basic.tps", "advanced.tps", "multi-segment.tps" })
@@ -115,6 +136,39 @@ public sealed class TpsRuntimeTests
     }
 
     [Fact]
+    public void Parse_TrailingNewlines_DoNotLeakIntoSegmentOrBlockContent()
+    {
+        const string source = """
+        ## [Signal|Warm]
+        ### [Body]
+        Ready.
+
+        """;
+
+        var result = TpsRuntime.Parse(source);
+
+        Assert.True(result.Ok);
+        Assert.Equal(string.Empty, result.Document.Segments[0].Content);
+        Assert.Equal("Ready.", result.Document.Segments[0].Blocks[0].Content);
+    }
+
+    [Fact]
+    public void Compile_SegmentBodyWithoutExplicitBlocks_DoesNotDuplicateWords()
+    {
+        const string source = """
+        ## [Intro]
+        Hello world.
+        """;
+
+        var result = TpsRuntime.Compile(source);
+
+        Assert.True(result.Ok);
+        Assert.Equal(["Hello", "world."], result.Script.Words.Select(word => word.CleanText).ToArray());
+        Assert.Single(result.Script.Segments[0].Blocks);
+        Assert.Equal("Hello world.", result.Script.Segments[0].Blocks[0].Phrases[0].Text);
+    }
+
+    [Fact]
     public void Player_ExposesPresentationStateAndCompletion()
     {
         var compiled = TpsRuntime.Compile(ReadFixture("valid", "runtime-parity.tps")).Script;
@@ -139,6 +193,7 @@ public sealed class TpsRuntimeTests
         Assert.Single(emptyCompiled.Segments);
         var emptyState = new TpsPlayer(emptyCompiled).GetState(0);
         Assert.Equal(1d, emptyState.Progress);
+        Assert.Equal(-1, emptyState.CurrentWordIndex);
         Assert.Empty(emptyState.Presentation.VisibleWords);
         Assert.Null(emptyState.CurrentWord);
 

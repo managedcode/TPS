@@ -12,8 +12,8 @@ Parent: `../../AGENTS.md`
 
 ## Entry Points
 
-- `src/ManagedCode.Tps.Compiler/`
-- `tests/ManagedCode.Tps.Compiler.Tests/`
+- `src/ManagedCode.Tps/`
+- `tests/ManagedCode.Tps.Tests/`
 
 ## Project Commands
 

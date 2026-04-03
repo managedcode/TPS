@@ -1,7 +1,7 @@
-using ManagedCode.Tps.Compiler.Internal;
-using ManagedCode.Tps.Compiler.Models;
+using ManagedCode.Tps.Internal;
+using ManagedCode.Tps.Models;
 
-namespace ManagedCode.Tps.Compiler.Tests;
+namespace ManagedCode.Tps.Tests;
 
 public sealed class TpsInternalTests
 {
@@ -23,6 +23,7 @@ public sealed class TpsInternalTests
         Assert.Equal("focused", TpsSupport.ResolveEmotion(null, "focused"));
         Assert.Equal(TpsSpec.EmotionPalettes[TpsSpec.DefaultEmotion], TpsSupport.ResolvePalette("mystery"));
         Assert.Equal(160, TpsSupport.ResolveBaseWpm(new Dictionary<string, string> { [TpsSpec.FrontMatterKeys.BaseWpm] = "160" }));
+        Assert.Equal(TpsSpec.MinimumWpm, TpsSupport.ResolveBaseWpm(new Dictionary<string, string> { [TpsSpec.FrontMatterKeys.BaseWpm] = "10" }));
         Assert.Equal(TpsSpec.DefaultBaseWpm, TpsSupport.ResolveBaseWpm(new Dictionary<string, string>()));
         Assert.Equal(0.8d, TpsSupport.ResolveSpeedMultiplier("slow", TpsSupport.ResolveSpeedOffsets(new Dictionary<string, string>())));
         Assert.Equal(150, TpsSupport.TryParseAbsoluteWpm("150WPM"));
@@ -82,6 +83,11 @@ public sealed class TpsInternalTests
         Assert.Equal(TpsSpec.DiagnosticCodes.InvalidWpm, parser.Parse("## [Fast|300WPM]").Diagnostics[0].Code);
         Assert.Equal(TpsSpec.DiagnosticCodes.InvalidWpm, parser.Parse("## [Slow|10WPM]").Diagnostics[0].Code);
         Assert.Equal("150", parser.Parse("---\n\nbase_wpm: 150\n---\n").Document.Metadata[TpsSpec.FrontMatterKeys.BaseWpm]);
+        Assert.Equal("Display", parser.Parse("---\nbase_wpm: 150\n---\n\n# Display").Document.Metadata[TpsSpec.FrontMatterKeys.Title]);
+        Assert.Equal("150", parser.Parse("---\nbase_wpm: 150\n---").Document.Metadata[TpsSpec.FrontMatterKeys.BaseWpm]);
+        Assert.Equal(TpsSpec.DiagnosticCodes.InvalidFrontMatter, parser.Parse("---\nbase_wpm: fast\n---").Diagnostics[0].Code);
+        Assert.Equal(TpsSpec.DiagnosticCodes.InvalidWpm, parser.Parse("---\nbase_wpm: 10\n---").Diagnostics[0].Code);
+        Assert.Equal(TpsSpec.DiagnosticCodes.InvalidFrontMatter, parser.Parse("---\nspeed_offsets:\n  fast: quick\n---").Diagnostics[0].Code);
     }
 
     [Fact]

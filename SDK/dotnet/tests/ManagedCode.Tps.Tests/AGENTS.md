@@ -1,18 +1,18 @@
 # AGENTS.md
 
-Project: ManagedCode.Tps.Compiler.Tests
+Project: ManagedCode.Tps.Tests
 Owned by: ManagedCode.Tps .NET test maintainers
 
 Parent: `../../../../AGENTS.md`
 
 ## Purpose
 
-- Hold xUnit regression and verification coverage for `ManagedCode.Tps.Compiler`.
+- Hold xUnit regression and verification coverage for `ManagedCode.Tps`.
 - Protect public contracts and future TPS behavior with repeatable tests.
 
 ## Entry Points
 
-- `ManagedCode.Tps.Compiler.Tests.csproj`
+- `ManagedCode.Tps.Tests.csproj`
 - `TpsRuntimeTests.cs`
 - `TpsInternalTests.cs`
 
@@ -32,10 +32,10 @@ Parent: `../../../../AGENTS.md`
 
 ## Project Commands
 
-- `build`: `dotnet build ManagedCode.Tps.Compiler.Tests.csproj`
-- `test`: `dotnet test ManagedCode.Tps.Compiler.Tests.csproj`
+- `build`: `dotnet build ManagedCode.Tps.Tests.csproj`
+- `test`: `dotnet test ManagedCode.Tps.Tests.csproj`
 - `format`: `dotnet format ../../ManagedCode.Tps.slnx --verify-no-changes`
-- `analyze`: `dotnet build ManagedCode.Tps.Compiler.Tests.csproj -warnaserror`
+- `analyze`: `dotnet build ManagedCode.Tps.Tests.csproj -warnaserror`
 
 For this .NET project:
 
@@ -62,6 +62,6 @@ For this .NET project:
 
 ## Local Rules
 
-- Keep test project namespaces under `ManagedCode.Tps.Compiler.Tests`.
+- Keep test project namespaces under `ManagedCode.Tps.Tests`.
 - Do not move production logic into test helpers.
 - Prefer behavior-oriented tests over implementation-detail assertions.

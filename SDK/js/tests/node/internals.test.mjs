@@ -72,6 +72,7 @@ test("covers low-level helpers and spec math", () => {
   assert.equal(resolveEmotion(undefined, "focused"), "focused");
   assert.equal(resolvePalette("unknown").accent, TpsSpec.emotionPalettes.neutral.accent);
   assert.equal(resolveBaseWpm({ base_wpm: "160" }), 160);
+  assert.equal(resolveBaseWpm({ base_wpm: "10" }), 80);
   assert.equal(resolveBaseWpm({}), 140);
   assert.equal(resolveSpeedMultiplier("slow", resolveSpeedOffsets({})), 0.8);
   assert.equal(tryParseAbsoluteWpm("150WPM"), 150);
@@ -127,6 +128,9 @@ test("covers parser edge cases for invalid headers and implicit content routing"
   assert.equal(parseTps("## []").diagnostics[0].code, "invalid-header");
   assert.equal(parseTps("---\n# comment\nbad-line\nbase_wpm: 150\n---\n## [Name| ]").document.metadata.base_wpm, "150");
   assert.equal(parseTps("## [Name|140]\n### [Empty]\n## [Next]").document.segments[0].blocks[0].content, "");
+  assert.equal(parseTps("---\nbase_wpm: fast\n---").diagnostics[0].code, "invalid-front-matter");
+  assert.equal(parseTps("---\nbase_wpm: 10\n---").diagnostics[0].code, "invalid-wpm");
+  assert.equal(parseTps("---\nspeed_offsets:\n  fast: quick\n---").diagnostics[0].code, "invalid-front-matter");
 
   const beforeBlock = parseTps("Lead text\n### Body\nCopy.");
   assert.equal(beforeBlock.document.segments[0].name, TpsSpec.defaultImplicitSegmentName);
@@ -141,6 +145,7 @@ test("covers player fallback branches on empty scripts and pause-only blocks", (
   const emptyScript = compileTps("").script;
   const emptyState = new TpsPlayer(emptyScript).getState(0);
   assert.equal(emptyState.progress, 1);
+  assert.equal(emptyState.currentWordIndex, -1);
   assert.equal(emptyState.presentation.visibleWords.length, 0);
 
   const pauseOnlyScript = compileTps("## [Signal]\n### [Body]\n[pause:1s]").script;

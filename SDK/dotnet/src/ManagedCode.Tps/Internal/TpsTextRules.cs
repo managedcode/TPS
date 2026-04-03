@@ -1,4 +1,4 @@
-namespace ManagedCode.Tps.Compiler.Internal;
+namespace ManagedCode.Tps.Internal;
 
 internal static class TpsTextRules
 {

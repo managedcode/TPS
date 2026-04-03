@@ -2,6 +2,8 @@
 
 This folder exposes the JavaScript-consumable TPS runtime built from the TypeScript source.
 
+Package identity: `managedcode.tps`
+
 ## Public API
 
 Imports come from `SDK/js/lib/index.js` and mirror the TS contract:

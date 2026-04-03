@@ -5,6 +5,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <AssemblyName>ManagedCode.Tps.Tests</AssemblyName>
+    <RootNamespace>ManagedCode.Tps.Tests</RootNamespace>
+    <IncludeTestAssembly>false</IncludeTestAssembly>
+    <Exclude>[*.Tests]*</Exclude>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\ManagedCode.Tps.Compiler\ManagedCode.Tps.Compiler.csproj" />
+    <ProjectReference Include="..\..\src\ManagedCode.Tps\ManagedCode.Tps.csproj" />
   </ItemGroup>
 
 </Project>

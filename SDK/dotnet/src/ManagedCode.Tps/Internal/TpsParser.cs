@@ -1,9 +1,11 @@
 using System.Globalization;
-using ManagedCode.Tps.Compiler.Models;
+using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
+using ManagedCode.Tps.Models;
 
-namespace ManagedCode.Tps.Compiler.Internal;
+namespace ManagedCode.Tps.Internal;
 
-internal sealed class TpsParser
+internal sealed partial class TpsParser
 {
     public DocumentAnalysis Parse(string source)
     {
@@ -18,11 +20,7 @@ internal sealed class TpsParser
             normalized,
             lineStarts,
             diagnostics,
-            new TpsDocument
-            {
-                Metadata = frontMatter.Metadata,
-                Segments = parsedSegments.Select(segment => segment.Segment).ToList()
-            },
+            FreezeDocument(frontMatter.Metadata, parsedSegments),
             parsedSegments);
     }
 
@@ -33,8 +31,8 @@ internal sealed class TpsParser
             return new FrontMatterResult(new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase), source, 0);
         }
 
-        var closingIndex = source.IndexOf("\n---\n", 4, StringComparison.Ordinal);
-        if (closingIndex < 0)
+        var closing = FindFrontMatterClosing(source);
+        if (closing is null)
         {
             diagnostics.Add(TpsSupport.CreateDiagnostic(
                 TpsSpec.DiagnosticCodes.InvalidFrontMatter,
@@ -45,16 +43,27 @@ internal sealed class TpsParser
             return new FrontMatterResult(new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase), source, 0);
         }
 
-        return new FrontMatterResult(ParseMetadata(source[4..closingIndex]), source[(closingIndex + 5)..], closingIndex + 5);
+        var metadata = ParseMetadata(source[4..closing.Value.Index], 4, lineStarts, diagnostics);
+        var bodyStartOffset = closing.Value.Index + closing.Value.Length;
+        return new FrontMatterResult(metadata, source[bodyStartOffset..], bodyStartOffset);
     }
 
-    private static Dictionary<string, string> ParseMetadata(string frontMatterText)
+    private static Dictionary<string, string> ParseMetadata(
+        string frontMatterText,
+        int startOffset,
+        IReadOnlyList<int> lineStarts,
+        List<TpsDiagnostic> diagnostics)
     {
         var metadata = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         string? currentSection = null;
+        var lineOffset = startOffset;
 
         foreach (var rawLine in frontMatterText.Split('\n'))
         {
+            var entryStart = lineOffset;
+            var entryEnd = lineOffset + rawLine.Length;
+            lineOffset = entryEnd + 1;
+
             if (string.IsNullOrWhiteSpace(rawLine) || rawLine.TrimStart().StartsWith('#'))
             {
                 continue;
@@ -76,6 +85,7 @@ internal sealed class TpsParser
                 if (!TpsSupport.IsLegacyMetadataKey(compositeKey))
                 {
                     metadata[compositeKey] = value;
+                    ValidateMetadataEntry(compositeKey, value, entryStart, entryEnd, lineStarts, diagnostics);
                 }
 
                 continue;
@@ -85,6 +95,7 @@ internal sealed class TpsParser
             if (value.Length > 0 && !TpsSupport.IsLegacyMetadataKey(key))
             {
                 metadata[key] = value;
+                ValidateMetadataEntry(key, value, entryStart, entryEnd, lineStarts, diagnostics);
             }
         }
 
@@ -107,8 +118,10 @@ internal sealed class TpsParser
             }
 
             metadata[TpsSpec.FrontMatterKeys.Title] = trimmed[2..].Trim();
-            var prefixLength = line.Text.Length + 1;
-            return new TitleBodyResult(body[prefixLength..], line.StartOffset + prefixLength);
+            var consumedLength = line.StartOffset - bodyStartOffset + line.Text.Length;
+            var trailingNewlineLength = consumedLength < body.Length && body[consumedLength] == '\n' ? 1 : 0;
+            var bodyOffset = consumedLength + trailingNewlineLength;
+            return new TitleBodyResult(body[bodyOffset..], bodyStartOffset + bodyOffset);
         }
 
         return new TitleBodyResult(body, bodyStartOffset);
@@ -191,7 +204,7 @@ internal sealed class TpsParser
 
         block.Content = CreateContentSection(lines);
         block.Block.Content = block.Content?.Text ?? string.Empty;
-        current.Segment.Blocks.Add(block.Block);
+        current.Blocks.Add(block.Block);
         current.ParsedBlocks.Add(block);
     }
 
@@ -339,7 +352,7 @@ internal sealed class TpsParser
         List<TpsDiagnostic> diagnostics)
     {
         var normalized = string.Concat(token.Where(character => !char.IsWhiteSpace(character)));
-        if (!System.Text.RegularExpressions.Regex.IsMatch(normalized, @"^\d+(wpm)?$", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+        if (!HeaderWpmRegex().IsMatch(normalized))
         {
             return false;
         }
@@ -366,6 +379,7 @@ internal sealed class TpsParser
     {
         var emotion = TpsSupport.ResolveEmotion(header.Emotion);
         var palette = TpsSupport.ResolvePalette(emotion);
+        var blocks = new List<TpsBlock>();
         return new ParsedSegmentInternal(
             new TpsSegment
             {
@@ -377,8 +391,10 @@ internal sealed class TpsParser
                 Timing = header.Timing,
                 BackgroundColor = palette.Background,
                 TextColor = palette.Text,
-                AccentColor = palette.Accent
-            });
+                AccentColor = palette.Accent,
+                Blocks = blocks
+            },
+            blocks);
     }
 
     private static ParsedSegmentInternal CreateImplicitSegment(IReadOnlyDictionary<string, string> metadata, int index) =>
@@ -418,6 +434,11 @@ internal sealed class TpsParser
         var lineStart = startOffset;
         foreach (var line in text.Split('\n'))
         {
+            if (line.Length == 0 && lineStart == startOffset + text.Length)
+            {
+                yield break;
+            }
+
             yield return new LineRecord(line, lineStart);
             lineStart += line.Length + 1;
         }
@@ -425,6 +446,108 @@ internal sealed class TpsParser
 
     private static string NormalizeMetadataValue(string value) =>
         value.Trim().Trim('"');
+
+    private static TpsDocument FreezeDocument(
+        IReadOnlyDictionary<string, string> metadata,
+        IReadOnlyList<ParsedSegmentInternal> parsedSegments) =>
+        new()
+        {
+            Metadata = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>(metadata, StringComparer.OrdinalIgnoreCase)),
+            Segments = Array.AsReadOnly(parsedSegments.Select(segment => FreezeSegment(segment.Segment)).ToArray())
+        };
+
+    private static TpsSegment FreezeSegment(TpsSegment segment) =>
+        new()
+        {
+            Id = segment.Id,
+            Name = segment.Name,
+            Content = segment.Content,
+            TargetWpm = segment.TargetWpm,
+            Emotion = segment.Emotion,
+            Speaker = segment.Speaker,
+            Timing = segment.Timing,
+            BackgroundColor = segment.BackgroundColor,
+            TextColor = segment.TextColor,
+            AccentColor = segment.AccentColor,
+            LeadingContent = segment.LeadingContent,
+            Blocks = Array.AsReadOnly(segment.Blocks.Select(FreezeBlock).ToArray())
+        };
+
+    private static TpsBlock FreezeBlock(TpsBlock block) =>
+        new()
+        {
+            Id = block.Id,
+            Name = block.Name,
+            Content = block.Content,
+            TargetWpm = block.TargetWpm,
+            Emotion = block.Emotion,
+            Speaker = block.Speaker
+        };
+
+    private static (int Index, int Length)? FindFrontMatterClosing(string source)
+    {
+        var blockClosingIndex = source.IndexOf("\n---\n", 4, StringComparison.Ordinal);
+        if (blockClosingIndex >= 0)
+        {
+            return (blockClosingIndex, 5);
+        }
+
+        if (source.EndsWith("\n---", StringComparison.Ordinal))
+        {
+            return (source.Length - 4, 4);
+        }
+
+        return null;
+    }
+
+    private static void ValidateMetadataEntry(
+        string key,
+        string value,
+        int start,
+        int end,
+        IReadOnlyList<int> lineStarts,
+        List<TpsDiagnostic> diagnostics)
+    {
+        if (string.Equals(key, TpsSpec.FrontMatterKeys.BaseWpm, StringComparison.Ordinal))
+        {
+            if (!int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed))
+            {
+                diagnostics.Add(TpsSupport.CreateDiagnostic(
+                    TpsSpec.DiagnosticCodes.InvalidFrontMatter,
+                    "Front matter field 'base_wpm' must be an integer.",
+                    start,
+                    end,
+                    lineStarts));
+                return;
+            }
+
+            if (parsed < TpsSpec.MinimumWpm || parsed > TpsSpec.MaximumWpm)
+            {
+                diagnostics.Add(TpsSupport.CreateDiagnostic(
+                    TpsSpec.DiagnosticCodes.InvalidWpm,
+                    $"WPM '{value}' must be between {TpsSpec.MinimumWpm} and {TpsSpec.MaximumWpm}.",
+                    start,
+                    end,
+                    lineStarts));
+            }
+
+            return;
+        }
+
+        if (key.StartsWith("speed_offsets.", StringComparison.Ordinal) &&
+            !int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out _))
+        {
+            diagnostics.Add(TpsSupport.CreateDiagnostic(
+                TpsSpec.DiagnosticCodes.InvalidFrontMatter,
+                $"Front matter field '{key}' must be an integer.",
+                start,
+                end,
+                lineStarts));
+        }
+    }
+
+    [GeneratedRegex(@"^\d+(wpm)?$", RegexOptions.IgnoreCase, "en-US")]
+    private static partial Regex HeaderWpmRegex();
 }
 
 internal enum HeaderLevel
@@ -451,9 +574,11 @@ internal sealed class ParsedBlockInternal(TpsBlock block)
     public ContentSection? Content { get; set; }
 }
 
-internal sealed class ParsedSegmentInternal(TpsSegment segment)
+internal sealed class ParsedSegmentInternal(TpsSegment segment, List<TpsBlock> blocks)
 {
     public TpsSegment Segment { get; } = segment;
+
+    public List<TpsBlock> Blocks { get; } = blocks;
 
     public ContentSection? LeadingContent { get; set; }
 

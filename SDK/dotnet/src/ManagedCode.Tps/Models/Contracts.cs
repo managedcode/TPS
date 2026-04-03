@@ -1,10 +1,24 @@
-namespace ManagedCode.Tps.Compiler.Models;
+using System.Text.Json.Serialization;
 
+namespace ManagedCode.Tps.Models;
+
+[JsonConverter(typeof(TpsSeverityJsonConverter))]
 public enum TpsSeverity
 {
     Info,
     Warning,
     Error
+}
+
+internal interface ICompiledTimeRange
+{
+    int StartWordIndex { get; set; }
+
+    int EndWordIndex { get; set; }
+
+    int StartMs { get; set; }
+
+    int EndMs { get; set; }
 }
 
 public sealed record TpsPosition(int Line, int Column, int Offset);
@@ -39,9 +53,9 @@ public sealed class TpsCompilationResult : TpsValidationResult
 
 public sealed class TpsDocument
 {
-    public Dictionary<string, string> Metadata { get; init; } = new(StringComparer.OrdinalIgnoreCase);
+    public IReadOnlyDictionary<string, string> Metadata { get; init; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-    public List<TpsSegment> Segments { get; init; } = [];
+    public IReadOnlyList<TpsSegment> Segments { get; init; } = Array.Empty<TpsSegment>();
 }
 
 public sealed class TpsSegment
@@ -54,21 +68,21 @@ public sealed class TpsSegment
 
     public int? TargetWpm { get; init; }
 
-    public string? Emotion { get; init; }
+    public required string Emotion { get; init; }
 
     public string? Speaker { get; init; }
 
     public string? Timing { get; init; }
 
-    public string? BackgroundColor { get; init; }
+    public required string BackgroundColor { get; init; }
 
-    public string? TextColor { get; init; }
+    public required string TextColor { get; init; }
 
-    public string? AccentColor { get; init; }
+    public required string AccentColor { get; init; }
 
     public string? LeadingContent { get; set; }
 
-    public List<TpsBlock> Blocks { get; init; } = [];
+    public IReadOnlyList<TpsBlock> Blocks { get; init; } = Array.Empty<TpsBlock>();
 }
 
 public sealed class TpsBlock
@@ -172,10 +186,10 @@ public sealed class CompiledPhrase
 
     public required int EndMs { get; init; }
 
-    public required List<CompiledWord> Words { get; init; }
+    public required IReadOnlyList<CompiledWord> Words { get; init; }
 }
 
-public sealed class CompiledBlock
+public sealed class CompiledBlock : ICompiledTimeRange
 {
     public required string Id { get; init; }
 
@@ -197,12 +211,12 @@ public sealed class CompiledBlock
 
     public int EndMs { get; set; }
 
-    public List<CompiledPhrase> Phrases { get; init; } = [];
+    public IReadOnlyList<CompiledPhrase> Phrases { get; init; } = Array.Empty<CompiledPhrase>();
 
-    public List<CompiledWord> Words { get; init; } = [];
+    public IReadOnlyList<CompiledWord> Words { get; init; } = Array.Empty<CompiledWord>();
 }
 
-public sealed class CompiledSegment
+public sealed class CompiledSegment : ICompiledTimeRange
 {
     public required string Id { get; init; }
 
@@ -230,20 +244,20 @@ public sealed class CompiledSegment
 
     public int EndMs { get; set; }
 
-    public List<CompiledBlock> Blocks { get; init; } = [];
+    public IReadOnlyList<CompiledBlock> Blocks { get; init; } = Array.Empty<CompiledBlock>();
 
-    public List<CompiledWord> Words { get; init; } = [];
+    public IReadOnlyList<CompiledWord> Words { get; init; } = Array.Empty<CompiledWord>();
 }
 
 public sealed class CompiledScript
 {
-    public Dictionary<string, string> Metadata { get; init; } = new(StringComparer.OrdinalIgnoreCase);
+    public IReadOnlyDictionary<string, string> Metadata { get; init; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
     public int TotalDurationMs { get; set; }
 
-    public List<CompiledSegment> Segments { get; init; } = [];
+    public IReadOnlyList<CompiledSegment> Segments { get; init; } = Array.Empty<CompiledSegment>();
 
-    public List<CompiledWord> Words { get; init; } = [];
+    public IReadOnlyList<CompiledWord> Words { get; init; } = Array.Empty<CompiledWord>();
 }
 
 public sealed class PlayerPresentationModel

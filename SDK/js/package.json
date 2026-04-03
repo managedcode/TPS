@@ -1,18 +1,29 @@
 {
-  "name": "managedcode-tps-javascript",
+  "name": "managedcode.tps",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.js",
+      "default": "./lib/index.js"
+    }
+  },
+  "files": [
+    "lib",
+    "README.md"
+  ],
   "scripts": {
     "build": "npm run build:tps",
     "build:tps": "tsc -p tsconfig.tps.json",
     "test": "npm run test:sdk",
     "test:sdk": "npm run test:types && npm run test:js",
-    "test:js": "node --test tests/node/**/*.test.mjs",
+    "test:js": "npm run build:tps && node --test tests/node/**/*.test.mjs",
     "test:types": "tsc -p tsconfig.typecheck.json --noEmit",
-    "coverage:js": "c8 --check-coverage --lines 90 --branches 90 --functions 90 --statements 90 node --test tests/node/**/*.test.mjs",
+    "coverage:js": "npm run build:tps && c8 --check-coverage --lines 90 --branches 90 --functions 90 --statements 90 node --test tests/node/**/*.test.mjs",
     "sdk:matrix": "node ../scripts/runtime-matrix.mjs --compact",
     "sdk:coverage-matrix": "node ../scripts/runtime-matrix.mjs --coverage --compact"
   },

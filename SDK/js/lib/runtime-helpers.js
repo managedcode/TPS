@@ -116,7 +116,10 @@ function resolveSpeedOffset(metadata, key, fallback) {
     return Number.isFinite(parsed) ? parsed : fallback;
 }
 function clampWpm(candidate, fallback) {
-    return Number.isFinite(candidate) ? Math.max(1, candidate) : fallback;
+    if (!Number.isFinite(candidate)) {
+        return fallback;
+    }
+    return Math.min(Math.max(candidate, TpsSpec.minimumWpm), TpsSpec.maximumWpm);
 }
 function isTimeToken(value) {
     const trimmed = value.trim();

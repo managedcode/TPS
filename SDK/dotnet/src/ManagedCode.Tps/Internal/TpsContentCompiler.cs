@@ -1,7 +1,7 @@
 using System.Text;
-using ManagedCode.Tps.Compiler.Models;
+using ManagedCode.Tps.Models;
 
-namespace ManagedCode.Tps.Compiler.Internal;
+namespace ManagedCode.Tps.Internal;
 
 internal sealed class TpsContentCompiler
 {

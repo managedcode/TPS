@@ -57,7 +57,7 @@ function compileSegment(parsedSegment, baseWpm, speedOffsets, analysis) {
 }
 function buildBlocks(parsedSegment) {
     const blocks = [];
-    if (parsedSegment.leadingContent?.text) {
+    if (parsedSegment.leadingContent?.text && parsedSegment.parsedBlocks.length > 0) {
         blocks.push({
             block: {
                 id: `${parsedSegment.segment.id}-implicit-lead`,

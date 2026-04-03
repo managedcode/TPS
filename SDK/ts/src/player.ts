@@ -1,17 +1,33 @@
-import type { CompiledPhrase, CompiledScript, CompiledWord, PlayerState } from "./models.js";
+import type { CompiledBlock, CompiledPhrase, CompiledScript, CompiledSegment, CompiledWord, PlayerState } from "./models.js";
 
 export class TpsPlayer {
-  public constructor(private readonly script: CompiledScript) {}
+  private readonly blockById = new Map<string, CompiledBlock>();
+
+  private readonly phraseById = new Map<string, CompiledPhrase>();
+
+  private readonly segmentById = new Map<string, CompiledSegment>();
+
+  public constructor(private readonly script: CompiledScript) {
+    for (const segment of script.segments) {
+      this.segmentById.set(segment.id, segment);
+      for (const block of segment.blocks) {
+        this.blockById.set(block.id, block);
+        for (const phrase of block.phrases) {
+          this.phraseById.set(phrase.id, phrase);
+        }
+      }
+    }
+  }
 
   public getState(elapsedMs: number): PlayerState {
     const clampedElapsed = clamp(elapsedMs, 0, this.script.totalDurationMs);
     const currentWord = this.findCurrentWord(clampedElapsed);
-    const currentSegment = currentWord ? this.script.segments.find((segment) => segment.id === currentWord.segmentId) : this.script.segments[0];
-    const currentBlock = currentWord ? currentSegment?.blocks.find((block) => block.id === currentWord.blockId) : currentSegment?.blocks[0];
-    const currentPhrase = currentWord ? currentBlock?.phrases.find((phrase) => phrase.id === currentWord.phraseId) : currentBlock?.phrases[0];
-    const currentWordIndex = currentWord?.index ?? Math.max(0, this.script.words.length - 1);
+    const currentSegment = currentWord ? this.segmentById.get(currentWord.segmentId) : this.script.segments[0];
+    const currentBlock = currentWord ? this.blockById.get(currentWord.blockId) : currentSegment?.blocks[0];
+    const currentPhrase = currentWord ? this.phraseById.get(currentWord.phraseId) : currentBlock?.phrases[0];
+    const currentWordIndex = currentWord?.index ?? -1;
     const previousWord = currentWordIndex > 0 ? this.script.words[currentWordIndex - 1] : undefined;
-    const nextWord = this.script.words[currentWordIndex + 1];
+    const nextWord = currentWordIndex >= 0 ? this.script.words[currentWordIndex + 1] : undefined;
 
     return {
       elapsedMs: clampedElapsed,
@@ -41,7 +57,35 @@ export class TpsPlayer {
   }
 
   private findCurrentWord(elapsedMs: number): CompiledWord | undefined {
-    return this.script.words.find((word) => word.endMs > elapsedMs && word.endMs > word.startMs) ?? this.script.words.at(-1);
+    if (this.script.words.length === 0) {
+      return undefined;
+    }
+
+    let low = 0;
+    let high = this.script.words.length - 1;
+    let candidateIndex = -1;
+
+    while (low <= high) {
+      const middle = low + Math.floor((high - low) / 2);
+      const word = this.script.words[middle]!;
+      if (word.endMs > elapsedMs) {
+        candidateIndex = middle;
+        high = middle - 1;
+      } else {
+        low = middle + 1;
+      }
+    }
+
+    if (candidateIndex >= 0) {
+      for (let index = candidateIndex; index < this.script.words.length; index += 1) {
+        const word = this.script.words[index]!;
+        if (word.endMs > elapsedMs && word.endMs > word.startMs) {
+          return word;
+        }
+      }
+    }
+
+    return this.script.words.at(-1);
   }
 }
 

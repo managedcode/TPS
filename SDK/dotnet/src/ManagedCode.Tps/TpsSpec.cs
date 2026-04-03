@@ -1,4 +1,4 @@
-namespace ManagedCode.Tps.Compiler;
+namespace ManagedCode.Tps;
 
 public static class TpsSpec
 {

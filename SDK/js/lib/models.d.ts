@@ -24,7 +24,7 @@ export interface TpsParseResult extends TpsValidationResult {
 }
 export interface TpsCompilationResult extends TpsValidationResult {
     document: TpsDocument;
-    script?: CompiledScript;
+    script: CompiledScript;
 }
 export interface TpsDocument {
     metadata: Record<string, string>;

@@ -92,8 +92,8 @@ function extractFrontMatter(source: string, lineStarts: number[], diagnostics: T
     return { metadata: {}, body: source, bodyStartOffset: 0 };
   }
 
-  const closingIndex = source.indexOf("\n---\n", 4);
-  if (closingIndex < 0) {
+  const closing = findFrontMatterClosing(source);
+  if (!closing) {
     diagnostics.push(
       createDiagnostic(
         TpsDiagnosticCodes.invalidFrontMatter,
@@ -107,17 +107,22 @@ function extractFrontMatter(source: string, lineStarts: number[], diagnostics: T
   }
 
   return {
-    metadata: parseMetadata(source.slice(4, closingIndex)),
-    body: source.slice(closingIndex + 5),
-    bodyStartOffset: closingIndex + 5
+    metadata: parseMetadata(source.slice(4, closing.index), 4, lineStarts, diagnostics),
+    body: source.slice(closing.index + closing.length),
+    bodyStartOffset: closing.index + closing.length
   };
 }
 
-function parseMetadata(frontMatterText: string): Record<string, string> {
+function parseMetadata(frontMatterText: string, startOffset: number, lineStarts: number[], diagnostics: TpsDiagnostic[]): Record<string, string> {
   const metadata: Record<string, string> = {};
   let currentSection: string | undefined;
+  let lineOffset = startOffset;
 
   for (const rawLine of frontMatterText.split("\n")) {
+    const entryStart = lineOffset;
+    const entryEnd = lineOffset + rawLine.length;
+    lineOffset = entryEnd + 1;
+
     if (!rawLine.trim() || rawLine.trimStart().startsWith("#")) {
       continue;
     }
@@ -135,6 +140,7 @@ function parseMetadata(frontMatterText: string): Record<string, string> {
       const compositeKey = `${currentSection}.${key}`;
       if (!isLegacyMetadataKey(compositeKey)) {
         metadata[compositeKey] = value;
+        validateMetadataEntry(compositeKey, value, entryStart, entryEnd, lineStarts, diagnostics);
       }
 
       continue;
@@ -143,6 +149,7 @@ function parseMetadata(frontMatterText: string): Record<string, string> {
     currentSection = value ? undefined : key;
     if (value && !isLegacyMetadataKey(key)) {
       metadata[key] = value;
+      validateMetadataEntry(key, value, entryStart, entryEnd, lineStarts, diagnostics);
     }
   }
 
@@ -162,8 +169,10 @@ function extractTitleHeader(body: string, bodyStartOffset: number, metadata: Rec
     }
 
     metadata[TpsFrontMatterKeys.title] = trimmed.slice(TpsHeaderTokens.title.length).trim();
-    const prefixLength = line.text.length + 1;
-    return { body: body.slice(prefixLength), startOffset: line.startOffset + prefixLength };
+    const consumedLength = line.startOffset - bodyStartOffset + line.text.length;
+    const trailingNewlineLength = body[consumedLength] === "\n" ? 1 : 0;
+    const bodyOffset = consumedLength + trailingNewlineLength;
+    return { body: body.slice(bodyOffset), startOffset: bodyStartOffset + bodyOffset };
   }
 
   return { body, startOffset: bodyStartOffset };
@@ -462,4 +471,52 @@ function splitLines(text: string, startOffset: number): LineRecord[] {
 
 function normalizeMetadataValue(value: string): string {
   return value.trim().replace(/^"(.*)"$/u, "$1");
+}
+
+function findFrontMatterClosing(source: string): { index: number; length: number } | undefined {
+  const blockClosingIndex = source.indexOf("\n---\n", 4);
+  if (blockClosingIndex >= 0) {
+    return { index: blockClosingIndex, length: 5 };
+  }
+
+  if (source.endsWith("\n---")) {
+    return { index: source.length - 4, length: 4 };
+  }
+
+  return undefined;
+}
+
+function validateMetadataEntry(
+  key: string,
+  value: string,
+  start: number,
+  end: number,
+  lineStarts: number[],
+  diagnostics: TpsDiagnostic[]
+): void {
+  if (key === TpsFrontMatterKeys.baseWpm) {
+    const parsed = Number.parseInt(value, 10);
+    if (!/^-?\d+$/u.test(value)) {
+      diagnostics.push(createDiagnostic(TpsDiagnosticCodes.invalidFrontMatter, "Front matter field 'base_wpm' must be an integer.", start, end, lineStarts));
+      return;
+    }
+
+    if (isInvalidWpm(parsed)) {
+      diagnostics.push(createDiagnostic(TpsDiagnosticCodes.invalidWpm, buildInvalidWpmMessage(value), start, end, lineStarts));
+    }
+
+    return;
+  }
+
+  if (key.startsWith("speed_offsets.") && !/^-?\d+$/u.test(value)) {
+    diagnostics.push(
+      createDiagnostic(
+        TpsDiagnosticCodes.invalidFrontMatter,
+        `Front matter field '${key}' must be an integer.`,
+        start,
+        end,
+        lineStarts
+      )
+    );
+  }
 }

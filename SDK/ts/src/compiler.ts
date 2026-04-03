@@ -80,7 +80,7 @@ function compileSegment(
 
 function buildBlocks(parsedSegment: ParsedSegmentInternal): Array<{ block: ParsedBlockInternal["block"]; isImplicit: boolean; content?: ContentSection }> {
   const blocks: Array<{ block: ParsedBlockInternal["block"]; isImplicit: boolean; content?: ContentSection }> = [];
-  if (parsedSegment.leadingContent?.text) {
+  if (parsedSegment.leadingContent?.text && parsedSegment.parsedBlocks.length > 0) {
     blocks.push({
       block: {
         id: `${parsedSegment.segment.id}-implicit-lead`,

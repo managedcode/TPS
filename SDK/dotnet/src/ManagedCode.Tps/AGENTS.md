@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Project: ManagedCode.Tps.Compiler
+Project: ManagedCode.Tps
 Owned by: ManagedCode.Tps .NET core library maintainers
 
 Parent: `../../../../AGENTS.md`
@@ -12,7 +12,7 @@ Parent: `../../../../AGENTS.md`
 
 ## Entry Points
 
-- `ManagedCode.Tps.Compiler.csproj`
+- `ManagedCode.Tps.csproj`
 - `TpsSpec.cs`
 - `TpsRuntime.cs`
 - `TpsPlayer.cs`
@@ -21,7 +21,7 @@ Parent: `../../../../AGENTS.md`
 
 - In scope:
   - .NET library code
-  - public contracts and namespaces under `ManagedCode.Tps.Compiler`
+  - public contracts and namespaces under `ManagedCode.Tps`
   - library-only build settings
 - Out of scope:
   - xUnit test code
@@ -33,10 +33,10 @@ Parent: `../../../../AGENTS.md`
 
 ## Project Commands
 
-- `build`: `dotnet build ManagedCode.Tps.Compiler.csproj`
-- `test`: `dotnet test ../../tests/ManagedCode.Tps.Compiler.Tests/ManagedCode.Tps.Compiler.Tests.csproj`
+- `build`: `dotnet build ManagedCode.Tps.csproj`
+- `test`: `dotnet test ../../tests/ManagedCode.Tps.Tests/ManagedCode.Tps.Tests.csproj`
 - `format`: `dotnet format ../../ManagedCode.Tps.slnx --verify-no-changes`
-- `analyze`: `dotnet build ManagedCode.Tps.Compiler.csproj -warnaserror`
+- `analyze`: `dotnet build ManagedCode.Tps.csproj -warnaserror`
 
 For this .NET project:
 
@@ -63,6 +63,6 @@ For this .NET project:
 
 ## Local Rules
 
-- Keep the `ManagedCode.Tps.Compiler` namespace prefix intact.
+- Keep the `ManagedCode.Tps` namespace prefix intact.
 - Do not place test helpers or test-only code in this project.
 - Prefer small, composable types over large utility buckets.

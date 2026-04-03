@@ -83,6 +83,17 @@ test("parses plain markdown headers, title overrides, implicit segments, and tim
   assert.equal(result.document.segments[1].blocks[0].targetWpm, 160);
 });
 
+test("accepts front matter closed at EOF and preserves title offsets after leading blank lines", () => {
+  const eofFrontMatter = parseTps("---\nbase_wpm: 150\n---");
+  assert.equal(eofFrontMatter.ok, true);
+  assert.equal(eofFrontMatter.document.metadata.base_wpm, "150");
+
+  const titled = parseTps("---\nbase_wpm: 150\n---\n\n# Display");
+  assert.equal(titled.ok, true);
+  assert.equal(titled.document.metadata.title, "Display");
+  assert.equal(titled.document.segments[0].name, "Display");
+});
+
 test("supports nested speed scopes, markdown emphasis, phonetics, and escaped control markers", () => {
   const source = `---\nbase_wpm: 140\n---\n\n## [Signal|focused]\n### [Body]\n[180WPM][slow]*beta*[/slow][normal]**gamma**[/normal][/180WPM] [phonetic:ˈkæməl]camel[/phonetic] literal \\/ slash \\[tag\\]`;
   const result = compileTps(source);
@@ -125,6 +136,13 @@ test("attaches punctuation and distinguishes slash punctuation from pause marker
   assert.equal(result.script.words.filter((word) => word.kind === "pause").length, 1);
 });
 
+test("compiles direct segment content once when no explicit block headers exist", () => {
+  const result = compileTps("## [Intro]\nHello world.");
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.script.words.map((word) => word.cleanText), ["Hello", "world."]);
+  assert.equal(result.script.segments[0].blocks.length, 1);
+});
+
 test("player exposes phrase-based presentation and completion state", () => {
   const { script } = compileTps(readFixture("valid", "runtime-parity.tps"));
   const player = new TpsPlayer(script);
@@ -154,6 +172,7 @@ test("handles empty content and malformed front matter", () => {
   assert.equal(empty.ok, true);
   assert.equal(empty.script.totalDurationMs, 0);
   assert.equal(empty.script.segments.length, 1);
+  assert.equal(new TpsPlayer(empty.script).getState(0).currentWordIndex, -1);
 
   const invalidFrontMatter = compileTps("---\ntitle: Broken");
   assert.equal(invalidFrontMatter.ok, false);

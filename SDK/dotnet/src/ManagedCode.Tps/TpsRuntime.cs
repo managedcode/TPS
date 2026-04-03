@@ -1,7 +1,8 @@
-using ManagedCode.Tps.Compiler.Internal;
-using ManagedCode.Tps.Compiler.Models;
+using System.Collections.ObjectModel;
+using ManagedCode.Tps.Internal;
+using ManagedCode.Tps.Models;
 
-namespace ManagedCode.Tps.Compiler;
+namespace ManagedCode.Tps;
 
 public static class TpsRuntime
 {
@@ -12,7 +13,7 @@ public static class TpsRuntime
         return new TpsValidationResult
         {
             Ok = !TpsSupport.HasErrors(analysis.Diagnostics),
-            Diagnostics = analysis.Diagnostics
+            Diagnostics = analysis.Diagnostics.ToArray()
         };
     }
 
@@ -23,7 +24,7 @@ public static class TpsRuntime
         return new TpsParseResult
         {
             Ok = !TpsSupport.HasErrors(analysis.Diagnostics),
-            Diagnostics = analysis.Diagnostics,
+            Diagnostics = analysis.Diagnostics.ToArray(),
             Document = analysis.Document
         };
     }
@@ -35,9 +36,9 @@ public static class TpsRuntime
         return new TpsCompilationResult
         {
             Ok = !TpsSupport.HasErrors(analysis.Diagnostics),
-            Diagnostics = analysis.Diagnostics,
+            Diagnostics = analysis.Diagnostics.ToArray(),
             Document = analysis.Document,
-            Script = script
+            Script = FreezeScript(script)
         };
     }
 
@@ -60,6 +61,8 @@ public static class TpsRuntime
         var segmentEmotion = TpsSupport.ResolveEmotion(parsedSegment.Segment.Emotion);
         var inherited = new InheritedFormattingState(parsedSegment.Segment.TargetWpm ?? baseWpm, segmentEmotion, parsedSegment.Segment.Speaker, speedOffsets);
         var blocks = BuildBlocks(parsedSegment).Select(entry => CompileBlock(entry, inherited, analysis)).ToList();
+        var compiledBlocks = new List<CompiledBlock>();
+        var compiledWords = new List<CompiledWord>();
         return new SegmentCandidate(
             new CompiledSegment
             {
@@ -69,16 +72,21 @@ public static class TpsRuntime
                 Emotion = segmentEmotion,
                 Speaker = parsedSegment.Segment.Speaker,
                 Timing = parsedSegment.Segment.Timing,
-                BackgroundColor = parsedSegment.Segment.BackgroundColor!,
-                TextColor = parsedSegment.Segment.TextColor!,
-                AccentColor = parsedSegment.Segment.AccentColor!
+                BackgroundColor = parsedSegment.Segment.BackgroundColor,
+                TextColor = parsedSegment.Segment.TextColor,
+                AccentColor = parsedSegment.Segment.AccentColor,
+                Blocks = compiledBlocks,
+                Words = compiledWords
             },
-            blocks);
+            blocks,
+            compiledBlocks,
+            compiledWords);
     }
 
     private static IEnumerable<BlockDefinition> BuildBlocks(ParsedSegmentInternal parsedSegment)
     {
-        if (parsedSegment.LeadingContent?.Text is { Length: > 0 } leadingContent)
+        if (parsedSegment.ParsedBlocks.Count > 0 &&
+            parsedSegment.LeadingContent?.Text is { Length: > 0 } leadingContent)
         {
             yield return new BlockDefinition(
                 new TpsBlock
@@ -130,6 +138,8 @@ public static class TpsRuntime
             blockInherited,
             analysis.LineStarts,
             analysis.Diagnostics);
+        var phrases = new List<CompiledPhrase>();
+        var words = new List<CompiledWord>();
 
         return new BlockCandidate(
             new CompiledBlock
@@ -139,16 +149,25 @@ public static class TpsRuntime
                 TargetWpm = blockInherited.TargetWpm,
                 Emotion = blockInherited.Emotion,
                 Speaker = blockInherited.Speaker,
-                IsImplicit = definition.IsImplicit
+                IsImplicit = definition.IsImplicit,
+                Phrases = phrases,
+                Words = words
             },
-            content);
+            content,
+            phrases,
+            words);
     }
 
     private static CompiledScript FinalizeScript(IReadOnlyDictionary<string, string> metadata, IEnumerable<SegmentCandidate> candidates)
     {
+        var scriptMetadata = new Dictionary<string, string>(metadata, StringComparer.OrdinalIgnoreCase);
+        var scriptSegments = new List<CompiledSegment>();
+        var scriptWords = new List<CompiledWord>();
         var script = new CompiledScript
         {
-            Metadata = new Dictionary<string, string>(metadata, StringComparer.OrdinalIgnoreCase)
+            Metadata = scriptMetadata,
+            Segments = scriptSegments,
+            Words = scriptWords
         };
         var elapsedMs = 0;
         var wordIndex = 0;
@@ -159,18 +178,18 @@ public static class TpsRuntime
             foreach (var blockCandidate in segmentCandidate.Blocks)
             {
                 var finalizedBlock = FinalizeBlock(blockCandidate.Block, blockCandidate.Content, segmentCandidate.Segment.Id, elapsedMs, wordIndex);
-                blockCandidate.Block.Words.AddRange(finalizedBlock.Words);
-                blockCandidate.Block.Phrases.AddRange(finalizedBlock.Phrases);
-                segmentCandidate.Segment.Blocks.Add(blockCandidate.Block);
+                blockCandidate.Words.AddRange(finalizedBlock.Words);
+                blockCandidate.Phrases.AddRange(finalizedBlock.Phrases);
+                segmentCandidate.CompiledBlocks.Add(blockCandidate.Block);
                 segmentWords.AddRange(finalizedBlock.Words);
-                script.Words.AddRange(finalizedBlock.Words);
+                scriptWords.AddRange(finalizedBlock.Words);
                 elapsedMs = finalizedBlock.ElapsedMs;
                 wordIndex = finalizedBlock.NextWordIndex;
             }
 
-            segmentCandidate.Segment.Words.AddRange(segmentWords);
+            segmentCandidate.CompiledWords.AddRange(segmentWords);
             ApplyTimeRange(segmentCandidate.Segment, segmentWords);
-            script.Segments.Add(segmentCandidate.Segment);
+            scriptSegments.Add(segmentCandidate.Segment);
         }
 
         script.TotalDurationMs = elapsedMs;
@@ -237,18 +256,125 @@ public static class TpsRuntime
         return new FinalizedBlock(words, phrases, elapsedMs, wordIndex);
     }
 
-    private static void ApplyTimeRange(dynamic target, IReadOnlyList<CompiledWord> words)
+    private static void ApplyTimeRange(ICompiledTimeRange target, IReadOnlyList<CompiledWord> words)
     {
         target.StartWordIndex = words.Count == 0 ? 0 : words[0].Index;
         target.EndWordIndex = words.Count == 0 ? target.StartWordIndex : words[^1].Index;
         target.StartMs = words.Count == 0 ? 0 : words[0].StartMs;
         target.EndMs = words.Count == 0 ? target.StartMs : words[^1].EndMs;
     }
+
+    private static CompiledScript FreezeScript(CompiledScript script)
+    {
+        var frozenWords = script.Words.Select(CloneWord).ToArray();
+        var frozenWordById = frozenWords.ToDictionary(word => word.Id, StringComparer.Ordinal);
+        var frozenSegments = script.Segments.Select(segment => FreezeSegment(segment, frozenWordById)).ToArray();
+
+        return new CompiledScript
+        {
+            Metadata = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>(script.Metadata, StringComparer.OrdinalIgnoreCase)),
+            TotalDurationMs = script.TotalDurationMs,
+            Segments = Array.AsReadOnly(frozenSegments),
+            Words = Array.AsReadOnly(frozenWords)
+        };
+    }
+
+    private static CompiledSegment FreezeSegment(
+        CompiledSegment segment,
+        IReadOnlyDictionary<string, CompiledWord> frozenWordById)
+    {
+        var frozenBlocks = segment.Blocks.Select(block => FreezeBlock(block, frozenWordById)).ToArray();
+        var frozenWords = segment.Words.Select(word => frozenWordById[word.Id]).ToArray();
+        return new CompiledSegment
+        {
+            Id = segment.Id,
+            Name = segment.Name,
+            TargetWpm = segment.TargetWpm,
+            Emotion = segment.Emotion,
+            Speaker = segment.Speaker,
+            Timing = segment.Timing,
+            BackgroundColor = segment.BackgroundColor,
+            TextColor = segment.TextColor,
+            AccentColor = segment.AccentColor,
+            StartWordIndex = segment.StartWordIndex,
+            EndWordIndex = segment.EndWordIndex,
+            StartMs = segment.StartMs,
+            EndMs = segment.EndMs,
+            Blocks = Array.AsReadOnly(frozenBlocks),
+            Words = Array.AsReadOnly(frozenWords)
+        };
+    }
+
+    private static CompiledBlock FreezeBlock(
+        CompiledBlock block,
+        IReadOnlyDictionary<string, CompiledWord> frozenWordById)
+    {
+        var frozenPhrases = block.Phrases.Select(phrase => FreezePhrase(phrase, frozenWordById)).ToArray();
+        var frozenWords = block.Words.Select(word => frozenWordById[word.Id]).ToArray();
+        return new CompiledBlock
+        {
+            Id = block.Id,
+            Name = block.Name,
+            TargetWpm = block.TargetWpm,
+            Emotion = block.Emotion,
+            Speaker = block.Speaker,
+            IsImplicit = block.IsImplicit,
+            StartWordIndex = block.StartWordIndex,
+            EndWordIndex = block.EndWordIndex,
+            StartMs = block.StartMs,
+            EndMs = block.EndMs,
+            Phrases = Array.AsReadOnly(frozenPhrases),
+            Words = Array.AsReadOnly(frozenWords)
+        };
+    }
+
+    private static CompiledPhrase FreezePhrase(
+        CompiledPhrase phrase,
+        IReadOnlyDictionary<string, CompiledWord> frozenWordById)
+    {
+        var frozenWords = phrase.Words.Select(word => frozenWordById[word.Id]).ToArray();
+        return new CompiledPhrase
+        {
+            Id = phrase.Id,
+            Text = phrase.Text,
+            StartWordIndex = phrase.StartWordIndex,
+            EndWordIndex = phrase.EndWordIndex,
+            StartMs = phrase.StartMs,
+            EndMs = phrase.EndMs,
+            Words = Array.AsReadOnly(frozenWords)
+        };
+    }
+
+    private static CompiledWord CloneWord(CompiledWord word) =>
+        new()
+        {
+            Id = word.Id,
+            Index = word.Index,
+            Kind = word.Kind,
+            CleanText = word.CleanText,
+            CharacterCount = word.CharacterCount,
+            OrpPosition = word.OrpPosition,
+            DisplayDurationMs = word.DisplayDurationMs,
+            StartMs = word.StartMs,
+            EndMs = word.EndMs,
+            Metadata = word.Metadata,
+            SegmentId = word.SegmentId,
+            BlockId = word.BlockId,
+            PhraseId = word.PhraseId
+        };
 }
 
-internal sealed record SegmentCandidate(CompiledSegment Segment, List<BlockCandidate> Blocks);
+internal sealed record SegmentCandidate(
+    CompiledSegment Segment,
+    List<BlockCandidate> Blocks,
+    List<CompiledBlock> CompiledBlocks,
+    List<CompiledWord> CompiledWords);
 
-internal sealed record BlockCandidate(CompiledBlock Block, ContentCompilationResult Content);
+internal sealed record BlockCandidate(
+    CompiledBlock Block,
+    ContentCompilationResult Content,
+    List<CompiledPhrase> Phrases,
+    List<CompiledWord> Words);
 
 internal sealed record BlockDefinition(TpsBlock Block, bool IsImplicit, ContentSection? Content);
 

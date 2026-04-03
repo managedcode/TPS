@@ -19,17 +19,17 @@ flowchart LR
   TsRuntime --> JsRuntime["SDK/js"]
   Fixtures --> CsRuntime["SDK/dotnet"]
 
-  Solution["SDK/dotnet/ManagedCode.Tps.slnx"] --> Compiler["ManagedCode.Tps.Compiler"]
-  Solution --> Tests["ManagedCode.Tps.Compiler.Tests"]
-  Tests --> Compiler
+  Solution["SDK/dotnet/ManagedCode.Tps.slnx"] --> Runtime["ManagedCode.Tps"]
+  Solution --> Tests["ManagedCode.Tps.Tests"]
+  Tests --> Runtime
 ```
 
 ## Repository Boundaries
 
 - The site surface owns documentation publishing and static example rendering.
 - `SDK/` owns runtime implementations, shared fixtures, manifest-driven verification metadata, and SDK-focused docs.
-- `ManagedCode.Tps.Compiler` is the C# SDK implementation area for TPS parsing, validation, compilation, and playback logic.
-- `ManagedCode.Tps.Compiler.Tests` owns xUnit-based verification for the C# runtime.
+- `ManagedCode.Tps` is the C# SDK implementation area for TPS parsing, validation, compilation, and playback logic.
+- `ManagedCode.Tps.Tests` owns xUnit-based verification for the C# runtime.
 - `.codex/skills/` holds repo-local MCAF and .NET companion skills used by Codex.
 
 ```mermaid
@@ -44,9 +44,9 @@ flowchart TD
   Sdk --> Cs["dotnet runtime"]
   Sdk --> Shared["fixtures + docs + manifest"]
 
-  Cs --> Compiler["ManagedCode.Tps.Compiler"]
-  Cs --> TestProject["ManagedCode.Tps.Compiler.Tests"]
-  TestProject -. verifies .-> Compiler
+  Cs --> Runtime["ManagedCode.Tps"]
+  Cs --> TestProject["ManagedCode.Tps.Tests"]
+  TestProject -. verifies .-> Runtime
 ```
 
 ## Verification Flow

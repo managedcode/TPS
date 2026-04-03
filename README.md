@@ -21,9 +21,18 @@ TPS bridges this gap: it is human-readable markdown that any text editor can ope
 TPS now includes a `ManagedCode.Tps` SDK workspace for parsing, validation, compilation, and playback.
 
 - **SDK catalog page:** [tps.managed-code.com/sdk](https://tps.managed-code.com/sdk/)
-- **TypeScript SDK:** [SDK/ts](https://github.com/managedcode/TPS/tree/main/SDK/ts)
-- **JavaScript SDK:** [SDK/js](https://github.com/managedcode/TPS/tree/main/SDK/js)
-- **.NET SDK:** [SDK/dotnet](https://github.com/managedcode/TPS/tree/main/SDK/dotnet)
+- **SDK glossary:** [docs/Glossary.md](https://github.com/managedcode/TPS/blob/main/docs/Glossary.md)
+
+### Runtime Catalog
+
+| Runtime | Status | Workspace | Notes |
+|---------|--------|-----------|-------|
+| **TypeScript** | Active | [SDK/ts](https://github.com/managedcode/TPS/tree/main/SDK/ts) | Canonical typed TPS implementation |
+| **JavaScript** | Active | [SDK/js](https://github.com/managedcode/TPS/tree/main/SDK/js) | Built consumer runtime generated from TypeScript |
+| **.NET / C#** | Active | [SDK/dotnet](https://github.com/managedcode/TPS/tree/main/SDK/dotnet) | `ManagedCode.Tps` runtime and xUnit suite |
+| **Flutter** | Planned | [SDK/flutter](https://github.com/managedcode/TPS/tree/main/SDK/flutter) | Reserved placeholder runtime |
+| **Swift** | Planned | [SDK/swift](https://github.com/managedcode/TPS/tree/main/SDK/swift) | Reserved placeholder runtime |
+| **Java** | Planned | [SDK/java](https://github.com/managedcode/TPS/tree/main/SDK/java) | Reserved placeholder runtime |
 
 Each active SDK exposes the same core contract:
 
@@ -39,6 +48,7 @@ Additional SDK documentation:
 - **TypeScript docs:** [SDK/ts/README.md](https://github.com/managedcode/TPS/blob/main/SDK/ts/README.md)
 - **JavaScript docs:** [SDK/js/README.md](https://github.com/managedcode/TPS/blob/main/SDK/js/README.md)
 - **.NET docs:** [SDK/dotnet/README.md](https://github.com/managedcode/TPS/blob/main/SDK/dotnet/README.md)
+- **Future runtime placeholders:** [SDK/flutter/README.md](https://github.com/managedcode/TPS/blob/main/SDK/flutter/README.md), [SDK/swift/README.md](https://github.com/managedcode/TPS/blob/main/SDK/swift/README.md), [SDK/java/README.md](https://github.com/managedcode/TPS/blob/main/SDK/java/README.md)
 
 ## Design Goals
 
@@ -49,10 +59,13 @@ Additional SDK documentation:
 
 ## Glossary
 
+Complete canonical glossary, including `#`, `##`, `###`, inline tags, diagnostics, compiler/runtime terms, and SDK terminology: [docs/Glossary.md](https://github.com/managedcode/TPS/blob/main/docs/Glossary.md)
+
 | Term | Definition |
 |------|-----------|
 | **Script** | The entire TPS document, including front matter and all content. |
 | **Front Matter** | YAML metadata block delimited by `---` at the top of the file. |
+| **Title** | The optional `#` heading used as display metadata for the script. |
 | **Segment** | A major section (`##` header) — e.g., Intro, Problem, Solution. |
 | **Block** | A topic group (`###` header) within a segment. |
 | **Phrase** | A sentence or thought within a block, delimited by sentence-ending punctuation or pause markers. |
@@ -60,6 +73,11 @@ Additional SDK documentation:
 | **WPM** | Words Per Minute — the reading speed. |
 | **Edit Point** | A marker indicating a natural place to stop or start an editing session. |
 | **Emotion** | A predefined delivery style that controls tone, energy, and visual presentation. |
+| **Validator** | The TPS component that reports actionable authoring diagnostics. |
+| **Compiler** | The TPS component that turns parsed TPS into a JSON-friendly timed state machine. |
+| **Compiled Script** | The runtime-ready output containing metadata, segments, blocks, phrases, words, and timing. |
+| **Player** | The runtime component that resolves what should be shown at a specific elapsed time. |
+| **ManagedCode.Tps SDK** | The multi-runtime SDK workspace under `SDK/` for TypeScript, JavaScript, .NET, and future runtimes. |
 
 ## File Structure
 

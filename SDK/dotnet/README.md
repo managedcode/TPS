@@ -1,6 +1,6 @@
 # ManagedCode.Tps .NET SDK
 
-This folder contains the .NET TPS runtime under the `ManagedCode.Tps.Compiler` namespace.
+This folder contains the .NET TPS runtime under the `ManagedCode.Tps` namespace.
 
 ## Public API
 
@@ -12,8 +12,8 @@ This folder contains the .NET TPS runtime under the `ManagedCode.Tps.Compiler` n
 
 ## Project Layout
 
-- `src/ManagedCode.Tps.Compiler/`: runtime implementation
-- `tests/ManagedCode.Tps.Compiler.Tests/`: xUnit coverage and parity tests
+- `src/ManagedCode.Tps/`: runtime implementation
+- `tests/ManagedCode.Tps.Tests/`: xUnit coverage and parity tests
 
 ## Contract Notes
 

@@ -30,8 +30,8 @@ This file defines the global rules for AI agents working in this repository.
 - SDK projects with local `AGENTS.md` files:
   - `SDK/ts/`
   - `SDK/js/`
-  - `SDK/dotnet/src/ManagedCode.Tps.Compiler/`
-  - `SDK/dotnet/tests/ManagedCode.Tps.Compiler.Tests/`
+  - `SDK/dotnet/src/ManagedCode.Tps/`
+  - `SDK/dotnet/tests/ManagedCode.Tps.Tests/`
 
 ## Rule Precedence
 
