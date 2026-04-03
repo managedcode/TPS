@@ -86,6 +86,9 @@ Block emotion is warm, / but you can override inline: /
 [urgent]this is critical[/urgent] / and back to warm. /
 Or shift to [calm]a more relaxed tone[/calm] for a moment. //
 
+Volume and emotion are independent / you can combine them: /
+[soft][urgent]this is critical but quiet[/urgent][/soft]. //
+
 ### [Emphasis Levels]
 
 [emphasis]Standard emphasis[/emphasis] for important words. /

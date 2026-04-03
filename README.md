@@ -103,6 +103,7 @@ All parameters after the name are optional, separated by `|`. Parameters are ide
 - An integer (or integer + `WPM` suffix) → **WPM**
 - A known emotion keyword → **Emotion**
 - A time pattern (`MM:SS` or `MM:SS-MM:SS`) → **Timing**
+- `Speaker:Name` → **Speaker** (for multi-talent scripts)
 
 This means parameters can appear in any order and unneeded ones can simply be omitted — no empty `||` slots required.
 
@@ -120,6 +121,7 @@ This means parameters can appear in any order and unneeded ones can simply be om
 | **WPM** | `NNN` or `NNNWPM` | Integer speed override. Omit to inherit. |
 | **Emotion** | preset name | Emotion preset (see table below). Omit to inherit (defaults to `Neutral` at document level). |
 | **Timing** | `MM:SS` or `MM:SS-MM:SS` | Duration hint. Stored for tooling; playback computes timing from word counts. |
+| **Speaker** | `Speaker:Name` | Talent assignment for multi-speaker scripts. Omit for single-speaker. |
 
 **Leading text:** Content between a segment header and its first block is preserved as introductory text that inherits the segment's speed and emotion.
 
@@ -144,6 +146,7 @@ Blocks are topic groups within a segment.
 | **Name** | free text | Descriptive label. Required (first value before the first `\|`). |
 | **WPM** | `NNN` or `NNNWPM` | Integer speed override. Inherits segment WPM if omitted. |
 | **Emotion** | preset name | Emotion override. Inherits segment emotion if omitted. |
+| **Speaker** | `Speaker:Name` | Talent assignment. Inherits segment speaker if omitted. |
 
 ### Inline Markers
 
@@ -279,6 +282,22 @@ Delivery mode tags describe **how** to deliver a passage, beyond emotion and vol
 | `[rhetorical]` | Deliver as a statement with question syntax. No rising intonation. | Rhetorical questions that don't expect answers. |
 | `[building]` | Start at lower energy, gradually increase through the passage. | Reveals, motivational build-ups, crescendo moments. |
 
+#### Speaker Tags
+
+For multi-talent scripts, mark who reads each section:
+
+```markdown
+## [Interview|Warm|Speaker:Alex]
+
+### [Question|Speaker:Jordan]
+So tell us about the project. //
+
+### [Answer|Speaker:Alex]
+We started with a simple idea. //
+```
+
+The `Speaker:Name` parameter is added to segment or block headers using the same `|`-separated syntax. The parser identifies it by the `Speaker:` prefix. Renderers should visually distinguish speakers (e.g., different text colors or labels).
+
 ## Keyword Reference
 
 ### Emotions (case-insensitive)
@@ -311,6 +330,8 @@ Renderers map each emotion to a visual style (colors, background, text treatment
 | `whisper` | Whispered, intimate delivery |
 
 ### Delivery Modes
+
+Delivery modes are a **closed set** — parsers should treat unknown delivery mode keywords as unknown tags (see Error Handling).
 
 | Keyword | Delivery | Use when |
 |---------|----------|----------|
@@ -427,6 +448,8 @@ When emotion changes between segments or blocks, renderers should apply a smooth
 
 **Delivery modes** (`[sarcasm]`, `[aside]`, `[rhetorical]`, `[building]`) override the current emotion for their span. They are specialized delivery instructions that take priority over the block emotion.
 
+**Volume + delivery modes:** Volume tags apply independently to delivery modes. `[building][loud]text[/loud][/building]` starts at loud volume and gradually increases energy while maintaining the loud level. Volume controls loudness; delivery modes control the shape of delivery.
+
 ### Phrase Boundaries
 
 A **phrase** is a unit of text delimited by:
@@ -483,13 +506,14 @@ All tags (`[emphasis]`, `[slow]`, `[loud]`, `[sarcasm]`, etc.) are **invisible i
 
 The reader sees only the spoken text with visual styling applied. Tags are commands for the renderer, not content for the speaker.
 
-### Content Restrictions
+### Content Guidelines
 
-TPS scripts contain **spoken text only**. Do not include:
-- URLs or hyperlinks — these are not spoken content
-- Code blocks or technical syntax — rewrite as spoken language
-- Images or embedded media references
-- Raw data tables — narrate the data instead
+TPS scripts contain **spoken text only**. Authors should avoid including non-spoken content. Parsers treat everything as plain text — these are authoring guidelines, not parsing constraints.
+
+- **URLs or hyperlinks** — not spoken content; rewrite as "visit our website" or similar
+- **Code blocks or technical syntax** — rewrite as spoken language
+- **Images or embedded media references** — describe verbally instead
+- **Raw data tables** — narrate the data instead
 
 ### Rendering Context
 
