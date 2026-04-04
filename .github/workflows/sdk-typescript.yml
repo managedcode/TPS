@@ -13,12 +13,14 @@ on:
       - "SDK/ts/**"
       - "SDK/js/**"
       - "SDK/fixtures/**"
+      - "examples/**"
       - ".github/workflows/sdk-typescript.yml"
   pull_request:
     paths:
       - "SDK/ts/**"
       - "SDK/js/**"
       - "SDK/fixtures/**"
+      - "examples/**"
       - ".github/workflows/sdk-typescript.yml"
   workflow_dispatch:
 

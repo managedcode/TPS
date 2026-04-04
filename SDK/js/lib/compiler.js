@@ -1,4 +1,5 @@
 import { compileContent } from "./content-compiler.js";
+import { normalizeCompiledScript } from "./compiled-script.js";
 import { hasErrors } from "./diagnostics.js";
 import { createParseResult, createValidationResult, parseDocument } from "./parser.js";
 import { resolveBaseWpm, resolveEmotion, resolveSpeedOffsets } from "./runtime-helpers.js";
@@ -19,7 +20,7 @@ export function compileTps(source) {
         ok: !hasErrors(analysis.diagnostics),
         diagnostics: analysis.diagnostics,
         document: analysis.document,
-        script
+        script: normalizeCompiledScript(script)
     };
 }
 function compileAnalysis(analysis) {
@@ -206,3 +207,4 @@ function finalizeTimeRange(target, words) {
     target.startMs = words[0]?.startMs ?? 0;
     target.endMs = words.at(-1)?.endMs ?? target.startMs;
 }
+//# sourceMappingURL=compiler.js.map

@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using ManagedCode.Tps.Internal;
 using ManagedCode.Tps.Models;
 
@@ -38,7 +37,7 @@ public static class TpsRuntime
             Ok = !TpsSupport.HasErrors(analysis.Diagnostics),
             Diagnostics = analysis.Diagnostics.ToArray(),
             Document = analysis.Document,
-            Script = FreezeScript(script)
+            Script = CompiledScriptNormalizer.Normalize(script)
         };
     }
 
@@ -192,8 +191,13 @@ public static class TpsRuntime
             scriptSegments.Add(segmentCandidate.Segment);
         }
 
-        script.TotalDurationMs = elapsedMs;
-        return script;
+        return new CompiledScript
+        {
+            Metadata = script.Metadata,
+            Segments = script.Segments,
+            Words = script.Words,
+            TotalDurationMs = elapsedMs
+        };
     }
 
     private static FinalizedBlock FinalizeBlock(
@@ -264,104 +268,6 @@ public static class TpsRuntime
         target.EndMs = words.Count == 0 ? target.StartMs : words[^1].EndMs;
     }
 
-    private static CompiledScript FreezeScript(CompiledScript script)
-    {
-        var frozenWords = script.Words.Select(CloneWord).ToArray();
-        var frozenWordById = frozenWords.ToDictionary(word => word.Id, StringComparer.Ordinal);
-        var frozenSegments = script.Segments.Select(segment => FreezeSegment(segment, frozenWordById)).ToArray();
-
-        return new CompiledScript
-        {
-            Metadata = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>(script.Metadata, StringComparer.OrdinalIgnoreCase)),
-            TotalDurationMs = script.TotalDurationMs,
-            Segments = Array.AsReadOnly(frozenSegments),
-            Words = Array.AsReadOnly(frozenWords)
-        };
-    }
-
-    private static CompiledSegment FreezeSegment(
-        CompiledSegment segment,
-        IReadOnlyDictionary<string, CompiledWord> frozenWordById)
-    {
-        var frozenBlocks = segment.Blocks.Select(block => FreezeBlock(block, frozenWordById)).ToArray();
-        var frozenWords = segment.Words.Select(word => frozenWordById[word.Id]).ToArray();
-        return new CompiledSegment
-        {
-            Id = segment.Id,
-            Name = segment.Name,
-            TargetWpm = segment.TargetWpm,
-            Emotion = segment.Emotion,
-            Speaker = segment.Speaker,
-            Timing = segment.Timing,
-            BackgroundColor = segment.BackgroundColor,
-            TextColor = segment.TextColor,
-            AccentColor = segment.AccentColor,
-            StartWordIndex = segment.StartWordIndex,
-            EndWordIndex = segment.EndWordIndex,
-            StartMs = segment.StartMs,
-            EndMs = segment.EndMs,
-            Blocks = Array.AsReadOnly(frozenBlocks),
-            Words = Array.AsReadOnly(frozenWords)
-        };
-    }
-
-    private static CompiledBlock FreezeBlock(
-        CompiledBlock block,
-        IReadOnlyDictionary<string, CompiledWord> frozenWordById)
-    {
-        var frozenPhrases = block.Phrases.Select(phrase => FreezePhrase(phrase, frozenWordById)).ToArray();
-        var frozenWords = block.Words.Select(word => frozenWordById[word.Id]).ToArray();
-        return new CompiledBlock
-        {
-            Id = block.Id,
-            Name = block.Name,
-            TargetWpm = block.TargetWpm,
-            Emotion = block.Emotion,
-            Speaker = block.Speaker,
-            IsImplicit = block.IsImplicit,
-            StartWordIndex = block.StartWordIndex,
-            EndWordIndex = block.EndWordIndex,
-            StartMs = block.StartMs,
-            EndMs = block.EndMs,
-            Phrases = Array.AsReadOnly(frozenPhrases),
-            Words = Array.AsReadOnly(frozenWords)
-        };
-    }
-
-    private static CompiledPhrase FreezePhrase(
-        CompiledPhrase phrase,
-        IReadOnlyDictionary<string, CompiledWord> frozenWordById)
-    {
-        var frozenWords = phrase.Words.Select(word => frozenWordById[word.Id]).ToArray();
-        return new CompiledPhrase
-        {
-            Id = phrase.Id,
-            Text = phrase.Text,
-            StartWordIndex = phrase.StartWordIndex,
-            EndWordIndex = phrase.EndWordIndex,
-            StartMs = phrase.StartMs,
-            EndMs = phrase.EndMs,
-            Words = Array.AsReadOnly(frozenWords)
-        };
-    }
-
-    private static CompiledWord CloneWord(CompiledWord word) =>
-        new()
-        {
-            Id = word.Id,
-            Index = word.Index,
-            Kind = word.Kind,
-            CleanText = word.CleanText,
-            CharacterCount = word.CharacterCount,
-            OrpPosition = word.OrpPosition,
-            DisplayDurationMs = word.DisplayDurationMs,
-            StartMs = word.StartMs,
-            EndMs = word.EndMs,
-            Metadata = word.Metadata,
-            SegmentId = word.SegmentId,
-            BlockId = word.BlockId,
-            PhraseId = word.PhraseId
-        };
 }
 
 internal sealed record SegmentCandidate(

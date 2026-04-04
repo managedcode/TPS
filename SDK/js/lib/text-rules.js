@@ -26,3 +26,4 @@ function usesLeadingSeparator(token) {
     }
     return true;
 }
+//# sourceMappingURL=text-rules.js.map

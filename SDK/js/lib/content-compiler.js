@@ -430,3 +430,4 @@ class TokenAccumulator {
         return metadata;
     }
 }
+//# sourceMappingURL=content-compiler.js.map

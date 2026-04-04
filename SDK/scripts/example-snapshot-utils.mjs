@@ -11,18 +11,29 @@ export function loadExampleSnapshot(rootDir, fileName) {
   return JSON.parse(readFileSync(exampleSnapshotPath(rootDir, fileName), "utf8"));
 }
 
-export function buildExampleSnapshot(fileName, script, playerFactory) {
-  const player = playerFactory(script);
+export function buildExampleSnapshot(fileName, script, factories) {
+  const player = factories.playerFactory(script);
+  const session = factories.sessionFactory(script);
+  const standalone = factories.standaloneFactory(script);
   const elapsedCheckpoints = createCheckpointTimes(script.totalDurationMs);
 
-  return {
-    fileName,
-    source: `examples/${fileName}`,
-    compiled: normalizeCompiledScript(script),
-    player: {
-      checkpoints: elapsedCheckpoints.map(({ label, elapsedMs }) => normalizePlayerState(label, player.getState(elapsedMs)))
-    }
-  };
+  try {
+    return {
+      fileName,
+      source: `examples/${fileName}`,
+      compiled: normalizeCompiledScript(script),
+      player: {
+        checkpoints: elapsedCheckpoints.map(({ label, elapsedMs }) => normalizePlayerState(label, player.getState(elapsedMs)))
+      },
+      playback: {
+        session: buildPlaybackSequence(session),
+        standalone: buildPlaybackSequence(standalone)
+      }
+    };
+  } finally {
+    disposeIfSupported(session);
+    disposeIfSupported(standalone);
+  }
 }
 
 function createCheckpointTimes(totalDurationMs) {
@@ -174,6 +185,70 @@ function normalizePlayerState(label, state) {
   });
 }
 
+function buildPlaybackSequence(controller) {
+  const checkpoints = [];
+  checkpoints.push(normalizePlaybackSnapshot("initial", controller.snapshot));
+  controller.nextWord();
+  checkpoints.push(normalizePlaybackSnapshot("afterNextWord", controller.snapshot));
+  controller.previousWord();
+  checkpoints.push(normalizePlaybackSnapshot("afterPreviousWord", controller.snapshot));
+  controller.nextBlock();
+  checkpoints.push(normalizePlaybackSnapshot("afterNextBlock", controller.snapshot));
+  controller.previousBlock();
+  checkpoints.push(normalizePlaybackSnapshot("afterPreviousBlock", controller.snapshot));
+  const faster = controller.increaseSpeed();
+  checkpoints.push(normalizePlaybackSnapshot("afterIncreaseSpeed", controller.snapshot ?? faster));
+  const resetStep = faster?.tempo?.speedStepWpm ?? controller.snapshot?.tempo?.speedStepWpm ?? 10;
+  controller.decreaseSpeed(resetStep);
+  checkpoints.push(normalizePlaybackSnapshot("afterDecreaseSpeed", controller.snapshot));
+  return checkpoints;
+}
+
+function normalizePlaybackSnapshot(label, snapshot) {
+  return compactObject({
+    label,
+    status: snapshot.status,
+    state: normalizePlayerState("state", snapshot.state),
+    tempo: compactObject({
+      baseWpm: snapshot.tempo.baseWpm,
+      effectiveBaseWpm: snapshot.tempo.effectiveBaseWpm,
+      speedOffsetWpm: snapshot.tempo.speedOffsetWpm,
+      speedStepWpm: snapshot.tempo.speedStepWpm,
+      playbackRate: normalizeNumber(snapshot.tempo.playbackRate)
+    }),
+    controls: compactObject({
+      canPlay: snapshot.controls.canPlay,
+      canPause: snapshot.controls.canPause,
+      canStop: snapshot.controls.canStop,
+      canNextWord: snapshot.controls.canNextWord,
+      canPreviousWord: snapshot.controls.canPreviousWord,
+      canNextBlock: snapshot.controls.canNextBlock,
+      canPreviousBlock: snapshot.controls.canPreviousBlock,
+      canIncreaseSpeed: snapshot.controls.canIncreaseSpeed,
+      canDecreaseSpeed: snapshot.controls.canDecreaseSpeed
+    }),
+    focusedWordId: snapshot.focusedWord?.word.id,
+    focusedWordText: snapshot.focusedWord?.word.cleanText,
+    currentWordDurationMs: snapshot.currentWordDurationMs,
+    currentWordRemainingMs: snapshot.currentWordRemainingMs,
+    currentSegmentIndex: snapshot.currentSegmentIndex,
+    currentBlockIndex: snapshot.currentBlockIndex,
+    visibleWords: snapshot.visibleWords.map((word) => compactObject({
+      id: word.word.id,
+      text: word.word.cleanText,
+      isActive: word.isActive,
+      isRead: word.isRead,
+      isUpcoming: word.isUpcoming,
+      emotion: word.emotion,
+      speaker: word.speaker,
+      emphasisLevel: word.emphasisLevel,
+      isHighlighted: word.isHighlighted,
+      deliveryMode: word.deliveryMode,
+      volumeLevel: word.volumeLevel
+    }))
+  });
+}
+
 function normalizeNumber(value) {
   return typeof value === "number" ? Number(value.toFixed(6)) : undefined;
 }
@@ -196,4 +271,10 @@ function compactObject(value) {
   }
 
   return value;
+}
+
+function disposeIfSupported(value) {
+  if (value && typeof value.dispose === "function") {
+    value.dispose();
+  }
 }

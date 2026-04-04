@@ -1,0 +1,39 @@
+name: SDK TypeScript Coverage
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - "codex/**"
+    paths:
+      - "SDK/ts/**"
+      - "SDK/js/**"
+      - "SDK/fixtures/**"
+      - "examples/**"
+      - ".github/workflows/sdk-typescript.yml"
+      - ".github/workflows/sdk-typescript-coverage.yml"
+  pull_request:
+    paths:
+      - "SDK/ts/**"
+      - "SDK/js/**"
+      - "SDK/fixtures/**"
+      - "examples/**"
+      - ".github/workflows/sdk-typescript.yml"
+      - ".github/workflows/sdk-typescript-coverage.yml"
+  workflow_dispatch:
+
+jobs:
+  coverage:
+    name: Coverage 90%+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - run: npm ci --prefix SDK/js
+      - run: npm --prefix SDK/js run coverage:typescript

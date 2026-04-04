@@ -1,3 +1,4 @@
+using ManagedCode.Tps.Internal;
 using ManagedCode.Tps.Models;
 
 namespace ManagedCode.Tps;
@@ -10,8 +11,8 @@ public sealed class TpsPlayer
 
     public TpsPlayer(CompiledScript script)
     {
-        Script = script;
-        foreach (var segment in script.Segments)
+        Script = CompiledScriptNormalizer.Normalize(script);
+        foreach (var segment in Script.Segments)
         {
             _segmentById[segment.Id] = segment;
             foreach (var block in segment.Blocks)
@@ -25,7 +26,7 @@ public sealed class TpsPlayer
         }
     }
 
-    private CompiledScript Script { get; }
+    public CompiledScript Script { get; }
 
     public PlayerState GetState(int elapsedMs)
     {

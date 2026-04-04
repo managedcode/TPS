@@ -1296,6 +1296,11 @@ function buildExamplesIndexPage(examples, css) {
 
 function buildSdkIndexPage(runtimes, css) {
   const sdkUrl = `${siteUrl}sdk/`;
+  const activeRuntimes = runtimes.filter(runtime => runtime.enabled);
+  const plannedRuntimes = runtimes.filter(runtime => !runtime.enabled);
+  const activeCount = activeRuntimes.length;
+  const plannedCount = plannedRuntimes.length;
+  const coverageCount = activeRuntimes.filter(runtime => Boolean(runtime.coverage)).length;
   const runtimeIcons = {
     typescript: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5" fill="#3178C6"/><path d="M7.8 8.2h8.4v2H13v6.1h-2.4v-6.1H7.8v-2Zm7.2 0h6.2v1.9h-1.8c-.7 0-1.1.2-1.1.7 0 .4.3.7 1.2 1l.6.2c1.6.5 2.3 1.3 2.3 2.6 0 1.7-1.4 2.8-3.7 2.8-1.3 0-2.5-.3-3.5-.9v-2.1c1 .7 2.1 1 3.1 1 .8 0 1.2-.2 1.2-.7 0-.4-.3-.6-1.1-.9l-.7-.2c-1.7-.5-2.4-1.4-2.4-2.7 0-1.6 1.3-2.8 3.6-2.8.9 0 1.9.2 2.8.5v2c-.9-.4-1.8-.6-2.6-.6-.8 0-1.2.2-1.2.6 0 .3.3.5 1.1.8l.8.2c1.8.6 2.5 1.4 2.5 2.8 0 1.8-1.4 2.9-3.8 2.9-1.4 0-2.6-.3-3.7-.9v-2.2c1.1.8 2.3 1.2 3.5 1.2.8 0 1.2-.3 1.2-.7 0-.4-.3-.6-1.2-.9l-.8-.2c-1.7-.5-2.4-1.3-2.4-2.6 0-1.7 1.4-2.8 3.7-2.8.9 0 1.8.1 2.7.4V8.2H15Z" fill="#fff"/></svg>',
     javascript: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5" fill="#F7DF1E"/><path d="M13.1 8.1h2.3v6.6c0 2-.9 3.1-2.9 3.1-.9 0-1.6-.2-2.3-.7l.6-1.8c.4.3.8.4 1.2.4.7 0 1.1-.4 1.1-1.4V8.1Zm4 8.7.7-1.8c.7.5 1.6.8 2.4.8 1 0 1.5-.3 1.5-.9 0-.5-.4-.8-1.6-1.2l-.4-.1c-1.8-.6-2.8-1.5-2.8-3 0-1.8 1.4-3 3.6-3 1.1 0 2.1.2 3 .7l-.7 1.8c-.8-.4-1.6-.6-2.3-.6-.9 0-1.4.3-1.4.8 0 .5.4.7 1.6 1.1l.4.1c1.9.6 2.8 1.5 2.8 3.1 0 1.9-1.5 3.1-3.9 3.1-1.3 0-2.6-.3-3.5-.9Z" fill="#1F2328"/></svg>',
@@ -1309,7 +1314,7 @@ function buildSdkIndexPage(runtimes, css) {
       summary: "Reference TPS runtime and source of truth for cross-SDK behavior.",
       chips: ["Reference"],
       facts: [
-        { label: "Status", valueHtml: "Active runtime used as the reference implementation." },
+        { label: "Status", valueHtml: "Active reference runtime with CI and coverage gating." },
         { label: "Workspace", valueHtml: "<code>SDK/ts</code>." }
       ]
     },
@@ -1332,29 +1337,29 @@ function buildSdkIndexPage(runtimes, css) {
       ]
     },
     flutter: {
-      summary: "Placeholder workspace only. No Flutter TPS runtime has been implemented yet.",
-      chips: ["Placeholder"],
+      summary: "Dart runtime for Flutter hosts with parser, compiler, validation, and playback parity tests.",
+      chips: ["Dart", "Flutter Apps"],
       facts: [
-        { label: "State", valueHtml: "Planned only. No implementation or CI yet." },
-        { label: "Next", valueHtml: "Add runtime code and tests when Flutter support starts." },
+        { label: "Status", valueHtml: "Active Dart runtime for Flutter embedding with CI and coverage gating." },
+        { label: "Package", valueHtml: "<code>managedcode_tps</code>." },
         { label: "Workspace", valueHtml: "<code>SDK/flutter</code>." }
       ]
     },
     swift: {
-      summary: "Placeholder workspace only. No Swift TPS runtime has been implemented yet.",
-      chips: ["Placeholder"],
+      summary: "Native Swift package with compile, restore, and timed playback APIs for Apple-platform hosts.",
+      chips: ["SwiftPM", "Apple"],
       facts: [
-        { label: "State", valueHtml: "Planned only. No implementation or CI yet." },
-        { label: "Next", valueHtml: "Add runtime code and tests when Swift support starts." },
+        { label: "Status", valueHtml: "Active Swift runtime package with CI, parity tests, and coverage gating." },
+        { label: "Package", valueHtml: "<code>ManagedCodeTps</code>." },
         { label: "Workspace", valueHtml: "<code>SDK/swift</code>." }
       ]
     },
     java: {
-      summary: "Placeholder workspace only. No Java TPS runtime has been implemented yet.",
-      chips: ["Placeholder"],
+      summary: "Standalone Java runtime with compile, restore, transport, and live playback support.",
+      chips: ["JVM", "Standalone"],
       facts: [
-        { label: "State", valueHtml: "Planned only. No implementation or CI yet." },
-        { label: "Next", valueHtml: "Add runtime code and tests when Java support starts." },
+        { label: "Status", valueHtml: "Active Java runtime with transport parity, CI, and coverage gating." },
+        { label: "Package", valueHtml: "<code>com.managedcode.tps</code>." },
         { label: "Workspace", valueHtml: "<code>SDK/java</code>." }
       ]
     }
@@ -1412,8 +1417,26 @@ function buildSdkIndexPage(runtimes, css) {
         </div>
       </article>`;
     };
-  const activeCards = runtimes.filter(runtime => runtime.enabled).map(renderRuntimeCard).join("");
-  const plannedCards = runtimes.filter(runtime => !runtime.enabled).map(renderRuntimeCard).join("");
+  const activeCards = activeRuntimes.map(renderRuntimeCard).join("");
+  const plannedCards = plannedRuntimes.map(renderRuntimeCard).join("");
+  const heroSignals = [
+    `${activeCount} active runtimes with CI`,
+    coverageCount > 0 ? `${coverageCount} runtimes with 90%+ coverage gates` : "Shared parity fixtures across all runtimes",
+    plannedCount > 0 ? `${plannedCount} planned runtime workspaces reserved` : "All runtime slots are implemented today"
+  ];
+  const plannedSection = plannedCount > 0
+    ? `
+    <section class="answer-strip reveal" aria-labelledby="planned-sdks-title">
+      <div class="answer-strip-header">
+        <p class="panel-label">Planned SDKs</p>
+        <h2 id="planned-sdks-title">Coming Next</h2>
+      </div>
+      <p class="sdk-section-copy">Reserved workspaces for future runtime implementations.</p>
+      <div class="sdk-grid sdk-grid--planned">
+        ${plannedCards}
+      </div>
+    </section>`
+    : "";
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -1462,9 +1485,9 @@ function buildSdkIndexPage(runtimes, css) {
       <h1 class="hero-title"><span class="hero-title-main">TPS SDKs</span></h1>
       <p class="hero-story">Every TPS SDK exposes the same contract: <em>constants</em>, <em>validation</em>, <em>parser</em>, <em>compiler</em>, and <em>player</em> APIs. Jump directly into the implementation code or check the <a href="../glossary/">glossary</a> for terminology.</p>
       <ul class="hero-signals">
-        <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M6 8.5l1.5 1.5L10 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>3 active runtimes with CI</li>
-        <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M8 5v3l2.5 1.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>3 planned runtimes reserved</li>
-        <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M8 3v10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>90%+ coverage gate enforced</li>
+        <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M6 8.5l1.5 1.5L10 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>${escapeHtml(heroSignals[0])}</li>
+        <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M8 5v3l2.5 1.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>${escapeHtml(heroSignals[1])}</li>
+        <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M8 3v10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>${escapeHtml(heroSignals[2])}</li>
       </ul>
       <div class="hero-actions">
         <a class="button button-primary" href="${repoUrl}/tree/main/SDK" target="_blank" rel="noopener">Browse SDK Workspace</a>
@@ -1474,9 +1497,9 @@ function buildSdkIndexPage(runtimes, css) {
         </a>
       </div>
       <div class="hero-facts">
-        <span><strong>3</strong> active SDKs</span>
-        <span><strong>3</strong> planned SDKs</span>
-        <span><strong>90%+</strong> coverage gate</span>
+        <span><strong>${activeCount}</strong> active SDKs</span>
+        <span><strong>${plannedCount}</strong> planned SDKs</span>
+        <span><strong>${coverageCount}</strong> coverage-gated runtimes</span>
         <span><strong>5</strong> API layers per runtime</span>
       </div>
     </header>
@@ -1492,16 +1515,7 @@ function buildSdkIndexPage(runtimes, css) {
       </div>
     </section>
 
-    <section class="answer-strip reveal" aria-labelledby="planned-sdks-title">
-      <div class="answer-strip-header">
-        <p class="panel-label">Planned SDKs</p>
-        <h2 id="planned-sdks-title">Coming Next</h2>
-      </div>
-      <p class="sdk-section-copy">Reserved workspaces for future runtime implementations.</p>
-      <div class="sdk-grid sdk-grid--planned">
-        ${plannedCards}
-      </div>
-    </section>
+    ${plannedSection}
 
     <footer class="site-footer">
       <span>Copyright &copy; <a href="https://www.managed-code.com/" target="_blank" rel="noopener">Managed Code</a></span>

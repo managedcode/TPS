@@ -30,25 +30,173 @@ TPS now includes a `ManagedCode.Tps` SDK workspace for parsing, validation, comp
 | **TypeScript** | Active | [SDK/ts](https://github.com/managedcode/TPS/tree/main/SDK/ts) | Canonical typed TPS implementation |
 | **JavaScript** | Active | [SDK/js](https://github.com/managedcode/TPS/tree/main/SDK/js) | Built consumer runtime generated from TypeScript |
 | **.NET / C#** | Active | [SDK/dotnet](https://github.com/managedcode/TPS/tree/main/SDK/dotnet) | `ManagedCode.Tps` runtime and xUnit suite |
-| **Flutter** | Planned | [SDK/flutter](https://github.com/managedcode/TPS/tree/main/SDK/flutter) | Reserved placeholder runtime |
-| **Swift** | Planned | [SDK/swift](https://github.com/managedcode/TPS/tree/main/SDK/swift) | Reserved placeholder runtime |
-| **Java** | Planned | [SDK/java](https://github.com/managedcode/TPS/tree/main/SDK/java) | Reserved placeholder runtime |
+| **Flutter** | Active | [SDK/flutter](https://github.com/managedcode/TPS/tree/main/SDK/flutter) | Dart runtime for Flutter hosts |
+| **Swift** | Active | [SDK/swift](https://github.com/managedcode/TPS/tree/main/SDK/swift) | Native Swift package for Apple-platform apps |
+| **Java** | Active | [SDK/java](https://github.com/managedcode/TPS/tree/main/SDK/java) | Standalone Java runtime under `com.managedcode.tps` |
 
 Each active SDK exposes the same core contract:
 
 - **Constants catalog** — TPS keywords, tags, metadata keys, emotions, and diagnostics
 - **Validation API** — actionable TPS format diagnostics
 - **Parser API** — TPS document model generation
-- **Compiler API** — JSON-friendly timed state machine generation
-- **Player API** — presentation model resolution at runtime
+- **Compiler API** — JSON-friendly timed state machine generation with a stable wire contract
+- **Player API** — deterministic state resolution plus stand-alone playback control for embeddable hosts
 
-Additional SDK documentation:
+All six active runtimes participate in repo-wide build/test CI and now have separate `90%+` coverage gates.
+
+The active SDKs now split playback into three layers:
+
+- **`TpsPlayer`** — pure resolver for `GetState(elapsed)` / sampling
+- **`TpsPlaybackSession`** — timer-driven runtime controller with `play`, `pause`, `seek`, `advanceBy`, `nextWord`, `previousWord`, `nextBlock`, `previousBlock`, and speed correction
+- **`TpsStandalonePlayer`** — compile-and-play wrapper that starts from raw TPS source and exposes bindable runtime snapshots, commands, and transport events
+
+Language-specific SDK documentation:
 
 - **Workspace overview:** [SDK/README.md](https://github.com/managedcode/TPS/blob/main/SDK/README.md)
 - **TypeScript docs:** [SDK/ts/README.md](https://github.com/managedcode/TPS/blob/main/SDK/ts/README.md)
 - **JavaScript docs:** [SDK/js/README.md](https://github.com/managedcode/TPS/blob/main/SDK/js/README.md)
 - **.NET docs:** [SDK/dotnet/README.md](https://github.com/managedcode/TPS/blob/main/SDK/dotnet/README.md)
-- **Future runtime placeholders:** [SDK/flutter/README.md](https://github.com/managedcode/TPS/blob/main/SDK/flutter/README.md), [SDK/swift/README.md](https://github.com/managedcode/TPS/blob/main/SDK/swift/README.md), [SDK/java/README.md](https://github.com/managedcode/TPS/blob/main/SDK/java/README.md)
+- **Flutter docs:** [SDK/flutter/README.md](https://github.com/managedcode/TPS/blob/main/SDK/flutter/README.md)
+- **Swift docs:** [SDK/swift/README.md](https://github.com/managedcode/TPS/blob/main/SDK/swift/README.md)
+- **Java docs:** [SDK/java/README.md](https://github.com/managedcode/TPS/blob/main/SDK/java/README.md)
+
+### Embedding In UI Apps
+
+The SDKs are designed to be embedded into other applications without owning the UI layer themselves.
+
+Recommended host pattern:
+
+1. Compile TPS source with `TpsStandalonePlayer` when your host starts from raw `.tps` text.
+2. Use `TpsPlaybackSession` when your host already has the compiled state machine.
+3. Restore precompiled JSON into the standalone player when your host downloads or caches a compiled TPS state machine.
+4. Bind UI buttons directly to runtime commands:
+   `play`, `pause`, `stop`, `seek`, `advanceBy`, `nextWord`, `previousWord`, `nextBlock`, `previousBlock`, `increaseSpeed`, `decreaseSpeed`, `setSpeedOffsetWpm`.
+5. Render from runtime snapshots, not from ad hoc host state.
+
+Each snapshot is intended to be a UI view-model and includes:
+
+- playback status and current progress
+- current segment, block, phrase, and focused word
+- visible words with `read`, `active`, and `upcoming` state
+- effective tempo information: base WPM, global offset, effective WPM, playback rate
+- control availability for transport and speed buttons
+
+For convenient host wiring, the active SDKs expose snapshot observation helpers:
+
+- TypeScript / JavaScript: `observeSnapshot(listener, emitCurrent = true)`
+- C#: `ObserveSnapshot(Action<TpsPlaybackSnapshot> observer, bool emitCurrent = true)`
+
+This lets a UI receive the current runtime model immediately and then keep rendering on every playback update.
+
+On .NET, `ObserveSnapshot(...)` and runtime events can be dispatched through `TpsPlaybackSessionOptions.EventSynchronizationContext`, and callback failures are surfaced through `ListenerException` instead of being silently swallowed.
+
+```csharp
+using var player = TpsStandalonePlayer.Compile(tpsSource);
+using var subscription = player.ObserveSnapshot(snapshot =>
+{
+    Render(snapshot);
+});
+
+playButton.Click += (_, _) => player.Play();
+pauseButton.Click += (_, _) => player.Pause();
+nextWordButton.Click += (_, _) => player.NextWord();
+slowerButton.Click += (_, _) => player.DecreaseSpeed();
+```
+
+```ts
+const player = TpsStandalonePlayer.compile(tpsSource);
+const dispose = player.observeSnapshot((snapshot) => {
+  render(snapshot);
+});
+
+playButton.onclick = () => player.play();
+pauseButton.onclick = () => player.pause();
+nextWordButton.onclick = () => player.nextWord();
+slowerButton.onclick = () => player.decreaseSpeed();
+```
+
+### Compile Once, Play Anywhere
+
+The compiled TPS state machine is meant to be portable across runtimes and hosts:
+
+- property names are camelCase by default
+- `severity` and playback `status` serialize as lowercase strings
+- the compiled graph is safe to store as JSON and restore later into a player
+
+Minimal .NET roundtrip:
+
+```csharp
+using System.Text.Json;
+using ManagedCode.Tps;
+
+var compiled = TpsRuntime.Compile(source).Script;
+var json = JsonSerializer.Serialize(compiled);
+
+using var player = TpsStandalonePlayer.FromCompiledJson(json);
+using var subscription = player.ObserveSnapshot(Render);
+
+player.Play();
+```
+
+When a .NET standalone player starts from compiled JSON instead of raw TPS source, `HasSourceCompilation` is `false` and `Document` is a projected structural view of the compiled graph. That projected document is suitable for host UI labels and navigation, but it does not recreate original authoring text content.
+
+## UI Integration Contract
+
+TPS SDKs are intentionally renderer-agnostic. They do not own your HTML, Razor, MAUI, WPF, WinUI, React, or canvas UI. Instead, the embeddable playback layer exposes a host-facing contract:
+
+- **Commands**: `play`, `pause`, `stop`, `seek`, `advanceBy`, `nextWord`, `previousWord`, `nextBlock`, `previousBlock`, `increaseSpeed`, `decreaseSpeed`, `setSpeedOffsetWpm`
+- **Transport state**: current elapsed time, progress, completion, current segment/block/phrase/word
+- **Snapshot view-model**: visible words, focused word, read/upcoming state, timing, emotion, speaker, highlight/emphasis/volume/delivery metadata
+- **Control gating**: `canPlay`, `canPause`, `canStop`, `canNextWord`, `canPreviousWord`, `canNextBlock`, `canPreviousBlock`, `canIncreaseSpeed`, `canDecreaseSpeed`
+- **Events**: runtime state change events plus `snapshotChanged` for UI rerender
+
+Recommended host flow:
+
+1. Compile TPS into a state machine.
+2. Bind your buttons and shortcuts to the playback commands.
+3. Render the current screen from the snapshot object, not from ad-hoc derived state.
+4. Use `controls.*` to enable or disable UI affordances consistently across platforms.
+
+On .NET hosts with a UI thread, configure `TpsPlaybackSessionOptions.EventSynchronizationContext` or create the player on the target UI thread so `SnapshotChanged` arrives on the correct dispatcher. For deterministic tests or host-controlled time, use `TpsPlaybackSessionOptions.TimeProvider`.
+
+Minimal .NET host:
+
+```csharp
+using ManagedCode.Tps;
+
+using var player = TpsStandalonePlayer.Compile(source);
+player.SnapshotChanged += (_, args) => Render(args.Snapshot);
+
+player.Play();
+player.NextWord();
+player.DecreaseSpeed();
+```
+
+Minimal TypeScript host:
+
+```ts
+import { TpsStandalonePlayer } from "managedcode.tps";
+
+const player = TpsStandalonePlayer.compile(source);
+const unsubscribe = player.onSnapshotChanged((snapshot) => render(snapshot));
+
+player.play();
+player.nextBlock();
+player.increaseSpeed();
+```
+
+## Reference Coverage
+
+This specification is backed by executable fixtures, not just prose:
+
+- `examples/basic.tps` covers the minimal authoring path.
+- `examples/advanced.tps` covers speed tags, pauses, volume, inline emotions, emphasis, pronunciation, stress, breath marks, delivery modes, speaker tags, edit points, and nested formatting.
+- `examples/multi-segment.tps` covers multi-section timing and hierarchy behavior.
+- `SDK/fixtures/invalid/*.tps` covers malformed headers, tags, and diagnostics.
+- `SDK/fixtures/examples/*.snapshot.json` captures normalized compiled output plus live session/standalone playback checkpoints that active runtimes must match.
+- `SDK/fixtures/transport/*.json` captures the canonical compiled JSON transport that active runtimes must serialize and restore.
+
+If TPS syntax changes, update this README, the examples, the shared fixtures, and the SDK tests together.
 
 ## Design Goals
 
@@ -77,7 +225,7 @@ Complete canonical glossary, including `#`, `##`, `###`, inline tags, diagnostic
 | **Compiler** | The TPS component that turns parsed TPS into a JSON-friendly timed state machine. |
 | **Compiled Script** | The runtime-ready output containing metadata, segments, blocks, phrases, words, and timing. |
 | **Player** | The runtime component that resolves what should be shown at a specific elapsed time. |
-| **ManagedCode.Tps SDK** | The multi-runtime SDK workspace under `SDK/` for TypeScript, JavaScript, .NET, and future runtimes. |
+| **ManagedCode.Tps SDK** | The multi-runtime SDK workspace under `SDK/` for TypeScript, JavaScript, .NET, Flutter, Swift, and Java runtimes. |
 
 ## File Structure
 

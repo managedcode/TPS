@@ -1,0 +1,34 @@
+name: SDK Flutter
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - "codex/**"
+    paths:
+      - "SDK/flutter/**"
+      - "SDK/fixtures/**"
+      - "examples/**"
+      - ".github/workflows/sdk-flutter.yml"
+  pull_request:
+    paths:
+      - "SDK/flutter/**"
+      - "SDK/fixtures/**"
+      - "examples/**"
+      - ".github/workflows/sdk-flutter.yml"
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    name: Build And Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dart-lang/setup-dart@v1
+      - run: cd SDK/flutter && dart pub get
+      - run: cd SDK/flutter && dart analyze
+      - run: cd SDK/flutter && dart test

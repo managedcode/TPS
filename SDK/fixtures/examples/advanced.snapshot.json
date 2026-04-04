@@ -10525,5 +10525,1663 @@
         }
       }
     ]
+  },
+  "playback": {
+    "session": [
+      {
+        "label": "initial",
+        "status": "idle",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 155862,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "Normal",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 446,
+          "presentation": {
+            "segmentName": "Speed and Pacing",
+            "blockName": "Speed Controls",
+            "phraseText": "Normal speed for regular content.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4",
+              "word-5"
+            ],
+            "visibleWordTexts": [
+              "Normal",
+              "speed",
+              "for",
+              "regular",
+              "content."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": false,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "Normal",
+        "currentWordDurationMs": 446,
+        "currentWordRemainingMs": 446,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "Normal",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "speed",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "for",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "regular",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-5",
+            "text": "content.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterNextWord",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 446,
+          "remainingMs": 155416,
+          "progress": 0.002862,
+          "isComplete": false,
+          "currentWordIndex": 1,
+          "currentWordId": "word-2",
+          "currentWordText": "speed",
+          "currentWordKind": "word",
+          "previousWordId": "word-1",
+          "nextWordId": "word-3",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 875,
+          "presentation": {
+            "segmentName": "Speed and Pacing",
+            "blockName": "Speed Controls",
+            "phraseText": "Normal speed for regular content.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4",
+              "word-5"
+            ],
+            "visibleWordTexts": [
+              "Normal",
+              "speed",
+              "for",
+              "regular",
+              "content."
+            ],
+            "activeWordInPhrase": 1
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": true,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-2",
+        "focusedWordText": "speed",
+        "currentWordDurationMs": 429,
+        "currentWordRemainingMs": 429,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "Normal",
+            "isActive": false,
+            "isRead": true,
+            "isUpcoming": false,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "speed",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "for",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "regular",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-5",
+            "text": "content.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterPreviousWord",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 155862,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "Normal",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 446,
+          "presentation": {
+            "segmentName": "Speed and Pacing",
+            "blockName": "Speed Controls",
+            "phraseText": "Normal speed for regular content.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4",
+              "word-5"
+            ],
+            "visibleWordTexts": [
+              "Normal",
+              "speed",
+              "for",
+              "regular",
+              "content."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "Normal",
+        "currentWordDurationMs": 446,
+        "currentWordRemainingMs": 446,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "Normal",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "speed",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "for",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "regular",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-5",
+            "text": "content.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterNextBlock",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 21872,
+          "remainingMs": 133990,
+          "progress": 0.140329,
+          "isComplete": false,
+          "currentWordIndex": 45,
+          "currentWordId": "word-46",
+          "currentWordText": "Short",
+          "currentWordKind": "word",
+          "previousWordId": "word-45",
+          "nextWordId": "word-47",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-2",
+          "currentPhraseId": "segment-1-block-2-phrase-1",
+          "nextTransitionMs": 22301,
+          "presentation": {
+            "segmentName": "Speed and Pacing",
+            "blockName": "Pauses",
+            "phraseText": "Short pause after a comma-like break.",
+            "visibleWordIds": [
+              "word-46",
+              "word-47",
+              "word-48",
+              "word-49",
+              "word-50",
+              "word-51"
+            ],
+            "visibleWordTexts": [
+              "Short",
+              "pause",
+              "after",
+              "a",
+              "comma-like",
+              "break."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": true,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-46",
+        "focusedWordText": "Short",
+        "currentWordDurationMs": 429,
+        "currentWordRemainingMs": 429,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 2,
+        "visibleWords": [
+          {
+            "id": "word-46",
+            "text": "Short",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "professional",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-47",
+            "text": "pause",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "professional",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-48",
+            "text": "after",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "professional",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-49",
+            "text": "a",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "professional",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-50",
+            "text": "comma-like",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "professional",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-51",
+            "text": "break.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "professional",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterPreviousBlock",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 155862,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "Normal",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 446,
+          "presentation": {
+            "segmentName": "Speed and Pacing",
+            "blockName": "Speed Controls",
+            "phraseText": "Normal speed for regular content.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4",
+              "word-5"
+            ],
+            "visibleWordTexts": [
+              "Normal",
+              "speed",
+              "for",
+              "regular",
+              "content."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "Normal",
+        "currentWordDurationMs": 446,
+        "currentWordRemainingMs": 446,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "Normal",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "speed",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "for",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "regular",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-5",
+            "text": "content.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterIncreaseSpeed",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 155862,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "Normal",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 446,
+          "presentation": {
+            "segmentName": "Speed and Pacing",
+            "blockName": "Speed Controls",
+            "phraseText": "Normal speed for regular content.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4",
+              "word-5"
+            ],
+            "visibleWordTexts": [
+              "Normal",
+              "speed",
+              "for",
+              "regular",
+              "content."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 150,
+          "speedOffsetWpm": 10,
+          "speedStepWpm": 10,
+          "playbackRate": 1.071429
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "Normal",
+        "currentWordDurationMs": 416,
+        "currentWordRemainingMs": 416,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "Normal",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "speed",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "for",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "regular",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-5",
+            "text": "content.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterDecreaseSpeed",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 155862,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "Normal",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 446,
+          "presentation": {
+            "segmentName": "Speed and Pacing",
+            "blockName": "Speed Controls",
+            "phraseText": "Normal speed for regular content.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4",
+              "word-5"
+            ],
+            "visibleWordTexts": [
+              "Normal",
+              "speed",
+              "for",
+              "regular",
+              "content."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "Normal",
+        "currentWordDurationMs": 446,
+        "currentWordRemainingMs": 446,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "Normal",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "speed",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "for",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "regular",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-5",
+            "text": "content.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      }
+    ],
+    "standalone": [
+      {
+        "label": "initial",
+        "status": "idle",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 155862,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "Normal",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 446,
+          "presentation": {
+            "segmentName": "Speed and Pacing",
+            "blockName": "Speed Controls",
+            "phraseText": "Normal speed for regular content.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4",
+              "word-5"
+            ],
+            "visibleWordTexts": [
+              "Normal",
+              "speed",
+              "for",
+              "regular",
+              "content."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": false,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "Normal",
+        "currentWordDurationMs": 446,
+        "currentWordRemainingMs": 446,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "Normal",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "speed",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "for",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "regular",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-5",
+            "text": "content.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterNextWord",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 446,
+          "remainingMs": 155416,
+          "progress": 0.002862,
+          "isComplete": false,
+          "currentWordIndex": 1,
+          "currentWordId": "word-2",
+          "currentWordText": "speed",
+          "currentWordKind": "word",
+          "previousWordId": "word-1",
+          "nextWordId": "word-3",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 875,
+          "presentation": {
+            "segmentName": "Speed and Pacing",
+            "blockName": "Speed Controls",
+            "phraseText": "Normal speed for regular content.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4",
+              "word-5"
+            ],
+            "visibleWordTexts": [
+              "Normal",
+              "speed",
+              "for",
+              "regular",
+              "content."
+            ],
+            "activeWordInPhrase": 1
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": true,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-2",
+        "focusedWordText": "speed",
+        "currentWordDurationMs": 429,
+        "currentWordRemainingMs": 429,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "Normal",
+            "isActive": false,
+            "isRead": true,
+            "isUpcoming": false,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "speed",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "for",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "regular",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-5",
+            "text": "content.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterPreviousWord",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 155862,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "Normal",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 446,
+          "presentation": {
+            "segmentName": "Speed and Pacing",
+            "blockName": "Speed Controls",
+            "phraseText": "Normal speed for regular content.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4",
+              "word-5"
+            ],
+            "visibleWordTexts": [
+              "Normal",
+              "speed",
+              "for",
+              "regular",
+              "content."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "Normal",
+        "currentWordDurationMs": 446,
+        "currentWordRemainingMs": 446,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "Normal",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "speed",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "for",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "regular",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-5",
+            "text": "content.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterNextBlock",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 21872,
+          "remainingMs": 133990,
+          "progress": 0.140329,
+          "isComplete": false,
+          "currentWordIndex": 45,
+          "currentWordId": "word-46",
+          "currentWordText": "Short",
+          "currentWordKind": "word",
+          "previousWordId": "word-45",
+          "nextWordId": "word-47",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-2",
+          "currentPhraseId": "segment-1-block-2-phrase-1",
+          "nextTransitionMs": 22301,
+          "presentation": {
+            "segmentName": "Speed and Pacing",
+            "blockName": "Pauses",
+            "phraseText": "Short pause after a comma-like break.",
+            "visibleWordIds": [
+              "word-46",
+              "word-47",
+              "word-48",
+              "word-49",
+              "word-50",
+              "word-51"
+            ],
+            "visibleWordTexts": [
+              "Short",
+              "pause",
+              "after",
+              "a",
+              "comma-like",
+              "break."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": true,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-46",
+        "focusedWordText": "Short",
+        "currentWordDurationMs": 429,
+        "currentWordRemainingMs": 429,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 2,
+        "visibleWords": [
+          {
+            "id": "word-46",
+            "text": "Short",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "professional",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-47",
+            "text": "pause",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "professional",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-48",
+            "text": "after",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "professional",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-49",
+            "text": "a",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "professional",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-50",
+            "text": "comma-like",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "professional",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-51",
+            "text": "break.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "professional",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterPreviousBlock",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 155862,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "Normal",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 446,
+          "presentation": {
+            "segmentName": "Speed and Pacing",
+            "blockName": "Speed Controls",
+            "phraseText": "Normal speed for regular content.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4",
+              "word-5"
+            ],
+            "visibleWordTexts": [
+              "Normal",
+              "speed",
+              "for",
+              "regular",
+              "content."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "Normal",
+        "currentWordDurationMs": 446,
+        "currentWordRemainingMs": 446,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "Normal",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "speed",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "for",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "regular",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-5",
+            "text": "content.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterIncreaseSpeed",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 155862,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "Normal",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 446,
+          "presentation": {
+            "segmentName": "Speed and Pacing",
+            "blockName": "Speed Controls",
+            "phraseText": "Normal speed for regular content.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4",
+              "word-5"
+            ],
+            "visibleWordTexts": [
+              "Normal",
+              "speed",
+              "for",
+              "regular",
+              "content."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 150,
+          "speedOffsetWpm": 10,
+          "speedStepWpm": 10,
+          "playbackRate": 1.071429
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "Normal",
+        "currentWordDurationMs": 416,
+        "currentWordRemainingMs": 416,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "Normal",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "speed",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "for",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "regular",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-5",
+            "text": "content.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterDecreaseSpeed",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 155862,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "Normal",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 446,
+          "presentation": {
+            "segmentName": "Speed and Pacing",
+            "blockName": "Speed Controls",
+            "phraseText": "Normal speed for regular content.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4",
+              "word-5"
+            ],
+            "visibleWordTexts": [
+              "Normal",
+              "speed",
+              "for",
+              "regular",
+              "content."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "Normal",
+        "currentWordDurationMs": 446,
+        "currentWordRemainingMs": 446,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "Normal",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "speed",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "for",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "regular",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-5",
+            "text": "content.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      }
+    ]
   }
 }

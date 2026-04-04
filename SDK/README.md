@@ -2,12 +2,12 @@
 
 | Runtime | Status | Build/Test | Coverage |
 |---------|--------|------------|----------|
-| TypeScript | Active | [![SDK TypeScript](https://github.com/managedcode/TPS/actions/workflows/sdk-typescript.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-typescript.yml) | — |
+| TypeScript | Active | [![SDK TypeScript](https://github.com/managedcode/TPS/actions/workflows/sdk-typescript.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-typescript.yml) | [![SDK TypeScript Coverage](https://github.com/managedcode/TPS/actions/workflows/sdk-typescript-coverage.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-typescript-coverage.yml) |
 | JavaScript | Active | [![SDK JavaScript](https://github.com/managedcode/TPS/actions/workflows/sdk-javascript.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-javascript.yml) | [![SDK JavaScript Coverage](https://github.com/managedcode/TPS/actions/workflows/sdk-javascript-coverage.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-javascript-coverage.yml) |
 | C# | Active | [![SDK CSharp](https://github.com/managedcode/TPS/actions/workflows/sdk-dotnet.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-dotnet.yml) | [![SDK CSharp Coverage](https://github.com/managedcode/TPS/actions/workflows/sdk-dotnet-coverage.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-dotnet-coverage.yml) |
-| Flutter | Planned | ![Status](https://img.shields.io/badge/status-planned-c4a060) | — |
-| Swift | Planned | ![Status](https://img.shields.io/badge/status-planned-c4a060) | — |
-| Java | Planned | ![Status](https://img.shields.io/badge/status-planned-c4a060) | — |
+| Flutter | Active | [![SDK Flutter](https://github.com/managedcode/TPS/actions/workflows/sdk-flutter.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-flutter.yml) | [![SDK Flutter Coverage](https://github.com/managedcode/TPS/actions/workflows/sdk-flutter-coverage.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-flutter-coverage.yml) |
+| Swift | Active | [![SDK Swift](https://github.com/managedcode/TPS/actions/workflows/sdk-swift.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-swift.yml) | [![SDK Swift Coverage](https://github.com/managedcode/TPS/actions/workflows/sdk-swift-coverage.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-swift-coverage.yml) |
+| Java | Active | [![SDK Java](https://github.com/managedcode/TPS/actions/workflows/sdk-java.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-java.yml) | [![SDK Java Coverage](https://github.com/managedcode/TPS/actions/workflows/sdk-java-coverage.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-java-coverage.yml) |
 
 `SDK/` is the multi-runtime workspace for `ManagedCode.Tps`.
 
@@ -19,18 +19,20 @@ This folder is where TPS runtime implementations live. The goal is parity across
 - TPS validation with actionable diagnostics
 - TPS parsing into a document model
 - TPS compilation into a JSON-friendly state machine
-- player/runtime APIs that resolve what to display at a specific elapsed time
+- player/runtime APIs for both deterministic sampling and live timed playback
 
-The TypeScript runtime is the canonical implementation. The JavaScript runtime is the consumer-facing built artifact of that source. The .NET runtime is an independent implementation under the `ManagedCode.Tps` namespace.
+The TypeScript runtime is the canonical implementation. The JavaScript runtime is the consumer-facing built artifact of that source. The .NET, Flutter, Swift, and Java runtimes are independent implementations that are kept aligned through shared fixtures and parity tests.
+
+Compiled TPS output is meant to be portable. The active runtimes treat the compiled state machine as the shared transport format for `compile -> json -> restore -> play` flows.
 
 ## Workspace Layout
 
 - `ts/`: canonical TypeScript implementation
 - `js/`: generated JavaScript runtime, Node tests, and package metadata
 - `dotnet/`: .NET runtime, solution, and xUnit tests
-- `flutter/`: reserved Flutter runtime folder
-- `swift/`: reserved Swift runtime folder
-- `java/`: reserved Java runtime folder
+- `flutter/`: Dart runtime for Flutter hosts
+- `swift/`: Swift runtime package
+- `java/`: Java runtime package
 - `fixtures/`: shared TPS fixtures and expected runtime behavior
 - `docs/`: SDK ADRs and architecture notes
 - `manifest.json`: internal runtime matrix source for CI and site generation
@@ -39,12 +41,12 @@ The TypeScript runtime is the canonical implementation. The JavaScript runtime i
 
 | Folder | Purpose | Edit Here When | Main Commands |
 |--------|---------|----------------|---------------|
-| `SDK/ts` | canonical runtime source | changing TPS behavior or runtime contract | `npm --prefix SDK/js run build:tps`, `npm --prefix SDK/js run test:typescript` |
+| `SDK/ts` | canonical runtime source | changing TPS behavior or runtime contract | `npm --prefix SDK/js run build:tps`, `npm --prefix SDK/js run coverage:typescript` |
 | `SDK/js` | JavaScript package and Node validation | changing JS packaging or JS-specific tests | `npm --prefix SDK/js run test:js`, `npm --prefix SDK/js run coverage:js` |
 | `SDK/dotnet` | C# runtime and tests | changing .NET API or .NET behavior | `dotnet build SDK/dotnet/ManagedCode.Tps.slnx -warnaserror --no-restore`, `dotnet test SDK/dotnet/ManagedCode.Tps.slnx --no-build --no-restore` |
-| `SDK/flutter` | placeholder | starting Flutter implementation | define runtime structure, tests, and workflow |
-| `SDK/swift` | placeholder | starting Swift implementation | define runtime structure, tests, and workflow |
-| `SDK/java` | placeholder | starting Java implementation | define runtime structure, tests, and workflow |
+| `SDK/flutter` | Dart runtime for Flutter hosts | changing Flutter/Dart behavior or tests | `cd SDK/flutter && dart pub get && ./coverage.sh` |
+| `SDK/swift` | Swift runtime package | changing Apple-platform runtime behavior or tests | `cd SDK/swift && ./coverage.sh` |
+| `SDK/java` | Java runtime package | changing Java behavior or tests | `cd SDK/java && ./coverage.sh` |
 
 ## Compiled Model
 
@@ -58,6 +60,42 @@ The compiled TPS state machine is organized as:
 
 Each compiled word carries timing and authoring-derived metadata such as emphasis, emotion, speed override, pronunciation, volume, delivery mode, and edit-point markers.
 
+## Playback Model
+
+Active runtimes expose three playback layers:
+
+- `TpsPlayer`: pure resolver for `GetState(elapsed)` and deterministic sampling
+- `TpsPlaybackSession`: stateful controller with its own timer, transport controls, speed correction, transition events, and host-controllable time sources
+- `TpsStandalonePlayer`: compile-and-play wrapper that starts from TPS source and exposes the embeddable runtime surface in one object, including direct commands and snapshot events
+- active runtimes also expose `FromCompiledScript(...)` and `FromCompiledJson(...)` helpers so hosts can restore a precompiled TPS JSON state machine instead of recompiling source on every open
+
+Use `TpsPlayer` when the host already owns the clock. Use `TpsPlaybackSession` when the SDK should drive playback itself from an already compiled state machine. Use `TpsStandalonePlayer` when the host wants one SDK-owned object that compiles TPS, plays it, and exposes bindable commands and snapshots.
+
+## Embeddable Control Surface
+
+The standalone player/session layer is UI-framework-neutral. The SDK does not render HTML, Razor, or native buttons for you; instead it exposes the command surface a host UI binds to:
+
+- `play`, `pause`, `stop`, `seek`
+- `advanceBy`
+- `nextWord`, `previousWord`
+- `nextBlock`, `previousBlock`
+- `increaseSpeed`, `decreaseSpeed`, `setSpeedOffsetWpm`
+- `snapshotChanged`
+- `observeSnapshot` / `ObserveSnapshot` for immediate current-state replay plus future updates
+
+Each snapshot exposes:
+
+- current segment, block, phrase, and focused word
+- visible words with read/active/upcoming state plus word effects
+- current transport status and completion progress
+- tempo state: base WPM, global offset, effective base WPM, playback rate
+- control availability for enabling or disabling host buttons
+
+The root [README.md](/Users/ksemenenko/Developer/TPS/README.md) is the canonical human-readable format spec. Keep it aligned with `examples/*.tps`, `SDK/fixtures/invalid/*.tps`, and the shared example snapshots whenever TPS syntax or playback semantics change.
+
+On .NET, prefer wiring playback through `TpsPlaybackSessionOptions.TimeProvider` when a host needs deterministic or externally controlled time.
+On .NET UI hosts, also wire `TpsPlaybackSessionOptions.EventSynchronizationContext` so snapshot and state events land on the dispatcher the host actually renders from.
+
 ## How To Work In This SDK
 
 1. Change the TPS contract in `SDK/ts` first unless the work is package-specific or .NET-specific.
@@ -68,13 +106,18 @@ Each compiled word carries timing and authoring-derived metadata such as emphasi
 
 ## Local Verification
 
-- TypeScript: `npm --prefix SDK/js run test:typescript`
+- TypeScript: `npm --prefix SDK/js run coverage:typescript`
 - JavaScript: `npm --prefix SDK/js run coverage:js`
 - C#: `dotnet test SDK/dotnet/ManagedCode.Tps.slnx --no-build --no-restore /p:CollectCoverage=true /p:CoverletOutputFormat=json /p:ThresholdType=line%2Cbranch%2Cmethod /p:Threshold=90`
+- Flutter: `cd SDK/flutter && ./coverage.sh`
+- Swift: `cd SDK/swift && ./coverage.sh`
+- Java: `cd SDK/java && ./coverage.sh`
 
 ## Shared Example Snapshots
 
-`SDK/fixtures/examples/*.snapshot.json` are cross-runtime integration fixtures generated from the documented `examples/*.tps` files. Active runtimes must compile those examples into the same normalized state machine shape and produce the same checkpointed player states.
+`SDK/fixtures/examples/*.snapshot.json` are cross-runtime integration fixtures generated from the documented `examples/*.tps` files. Active runtimes must compile those examples into the same normalized state machine shape, produce the same checkpointed player states, and expose the same session/standalone playback snapshots for navigation and speed controls.
+
+`SDK/fixtures/transport/*.json` are canonical compiled-wire fixtures. Active runtimes must serialize the same JSON transport shape and be able to restore playback from it.
 
 Regenerate them with:
 
@@ -85,7 +128,14 @@ Regenerate them with:
 - `.github/workflows/ci.yml`: repo-wide build/test matrix
 - `.github/workflows/coverage.yml`: repo-wide coverage matrix
 - `.github/workflows/sdk-typescript.yml`: TypeScript build and typecheck badge target
+- `.github/workflows/sdk-typescript-coverage.yml`: TypeScript coverage badge target
 - `.github/workflows/sdk-javascript.yml`: JavaScript build/test badge target
 - `.github/workflows/sdk-javascript-coverage.yml`: JavaScript coverage badge target
 - `.github/workflows/sdk-dotnet.yml`: C# build/test badge target
 - `.github/workflows/sdk-dotnet-coverage.yml`: C# coverage badge target
+- `.github/workflows/sdk-flutter.yml`: Flutter build/test badge target
+- `.github/workflows/sdk-flutter-coverage.yml`: Flutter coverage badge target
+- `.github/workflows/sdk-swift.yml`: Swift build/test badge target
+- `.github/workflows/sdk-swift-coverage.yml`: Swift coverage badge target
+- `.github/workflows/sdk-java.yml`: Java build/test badge target
+- `.github/workflows/sdk-java-coverage.yml`: Java coverage badge target

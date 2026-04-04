@@ -1,32 +1,66 @@
 # ManagedCode.Tps Swift SDK
 
-![Status](https://img.shields.io/badge/status-planned-c4a060)
-![CI](https://img.shields.io/badge/ci-not%20configured-b8afa1)
+[![SDK Swift](https://github.com/managedcode/TPS/actions/workflows/sdk-swift.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-swift.yml)
+[![SDK Swift Coverage](https://github.com/managedcode/TPS/actions/workflows/sdk-swift-coverage.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-swift-coverage.yml)
 
-This folder is reserved for a future TPS runtime in Swift.
+This folder contains the Swift TPS runtime package.
+
+Package identity: `ManagedCodeTps`
 
 ## What This Project Is
 
-`SDK/swift` is a placeholder only. There is no Swift TPS runtime implementation here yet.
+`SDK/swift` is the native Swift implementation of the TPS runtime. It is designed as a standalone Swift package that compiles TPS source, restores compiled TPS JSON, and drives playback for Apple-platform hosts.
 
-## Intended Scope
+## Public API
 
-When implemented, this project should provide:
+- `TpsSpec`
+- `TpsKeywords`
+- `TpsRuntime.validateTps(source)`
+- `TpsRuntime.parseTps(source)`
+- `TpsRuntime.compileTps(source)`
+- `TpsPlayer`: deterministic state resolver
+- `TpsPlayer.enumerateStates(stepMs:)`: deterministic sampling helper
+- `TpsPlaybackSession`: timed playback controller with transport, navigation, and speed controls
+- `TpsPlaybackSession.snapshot`: embeddable runtime snapshot for host UIs
+- `TpsPlaybackSession.on(_:listener:)`: runtime event subscription
+- `TpsStandalonePlayer.compile(source:options:)`: compile-and-play wrapper
+- `TpsStandalonePlayer.fromCompiledScript(_:options:)`: start from a compiled state machine
+- `TpsStandalonePlayer.fromCompiledJson(_:options:)`: restore from serialized compiled JSON
 
-- TPS constants and keywords
-- validation diagnostics
-- parser and compiler APIs
-- player/runtime APIs for compiled TPS playback
+## Project Layout
 
-## Current State
+- `Package.swift`: SwiftPM definition
+- `Sources/ManagedCodeTps/ManagedCodeTps.swift`: runtime source
+- `Tests/ManagedCodeTpsTests/ManagedCodeTpsTests.swift`: parity, playback, and integration tests
 
-- no source runtime yet
-- no tests yet
-- no CI workflow yet
+## Integration Model
 
-## What To Do When Swift Work Starts
+This package does not own the UI layer. Native Apple hosts should:
 
-1. add the actual Swift runtime source
-2. add tests and fixture coverage
-3. add a runtime-specific workflow and badges
-4. document local commands in this README
+1. compile or restore TPS into `TpsStandalonePlayer`
+2. observe snapshots or runtime events
+3. bind UI commands to `play`, `pause`, `stop`, `seek`, `nextWord`, `previousWord`, `nextBlock`, `previousBlock`, `increaseSpeed`, `decreaseSpeed`, and `setSpeedOffsetWpm`
+
+`TpsPlayer` stays deterministic for editor previews and host-owned render loops. `TpsPlaybackSession` owns the internal timer for live playback.
+
+## Local Commands
+
+- `cd SDK/swift && swift build`
+- `cd SDK/swift && swift test`
+- `cd SDK/swift && ./coverage.sh`
+
+## Verification Scope
+
+The Swift suite checks:
+
+- constants and keyword parity
+- canonical transport JSON parity
+- shared example snapshots
+- invalid TPS diagnostics
+- public parse/validate API behavior for title headers, front matter, punctuation, and malformed authoring
+- compiled JSON restore guards and playback session lifecycle
+- timed playback completion
+- large generated-script compile/player smoke
+- line coverage gate at 90% or higher for SDK source
+
+Keep this package aligned with the root [README.md](/Users/ksemenenko/Developer/TPS/README.md) specification and the shared fixtures under `SDK/fixtures/`.

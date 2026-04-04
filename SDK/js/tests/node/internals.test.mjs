@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
+import { normalizeCompiledScript, parseCompiledScriptJson } from "../../lib/compiled-script.js";
 import { compileContent } from "../../lib/content-compiler.js";
 import { createDiagnostic, createLineStarts, hasErrors, normalizeLineEndings, positionAt, rangeAt } from "../../lib/diagnostics.js";
 import { protectEscapes, restoreEscapes, splitHeaderParts, splitHeaderPartsDetailed } from "../../lib/escaping.js";
@@ -28,6 +29,7 @@ import {
   tryParseAbsoluteWpm,
   tryResolvePauseMilliseconds
 } from "../../lib/runtime-helpers.js";
+import { TpsPlaybackSession } from "../../lib/playback-session.js";
 import { TpsPlayer } from "../../lib/player.js";
 
 function inherited() {
@@ -152,4 +154,43 @@ test("covers player fallback branches on empty scripts and pause-only blocks", (
   const pauseState = new TpsPlayer(pauseOnlyScript).getState(100);
   assert.equal(pauseState.currentWord.kind, "pause");
   assert.equal(pauseState.nextTransitionMs, 1000);
+});
+
+test("covers compiled-script normalization and playback option guard branches", () => {
+  const compiled = compileTps("## [Intro]\n### [Lead]\nReady.\n### [Close]\nNow.").script;
+  const frozen = normalizeCompiledScript(compiled);
+  assert.equal(Object.isFrozen(frozen), true);
+  assert.equal(Object.isFrozen(frozen.words), true);
+  assert.equal(Object.isFrozen(frozen.words[0]), true);
+
+  assert.throws(() => parseCompiledScriptJson("[]"), /script object/i);
+  assert.throws(() => normalizeCompiledScript({ metadata: [], totalDurationMs: 0, segments: [], words: [] }), /metadata must be an object/i);
+  assert.throws(() => normalizeCompiledScript({ metadata: {}, totalDurationMs: 0, segments: {}, words: [] }), /segments array/i);
+  assert.throws(() => normalizeCompiledScript({ metadata: {}, totalDurationMs: "0", segments: [], words: [] }), /totalDurationMs must be an integer/i);
+
+  const invalidWord = structuredClone(compiled);
+  invalidWord.words[0].index = 99;
+  assert.throws(() => normalizeCompiledScript(invalidWord), /sequential indexes/i);
+
+  const invalidCanonicalReference = structuredClone(compiled);
+  invalidCanonicalReference.segments[0].words = [
+    { ...invalidCanonicalReference.segments[0].words[0], id: "missing-word" },
+    ...invalidCanonicalReference.segments[0].words.slice(1)
+  ];
+  assert.throws(() => normalizeCompiledScript(invalidCanonicalReference), /canonical word/i);
+
+  const defaultedTempoSession = new TpsPlaybackSession(compiled, { baseWpm: Number.NaN, initialSpeedOffsetWpm: Number.NaN });
+  assert.equal(defaultedTempoSession.baseWpm, TpsSpec.defaultBaseWpm);
+  assert.equal(defaultedTempoSession.speedOffset, 0);
+  defaultedTempoSession.dispose();
+
+  assert.throws(() => new TpsPlaybackSession(compiled, { speedStepWpm: 0 }), /speedStepWpm/i);
+  assert.throws(() => new TpsPlaybackSession(compiled, { tickIntervalMs: 0 }), /tickIntervalMs/i);
+
+  const seekSession = new TpsPlaybackSession(compiled);
+  assert.equal(seekSession.seek(0).elapsedMs, 0);
+  assert.equal(seekSession.status, "idle");
+  assert.equal(seekSession.seek(compiled.totalDurationMs).isComplete, true);
+  assert.equal(seekSession.status, "completed");
+  seekSession.dispose();
 });

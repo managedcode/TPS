@@ -4268,5 +4268,2023 @@
         }
       }
     ]
+  },
+  "playback": {
+    "session": [
+      {
+        "label": "initial",
+        "status": "idle",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 60951,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "This",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-implicit-lead",
+          "currentPhraseId": "segment-1-implicit-lead-phrase-1",
+          "nextTransitionMs": 411,
+          "presentation": {
+            "segmentName": "Introduction",
+            "blockName": "Introduction Lead",
+            "phraseText": "This is leading text before the first block.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4",
+              "word-5",
+              "word-6",
+              "word-7",
+              "word-8"
+            ],
+            "visibleWordTexts": [
+              "This",
+              "is",
+              "leading",
+              "text",
+              "before",
+              "the",
+              "first",
+              "block."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": false,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": false,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "This",
+        "currentWordDurationMs": 411,
+        "currentWordRemainingMs": 411,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 0,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "This",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "is",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "leading",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "text",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-5",
+            "text": "before",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-6",
+            "text": "the",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-7",
+            "text": "first",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-8",
+            "text": "block.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterNextWord",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 411,
+          "remainingMs": 60540,
+          "progress": 0.006743,
+          "isComplete": false,
+          "currentWordIndex": 1,
+          "currentWordId": "word-2",
+          "currentWordText": "is",
+          "currentWordKind": "word",
+          "previousWordId": "word-1",
+          "nextWordId": "word-3",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-implicit-lead",
+          "currentPhraseId": "segment-1-implicit-lead-phrase-1",
+          "nextTransitionMs": 788,
+          "presentation": {
+            "segmentName": "Introduction",
+            "blockName": "Introduction Lead",
+            "phraseText": "This is leading text before the first block.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4",
+              "word-5",
+              "word-6",
+              "word-7",
+              "word-8"
+            ],
+            "visibleWordTexts": [
+              "This",
+              "is",
+              "leading",
+              "text",
+              "before",
+              "the",
+              "first",
+              "block."
+            ],
+            "activeWordInPhrase": 1
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": true,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-2",
+        "focusedWordText": "is",
+        "currentWordDurationMs": 377,
+        "currentWordRemainingMs": 377,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 0,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "This",
+            "isActive": false,
+            "isRead": true,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "is",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "leading",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "text",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-5",
+            "text": "before",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-6",
+            "text": "the",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-7",
+            "text": "first",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-8",
+            "text": "block.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterPreviousWord",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 60951,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "This",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-implicit-lead",
+          "currentPhraseId": "segment-1-implicit-lead-phrase-1",
+          "nextTransitionMs": 411,
+          "presentation": {
+            "segmentName": "Introduction",
+            "blockName": "Introduction Lead",
+            "phraseText": "This is leading text before the first block.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4",
+              "word-5",
+              "word-6",
+              "word-7",
+              "word-8"
+            ],
+            "visibleWordTexts": [
+              "This",
+              "is",
+              "leading",
+              "text",
+              "before",
+              "the",
+              "first",
+              "block."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": false,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "This",
+        "currentWordDurationMs": 411,
+        "currentWordRemainingMs": 411,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 0,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "This",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "is",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "leading",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "text",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-5",
+            "text": "before",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-6",
+            "text": "the",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-7",
+            "text": "first",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-8",
+            "text": "block.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterNextBlock",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 7328,
+          "remainingMs": 53623,
+          "progress": 0.120228,
+          "isComplete": false,
+          "currentWordIndex": 17,
+          "currentWordId": "word-18",
+          "currentWordText": "Welcome",
+          "currentWordKind": "word",
+          "previousWordId": "word-17",
+          "nextWordId": "word-19",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 7791,
+          "presentation": {
+            "segmentName": "Introduction",
+            "blockName": "Welcome",
+            "phraseText": "Welcome to TPS.",
+            "visibleWordIds": [
+              "word-18",
+              "word-19",
+              "word-20"
+            ],
+            "visibleWordTexts": [
+              "Welcome",
+              "to",
+              "TPS."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": true,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-18",
+        "focusedWordText": "Welcome",
+        "currentWordDurationMs": 463,
+        "currentWordRemainingMs": 463,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-18",
+            "text": "Welcome",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-19",
+            "text": "to",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-20",
+            "text": "TPS.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterPreviousBlock",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 60951,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "This",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-implicit-lead",
+          "currentPhraseId": "segment-1-implicit-lead-phrase-1",
+          "nextTransitionMs": 411,
+          "presentation": {
+            "segmentName": "Introduction",
+            "blockName": "Introduction Lead",
+            "phraseText": "This is leading text before the first block.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4",
+              "word-5",
+              "word-6",
+              "word-7",
+              "word-8"
+            ],
+            "visibleWordTexts": [
+              "This",
+              "is",
+              "leading",
+              "text",
+              "before",
+              "the",
+              "first",
+              "block."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": false,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "This",
+        "currentWordDurationMs": 411,
+        "currentWordRemainingMs": 411,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 0,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "This",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "is",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "leading",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "text",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-5",
+            "text": "before",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-6",
+            "text": "the",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-7",
+            "text": "first",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-8",
+            "text": "block.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterIncreaseSpeed",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 60951,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "This",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-implicit-lead",
+          "currentPhraseId": "segment-1-implicit-lead-phrase-1",
+          "nextTransitionMs": 411,
+          "presentation": {
+            "segmentName": "Introduction",
+            "blockName": "Introduction Lead",
+            "phraseText": "This is leading text before the first block.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4",
+              "word-5",
+              "word-6",
+              "word-7",
+              "word-8"
+            ],
+            "visibleWordTexts": [
+              "This",
+              "is",
+              "leading",
+              "text",
+              "before",
+              "the",
+              "first",
+              "block."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 150,
+          "speedOffsetWpm": 10,
+          "speedStepWpm": 10,
+          "playbackRate": 1.071429
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": false,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "This",
+        "currentWordDurationMs": 384,
+        "currentWordRemainingMs": 384,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 0,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "This",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "is",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "leading",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "text",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-5",
+            "text": "before",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-6",
+            "text": "the",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-7",
+            "text": "first",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-8",
+            "text": "block.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterDecreaseSpeed",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 60951,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "This",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-implicit-lead",
+          "currentPhraseId": "segment-1-implicit-lead-phrase-1",
+          "nextTransitionMs": 411,
+          "presentation": {
+            "segmentName": "Introduction",
+            "blockName": "Introduction Lead",
+            "phraseText": "This is leading text before the first block.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4",
+              "word-5",
+              "word-6",
+              "word-7",
+              "word-8"
+            ],
+            "visibleWordTexts": [
+              "This",
+              "is",
+              "leading",
+              "text",
+              "before",
+              "the",
+              "first",
+              "block."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": false,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "This",
+        "currentWordDurationMs": 411,
+        "currentWordRemainingMs": 411,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 0,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "This",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "is",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "leading",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "text",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-5",
+            "text": "before",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-6",
+            "text": "the",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-7",
+            "text": "first",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-8",
+            "text": "block.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      }
+    ],
+    "standalone": [
+      {
+        "label": "initial",
+        "status": "idle",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 60951,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "This",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-implicit-lead",
+          "currentPhraseId": "segment-1-implicit-lead-phrase-1",
+          "nextTransitionMs": 411,
+          "presentation": {
+            "segmentName": "Introduction",
+            "blockName": "Introduction Lead",
+            "phraseText": "This is leading text before the first block.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4",
+              "word-5",
+              "word-6",
+              "word-7",
+              "word-8"
+            ],
+            "visibleWordTexts": [
+              "This",
+              "is",
+              "leading",
+              "text",
+              "before",
+              "the",
+              "first",
+              "block."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": false,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": false,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "This",
+        "currentWordDurationMs": 411,
+        "currentWordRemainingMs": 411,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 0,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "This",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "is",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "leading",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "text",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-5",
+            "text": "before",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-6",
+            "text": "the",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-7",
+            "text": "first",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-8",
+            "text": "block.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterNextWord",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 411,
+          "remainingMs": 60540,
+          "progress": 0.006743,
+          "isComplete": false,
+          "currentWordIndex": 1,
+          "currentWordId": "word-2",
+          "currentWordText": "is",
+          "currentWordKind": "word",
+          "previousWordId": "word-1",
+          "nextWordId": "word-3",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-implicit-lead",
+          "currentPhraseId": "segment-1-implicit-lead-phrase-1",
+          "nextTransitionMs": 788,
+          "presentation": {
+            "segmentName": "Introduction",
+            "blockName": "Introduction Lead",
+            "phraseText": "This is leading text before the first block.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4",
+              "word-5",
+              "word-6",
+              "word-7",
+              "word-8"
+            ],
+            "visibleWordTexts": [
+              "This",
+              "is",
+              "leading",
+              "text",
+              "before",
+              "the",
+              "first",
+              "block."
+            ],
+            "activeWordInPhrase": 1
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": true,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-2",
+        "focusedWordText": "is",
+        "currentWordDurationMs": 377,
+        "currentWordRemainingMs": 377,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 0,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "This",
+            "isActive": false,
+            "isRead": true,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "is",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "leading",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "text",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-5",
+            "text": "before",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-6",
+            "text": "the",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-7",
+            "text": "first",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-8",
+            "text": "block.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterPreviousWord",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 60951,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "This",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-implicit-lead",
+          "currentPhraseId": "segment-1-implicit-lead-phrase-1",
+          "nextTransitionMs": 411,
+          "presentation": {
+            "segmentName": "Introduction",
+            "blockName": "Introduction Lead",
+            "phraseText": "This is leading text before the first block.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4",
+              "word-5",
+              "word-6",
+              "word-7",
+              "word-8"
+            ],
+            "visibleWordTexts": [
+              "This",
+              "is",
+              "leading",
+              "text",
+              "before",
+              "the",
+              "first",
+              "block."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": false,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "This",
+        "currentWordDurationMs": 411,
+        "currentWordRemainingMs": 411,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 0,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "This",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "is",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "leading",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "text",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-5",
+            "text": "before",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-6",
+            "text": "the",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-7",
+            "text": "first",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-8",
+            "text": "block.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterNextBlock",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 7328,
+          "remainingMs": 53623,
+          "progress": 0.120228,
+          "isComplete": false,
+          "currentWordIndex": 17,
+          "currentWordId": "word-18",
+          "currentWordText": "Welcome",
+          "currentWordKind": "word",
+          "previousWordId": "word-17",
+          "nextWordId": "word-19",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 7791,
+          "presentation": {
+            "segmentName": "Introduction",
+            "blockName": "Welcome",
+            "phraseText": "Welcome to TPS.",
+            "visibleWordIds": [
+              "word-18",
+              "word-19",
+              "word-20"
+            ],
+            "visibleWordTexts": [
+              "Welcome",
+              "to",
+              "TPS."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": true,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-18",
+        "focusedWordText": "Welcome",
+        "currentWordDurationMs": 463,
+        "currentWordRemainingMs": 463,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-18",
+            "text": "Welcome",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-19",
+            "text": "to",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-20",
+            "text": "TPS.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterPreviousBlock",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 60951,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "This",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-implicit-lead",
+          "currentPhraseId": "segment-1-implicit-lead-phrase-1",
+          "nextTransitionMs": 411,
+          "presentation": {
+            "segmentName": "Introduction",
+            "blockName": "Introduction Lead",
+            "phraseText": "This is leading text before the first block.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4",
+              "word-5",
+              "word-6",
+              "word-7",
+              "word-8"
+            ],
+            "visibleWordTexts": [
+              "This",
+              "is",
+              "leading",
+              "text",
+              "before",
+              "the",
+              "first",
+              "block."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": false,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "This",
+        "currentWordDurationMs": 411,
+        "currentWordRemainingMs": 411,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 0,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "This",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "is",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "leading",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "text",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-5",
+            "text": "before",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-6",
+            "text": "the",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-7",
+            "text": "first",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-8",
+            "text": "block.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterIncreaseSpeed",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 60951,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "This",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-implicit-lead",
+          "currentPhraseId": "segment-1-implicit-lead-phrase-1",
+          "nextTransitionMs": 411,
+          "presentation": {
+            "segmentName": "Introduction",
+            "blockName": "Introduction Lead",
+            "phraseText": "This is leading text before the first block.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4",
+              "word-5",
+              "word-6",
+              "word-7",
+              "word-8"
+            ],
+            "visibleWordTexts": [
+              "This",
+              "is",
+              "leading",
+              "text",
+              "before",
+              "the",
+              "first",
+              "block."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 150,
+          "speedOffsetWpm": 10,
+          "speedStepWpm": 10,
+          "playbackRate": 1.071429
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": false,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "This",
+        "currentWordDurationMs": 384,
+        "currentWordRemainingMs": 384,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 0,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "This",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "is",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "leading",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "text",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-5",
+            "text": "before",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-6",
+            "text": "the",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-7",
+            "text": "first",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-8",
+            "text": "block.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterDecreaseSpeed",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 60951,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "This",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-implicit-lead",
+          "currentPhraseId": "segment-1-implicit-lead-phrase-1",
+          "nextTransitionMs": 411,
+          "presentation": {
+            "segmentName": "Introduction",
+            "blockName": "Introduction Lead",
+            "phraseText": "This is leading text before the first block.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4",
+              "word-5",
+              "word-6",
+              "word-7",
+              "word-8"
+            ],
+            "visibleWordTexts": [
+              "This",
+              "is",
+              "leading",
+              "text",
+              "before",
+              "the",
+              "first",
+              "block."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": false,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "This",
+        "currentWordDurationMs": 411,
+        "currentWordRemainingMs": 411,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 0,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "This",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "is",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "leading",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "text",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-5",
+            "text": "before",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-6",
+            "text": "the",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-7",
+            "text": "first",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-8",
+            "text": "block.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      }
+    ]
   }
 }

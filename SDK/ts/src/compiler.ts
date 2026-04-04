@@ -1,4 +1,5 @@
 import { compileContent, type InheritedFormattingState, type PhraseSeed, type WordSeed } from "./content-compiler.js";
+import { normalizeCompiledScript } from "./compiled-script.js";
 import { hasErrors } from "./diagnostics.js";
 import { createParseResult, createValidationResult, parseDocument, type ContentSection, type DocumentAnalysis, type ParsedBlockInternal, type ParsedSegmentInternal } from "./parser.js";
 import type { CompiledBlock, CompiledPhrase, CompiledScript, CompiledSegment, CompiledWord, TpsCompilationResult, TpsParseResult, TpsValidationResult } from "./models.js";
@@ -33,7 +34,7 @@ export function compileTps(source: string): TpsCompilationResult {
     ok: !hasErrors(analysis.diagnostics),
     diagnostics: analysis.diagnostics,
     document: analysis.document,
-    script
+    script: normalizeCompiledScript(script)
   };
 }
 

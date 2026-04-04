@@ -1,0 +1,32 @@
+name: SDK Swift
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - "codex/**"
+    paths:
+      - "SDK/swift/**"
+      - "SDK/fixtures/**"
+      - "examples/**"
+      - ".github/workflows/sdk-swift.yml"
+  pull_request:
+    paths:
+      - "SDK/swift/**"
+      - "SDK/fixtures/**"
+      - "examples/**"
+      - ".github/workflows/sdk-swift.yml"
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    name: Build And Test
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: cd SDK/swift && swift build
+      - run: cd SDK/swift && swift test

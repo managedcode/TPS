@@ -4,7 +4,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { compileTps, parseTps, TpsKeywords, TpsPlayer, TpsSpec, validateTps } from "../../lib/index.js";
+import { compileTps, parseTps, TpsKeywords, TpsPlaybackSession, TpsPlayer, TpsSpec, TpsStandalonePlayer, validateTps } from "../../lib/index.js";
 import { buildExampleSnapshot, EXAMPLE_FILES, loadExampleSnapshot } from "../../../scripts/example-snapshot-utils.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -174,7 +174,11 @@ test("matches shared compiled and player snapshots for documented examples", () 
     const result = compileTps(source);
     assert.equal(result.ok, true, example);
     assert.deepEqual(
-      buildExampleSnapshot(example, result.script, script => new TpsPlayer(script)),
+      buildExampleSnapshot(example, result.script, {
+        playerFactory: (script) => new TpsPlayer(script),
+        sessionFactory: (script) => new TpsPlaybackSession(script),
+        standaloneFactory: (script) => TpsStandalonePlayer.fromCompiledScript(script)
+      }),
       loadExampleSnapshot(rootDir, example),
       example
     );
@@ -203,4 +207,140 @@ test("enumerates player states across the playback timeline", () => {
   assert.equal(states.at(-1)?.elapsedMs, script.totalDurationMs);
   assert.equal(states.at(-1)?.isComplete, true);
   assert.throws(() => Array.from(player.enumerateStates(0)), /stepMs/i);
+});
+
+test("playback session raises transition events while seeking deterministically", () => {
+  const { script } = compileTps("## [Signal]\n### [Body]\nReady now.");
+  const session = new TpsPlaybackSession(script, { tickIntervalMs: 5 });
+  const statuses = [];
+  const words = [];
+  let completedCount = 0;
+
+  session.on("statusChanged", (event) => statuses.push(event.status));
+  session.on("wordChanged", (event) => words.push(event.state.currentWord?.cleanText));
+  session.on("completed", () => {
+    completedCount += 1;
+  });
+
+  const secondWord = session.seek(script.words[0].endMs);
+  const done = session.seek(script.totalDurationMs);
+
+  assert.equal(secondWord.currentWord?.cleanText, "now.");
+  assert.equal(done.isComplete, true);
+  assert.equal(session.status, "completed");
+  assert.deepEqual(words, ["now."]);
+  assert.deepEqual(statuses, ["paused", "completed"]);
+  assert.equal(completedCount, 1);
+  session.dispose();
+});
+
+test("playback session can autoplay to completion with its internal timer", async () => {
+  const { script } = compileTps("## [Signal]\n### [Body]\nReady.");
+  const session = new TpsPlaybackSession(script, { tickIntervalMs: 10 });
+  const completed = new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => reject(new Error("playback did not complete in time")), 3000);
+    session.on("completed", (event) => {
+      clearTimeout(timeout);
+      resolve(event.state);
+    });
+  });
+
+  session.play();
+  const finalState = await completed;
+
+  assert.equal(finalState.isComplete, true);
+  assert.equal(session.status, "completed");
+  session.dispose();
+});
+
+test("playback session exposes standalone controls, speed correction, and snapshot output", () => {
+  const { script } = compileTps("## [Intro]\n### [Lead]\nReady.\n### [Close]\nNow.\n## [Wrap]\n### [Body]\nDone.");
+  const session = new TpsPlaybackSession(script, { tickIntervalMs: 5, initialSpeedOffsetWpm: -10 });
+  const snapshots = [];
+  session.on("snapshotChanged", (event) => snapshots.push(event.snapshot));
+  const observedSnapshots = [];
+  const disposeObservation = session.observeSnapshot((snapshot) => observedSnapshots.push(snapshot));
+
+  assert.equal(session.snapshot.tempo.baseWpm, 140);
+  assert.equal(session.snapshot.tempo.effectiveBaseWpm, 130);
+  assert.equal(session.snapshot.controls.canIncreaseSpeed, true);
+
+  const nextWord = session.nextWord();
+  assert.equal(nextWord.currentWord?.cleanText, "Now.");
+
+  const previousWord = session.previousWord();
+  assert.equal(previousWord.currentWord?.cleanText, "Ready.");
+
+  const nextBlock = session.nextBlock();
+  assert.equal(nextBlock.currentBlock?.name, "Close");
+  assert.equal(session.snapshot.currentBlockIndex, 1);
+
+  const previousBlock = session.previousBlock();
+  assert.equal(previousBlock.currentBlock?.name, "Lead");
+
+  const faster = session.increaseSpeed(20);
+  assert.equal(faster.tempo.effectiveBaseWpm, 150);
+  assert.ok(faster.visibleWords.length > 0);
+  assert.equal(faster.focusedWord?.isActive, true);
+  assert.equal(observedSnapshots[0]?.state.currentWord?.cleanText, "Ready.");
+  assert.ok(observedSnapshots.some((snapshot) => snapshot.tempo.effectiveBaseWpm === 150));
+  assert.ok(snapshots.length >= 1);
+  disposeObservation();
+  session.dispose();
+});
+
+test("standalone player compiles source and proxies runtime controls", () => {
+  const player = TpsStandalonePlayer.compile("## [Signal]\n### [Body]\nReady now.", { initialSpeedOffsetWpm: 5 });
+  const seen = [];
+  const dispose = player.onSnapshotChanged((snapshot) => seen.push(snapshot.status));
+  const unsubscribe = player.on("snapshotChanged", (event) => seen.push(event.snapshot.status));
+  const observedSnapshots = [];
+  const disposeObservation = player.observeSnapshot((snapshot) => observedSnapshots.push(snapshot));
+
+  assert.equal(player.ok, true);
+  assert.equal(player.status, "idle");
+  assert.equal(player.isPlaying, false);
+  assert.equal(player.script.words.length, 2);
+  assert.equal(player.snapshot.tempo.effectiveBaseWpm, 145);
+  assert.equal(player.currentState.currentWord?.cleanText, "Ready");
+
+  player.advanceBy(10);
+  player.nextWord();
+  assert.equal(player.snapshot.state.currentWord?.cleanText, "now.");
+  assert.equal(player.currentState.currentWord?.cleanText, "now.");
+
+  player.decreaseSpeed(5);
+  assert.equal(player.snapshot.tempo.effectiveBaseWpm, 140);
+  assert.equal(observedSnapshots[0]?.state.currentWord?.cleanText, "Ready");
+
+  dispose();
+  unsubscribe();
+  disposeObservation();
+  player.dispose();
+  assert.ok(seen.length >= 1);
+});
+
+test("standalone player can restore from compiled script and JSON", () => {
+  const compiled = compileTps("## [Signal]\n### [Body]\nReady now.");
+  const playerFromScript = TpsStandalonePlayer.fromCompiledScript(compiled.script);
+  const playerFromJson = TpsStandalonePlayer.fromCompiledJson(JSON.stringify(compiled.script));
+  const canonicalTransport = JSON.parse(readFixture("transport", "runtime-parity.compiled.json"));
+  const fromCanonicalTransport = TpsStandalonePlayer.fromCompiledJson(JSON.stringify(canonicalTransport));
+
+  assert.equal(playerFromScript.snapshot.state.currentWord?.cleanText, "Ready");
+  assert.equal(playerFromJson.snapshot.state.currentWord?.cleanText, "Ready");
+  assert.equal(playerFromJson.script.totalDurationMs, compiled.script.totalDurationMs);
+  assert.equal(fromCanonicalTransport.snapshot.state.currentSegment?.name, expectations.runtimeParity.segmentName);
+  assert.deepEqual(JSON.parse(JSON.stringify(compileTps(readFixture("valid", "runtime-parity.tps")).script)), canonicalTransport);
+  assert.throws(() => TpsStandalonePlayer.fromCompiledJson(""), /non-empty string/i);
+  assert.throws(() => TpsStandalonePlayer.fromCompiledJson("null"), /script object/i);
+  const invalidTransport = structuredClone(canonicalTransport);
+  const blockWithPhrase = invalidTransport.segments.flatMap((segment) => segment.blocks).find((block) => block.phrases.length > 0);
+  assert.ok(blockWithPhrase);
+  blockWithPhrase.phrases[0].words = [];
+  assert.throws(() => TpsStandalonePlayer.fromCompiledJson(JSON.stringify(invalidTransport)), /canonical|empty phrase/i);
+
+  playerFromScript.dispose();
+  playerFromJson.dispose();
+  fromCanonicalTransport.dispose();
 });

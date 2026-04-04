@@ -49,6 +49,8 @@ public sealed class ExampleSnapshotTests
     private static JsonObject BuildExampleSnapshot(string fileName, CompiledScript script)
     {
         var player = new TpsPlayer(script);
+        using var session = new TpsPlaybackSession(script);
+        using var standalone = TpsStandalonePlayer.FromCompiledScript(script);
         var checkpoints = new JsonArray();
         foreach (var checkpoint in CreateCheckpointTimes(script.TotalDurationMs))
         {
@@ -63,6 +65,11 @@ public sealed class ExampleSnapshotTests
             ["player"] = new JsonObject
             {
                 ["checkpoints"] = checkpoints
+            },
+            ["playback"] = new JsonObject
+            {
+                ["session"] = BuildPlaybackSequence(session),
+                ["standalone"] = BuildPlaybackSequence(standalone)
             }
         };
     }
@@ -231,6 +238,102 @@ public sealed class ExampleSnapshotTests
                 ["visibleWordTexts"] = ToJsonArray(state.Presentation.VisibleWords.Select(word => word.CleanText)),
                 ["activeWordInPhrase"] = state.Presentation.ActiveWordInPhrase
             })
+        });
+
+    private static JsonArray BuildPlaybackSequence(TpsPlaybackSession session)
+    {
+        var checkpoints = new JsonArray
+        {
+            NormalizePlaybackSnapshot("initial", session.Snapshot)
+        };
+
+        session.NextWord();
+        checkpoints.Add(NormalizePlaybackSnapshot("afterNextWord", session.Snapshot));
+        session.PreviousWord();
+        checkpoints.Add(NormalizePlaybackSnapshot("afterPreviousWord", session.Snapshot));
+        session.NextBlock();
+        checkpoints.Add(NormalizePlaybackSnapshot("afterNextBlock", session.Snapshot));
+        session.PreviousBlock();
+        checkpoints.Add(NormalizePlaybackSnapshot("afterPreviousBlock", session.Snapshot));
+        session.IncreaseSpeed();
+        checkpoints.Add(NormalizePlaybackSnapshot("afterIncreaseSpeed", session.Snapshot));
+        session.DecreaseSpeed(session.Snapshot.Tempo.SpeedStepWpm);
+        checkpoints.Add(NormalizePlaybackSnapshot("afterDecreaseSpeed", session.Snapshot));
+
+        return checkpoints;
+    }
+
+    private static JsonArray BuildPlaybackSequence(TpsStandalonePlayer player)
+    {
+        var checkpoints = new JsonArray
+        {
+            NormalizePlaybackSnapshot("initial", player.Snapshot)
+        };
+
+        player.NextWord();
+        checkpoints.Add(NormalizePlaybackSnapshot("afterNextWord", player.Snapshot));
+        player.PreviousWord();
+        checkpoints.Add(NormalizePlaybackSnapshot("afterPreviousWord", player.Snapshot));
+        player.NextBlock();
+        checkpoints.Add(NormalizePlaybackSnapshot("afterNextBlock", player.Snapshot));
+        player.PreviousBlock();
+        checkpoints.Add(NormalizePlaybackSnapshot("afterPreviousBlock", player.Snapshot));
+        player.IncreaseSpeed();
+        checkpoints.Add(NormalizePlaybackSnapshot("afterIncreaseSpeed", player.Snapshot));
+        player.DecreaseSpeed(player.Snapshot.Tempo.SpeedStepWpm);
+        checkpoints.Add(NormalizePlaybackSnapshot("afterDecreaseSpeed", player.Snapshot));
+
+        return checkpoints;
+    }
+
+    private static JsonObject NormalizePlaybackSnapshot(string label, TpsPlaybackSnapshot snapshot) =>
+        Compact(new JsonObject
+        {
+            ["label"] = label,
+            ["status"] = snapshot.Status.ToString().ToLowerInvariant(),
+            ["state"] = NormalizePlayerState("state", snapshot.State),
+            ["tempo"] = Compact(new JsonObject
+            {
+                ["baseWpm"] = snapshot.Tempo.BaseWpm,
+                ["effectiveBaseWpm"] = snapshot.Tempo.EffectiveBaseWpm,
+                ["speedOffsetWpm"] = snapshot.Tempo.SpeedOffsetWpm,
+                ["speedStepWpm"] = snapshot.Tempo.SpeedStepWpm,
+                ["playbackRate"] = NormalizeNumber(snapshot.Tempo.PlaybackRate)
+            }),
+            ["controls"] = Compact(new JsonObject
+            {
+                ["canPlay"] = snapshot.Controls.CanPlay,
+                ["canPause"] = snapshot.Controls.CanPause,
+                ["canStop"] = snapshot.Controls.CanStop,
+                ["canNextWord"] = snapshot.Controls.CanNextWord,
+                ["canPreviousWord"] = snapshot.Controls.CanPreviousWord,
+                ["canNextBlock"] = snapshot.Controls.CanNextBlock,
+                ["canPreviousBlock"] = snapshot.Controls.CanPreviousBlock,
+                ["canIncreaseSpeed"] = snapshot.Controls.CanIncreaseSpeed,
+                ["canDecreaseSpeed"] = snapshot.Controls.CanDecreaseSpeed
+            }),
+            ["focusedWordId"] = snapshot.FocusedWord?.Word.Id,
+            ["focusedWordText"] = snapshot.FocusedWord?.Word.CleanText,
+            ["currentWordDurationMs"] = snapshot.CurrentWordDurationMs,
+            ["currentWordRemainingMs"] = snapshot.CurrentWordRemainingMs,
+            ["currentSegmentIndex"] = snapshot.CurrentSegmentIndex,
+            ["currentBlockIndex"] = snapshot.CurrentBlockIndex,
+            ["visibleWords"] = new JsonArray(snapshot.VisibleWords
+                .Select(word => Compact(new JsonObject
+                {
+                    ["id"] = word.Word.Id,
+                    ["text"] = word.Word.CleanText,
+                    ["isActive"] = word.IsActive,
+                    ["isRead"] = word.IsRead,
+                    ["isUpcoming"] = word.IsUpcoming,
+                    ["emotion"] = word.Emotion,
+                    ["speaker"] = word.Speaker,
+                    ["emphasisLevel"] = word.EmphasisLevel,
+                    ["isHighlighted"] = word.IsHighlighted,
+                    ["deliveryMode"] = word.DeliveryMode,
+                    ["volumeLevel"] = word.VolumeLevel
+                }))
+                .ToArray())
         });
 
     private static JsonArray ToJsonArray(IEnumerable<string> values)

@@ -1,0 +1,34 @@
+import type { CompiledScript, PlayerState, TpsCompilationResult, TpsPlaybackEventMap, TpsPlaybackEventName, TpsPlaybackSnapshot, TpsPlaybackStatus, TpsStandalonePlayerOptions } from "./models.js";
+import { TpsPlaybackSession } from "./playback-session.js";
+export declare class TpsStandalonePlayer {
+    readonly diagnostics: TpsCompilationResult["diagnostics"];
+    readonly document: TpsCompilationResult["document"] | undefined;
+    readonly ok: boolean;
+    readonly script: CompiledScript;
+    readonly session: TpsPlaybackSession;
+    constructor(compilationOrScript: TpsCompilationResult | CompiledScript, options?: TpsStandalonePlayerOptions);
+    static compile(source: string, options?: TpsStandalonePlayerOptions): TpsStandalonePlayer;
+    static fromCompiledScript(script: CompiledScript, options?: TpsStandalonePlayerOptions): TpsStandalonePlayer;
+    static fromCompiledJson(json: string, options?: TpsStandalonePlayerOptions): TpsStandalonePlayer;
+    get currentState(): PlayerState;
+    get isPlaying(): boolean;
+    get snapshot(): TpsPlaybackSnapshot;
+    get status(): TpsPlaybackStatus;
+    on<K extends TpsPlaybackEventName>(eventName: K, listener: (event: TpsPlaybackEventMap[K]) => void): () => void;
+    off<K extends TpsPlaybackEventName>(eventName: K, listener: (event: TpsPlaybackEventMap[K]) => void): void;
+    onSnapshotChanged(listener: (snapshot: TpsPlaybackSnapshot) => void): () => void;
+    observeSnapshot(listener: (snapshot: TpsPlaybackSnapshot) => void, emitCurrent?: boolean): () => void;
+    play(): PlayerState;
+    pause(): PlayerState;
+    stop(): PlayerState;
+    seek(elapsedMs: number): PlayerState;
+    advanceBy(deltaMs: number): PlayerState;
+    nextWord(): PlayerState;
+    previousWord(): PlayerState;
+    nextBlock(): PlayerState;
+    previousBlock(): PlayerState;
+    increaseSpeed(stepWpm?: number): TpsPlaybackSnapshot;
+    decreaseSpeed(stepWpm?: number): TpsPlaybackSnapshot;
+    setSpeedOffsetWpm(offsetWpm: number): TpsPlaybackSnapshot;
+    dispose(): void;
+}

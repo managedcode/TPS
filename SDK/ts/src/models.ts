@@ -176,3 +176,91 @@ export interface PlayerState {
   nextTransitionMs?: number | undefined;
   presentation: PlayerPresentationModel;
 }
+
+export type TpsPlaybackStatus = "idle" | "playing" | "paused" | "completed";
+
+export interface TpsPlaybackSessionOptions {
+  tickIntervalMs?: number | undefined;
+  baseWpm?: number | undefined;
+  speedStepWpm?: number | undefined;
+  initialSpeedOffsetWpm?: number | undefined;
+}
+
+export interface TpsPlaybackStateChangedEvent {
+  state: PlayerState;
+  previousState: PlayerState;
+  status: TpsPlaybackStatus;
+}
+
+export interface TpsPlaybackStatusChangedEvent {
+  state: PlayerState;
+  previousStatus: TpsPlaybackStatus;
+  status: TpsPlaybackStatus;
+}
+
+export interface TpsPlaybackTempo {
+  baseWpm: number;
+  effectiveBaseWpm: number;
+  speedOffsetWpm: number;
+  speedStepWpm: number;
+  playbackRate: number;
+}
+
+export interface TpsPlaybackControls {
+  canPlay: boolean;
+  canPause: boolean;
+  canStop: boolean;
+  canNextWord: boolean;
+  canPreviousWord: boolean;
+  canNextBlock: boolean;
+  canPreviousBlock: boolean;
+  canIncreaseSpeed: boolean;
+  canDecreaseSpeed: boolean;
+}
+
+export interface TpsPlaybackWordView {
+  word: CompiledWord;
+  isActive: boolean;
+  isRead: boolean;
+  isUpcoming: boolean;
+  emotion: string;
+  speaker?: string | undefined;
+  emphasisLevel: number;
+  isHighlighted: boolean;
+  deliveryMode?: string | undefined;
+  volumeLevel?: string | undefined;
+}
+
+export interface TpsPlaybackSnapshot {
+  status: TpsPlaybackStatus;
+  state: PlayerState;
+  tempo: TpsPlaybackTempo;
+  controls: TpsPlaybackControls;
+  visibleWords: TpsPlaybackWordView[];
+  focusedWord?: TpsPlaybackWordView | undefined;
+  currentWordDurationMs?: number | undefined;
+  currentWordRemainingMs?: number | undefined;
+  currentSegmentIndex: number;
+  currentBlockIndex: number;
+}
+
+export interface TpsPlaybackSnapshotChangedEvent {
+  snapshot: TpsPlaybackSnapshot;
+}
+
+export interface TpsPlaybackEventMap {
+  stateChanged: TpsPlaybackStateChangedEvent;
+  wordChanged: TpsPlaybackStateChangedEvent;
+  phraseChanged: TpsPlaybackStateChangedEvent;
+  blockChanged: TpsPlaybackStateChangedEvent;
+  segmentChanged: TpsPlaybackStateChangedEvent;
+  statusChanged: TpsPlaybackStatusChangedEvent;
+  completed: TpsPlaybackStateChangedEvent;
+  snapshotChanged: TpsPlaybackSnapshotChangedEvent;
+}
+
+export type TpsPlaybackEventName = keyof TpsPlaybackEventMap;
+
+export interface TpsStandalonePlayerOptions extends TpsPlaybackSessionOptions {
+  autoPlay?: boolean | undefined;
+}

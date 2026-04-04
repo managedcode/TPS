@@ -25,6 +25,7 @@
     "test:ts": "npm run build:tps && node --import tsx --test ../ts/tests/runtime/**/*.test.ts",
     "test:js": "npm run build:tps && node --test tests/node/**/*.test.mjs",
     "test:types": "tsc -p tsconfig.typecheck.json --noEmit",
+    "coverage:typescript": "npm run build:tps && c8 --all --src ../ts/src --exclude '../ts/tests/**' --check-coverage --lines 90 --branches 90 --functions 90 --statements 90 node --enable-source-maps --test tests/node/**/*.test.mjs",
     "coverage:js": "npm run build:tps && c8 --check-coverage --lines 90 --branches 90 --functions 90 --statements 90 node --test tests/node/**/*.test.mjs",
     "generate:example-snapshots": "npm run build:tps && node ../scripts/generate-example-snapshots.mjs",
     "sdk:matrix": "node ../scripts/runtime-matrix.mjs --compact",

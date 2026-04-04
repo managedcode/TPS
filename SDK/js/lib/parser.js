@@ -337,3 +337,4 @@ function validateMetadataEntry(key, value, start, end, lineStarts, diagnostics) 
         diagnostics.push(createDiagnostic(TpsDiagnosticCodes.invalidFrontMatter, `Front matter field '${key}' must be an integer.`, start, end, lineStarts));
     }
 }
+//# sourceMappingURL=parser.js.map

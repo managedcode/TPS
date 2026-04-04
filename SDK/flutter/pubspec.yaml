@@ -1,0 +1,9 @@
+name: managedcode_tps
+description: ManagedCode.Tps Flutter-compatible TPS runtime.
+version: 1.0.0
+publish_to: none
+environment:
+  sdk: ^3.9.0
+dev_dependencies:
+  coverage: ^1.15.0
+  test: ^1.26.3

@@ -6997,5 +6997,1447 @@
         }
       }
     ]
+  },
+  "playback": {
+    "session": [
+      {
+        "label": "initial",
+        "status": "idle",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 105560,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "Every",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 429,
+          "presentation": {
+            "segmentName": "Act One - The Setup",
+            "blockName": "Opening",
+            "phraseText": "Every story begins somewhere.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4"
+            ],
+            "visibleWordTexts": [
+              "Every",
+              "story",
+              "begins",
+              "somewhere."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": false,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "Every",
+        "currentWordDurationMs": 429,
+        "currentWordRemainingMs": 429,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "Every",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "story",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "begins",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "somewhere.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterNextWord",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 429,
+          "remainingMs": 105131,
+          "progress": 0.004064,
+          "isComplete": false,
+          "currentWordIndex": 1,
+          "currentWordId": "word-2",
+          "currentWordText": "story",
+          "currentWordKind": "word",
+          "previousWordId": "word-1",
+          "nextWordId": "word-3",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 858,
+          "presentation": {
+            "segmentName": "Act One - The Setup",
+            "blockName": "Opening",
+            "phraseText": "Every story begins somewhere.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4"
+            ],
+            "visibleWordTexts": [
+              "Every",
+              "story",
+              "begins",
+              "somewhere."
+            ],
+            "activeWordInPhrase": 1
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": true,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-2",
+        "focusedWordText": "story",
+        "currentWordDurationMs": 429,
+        "currentWordRemainingMs": 429,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "Every",
+            "isActive": false,
+            "isRead": true,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "story",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "begins",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "somewhere.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterPreviousWord",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 105560,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "Every",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 429,
+          "presentation": {
+            "segmentName": "Act One - The Setup",
+            "blockName": "Opening",
+            "phraseText": "Every story begins somewhere.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4"
+            ],
+            "visibleWordTexts": [
+              "Every",
+              "story",
+              "begins",
+              "somewhere."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "Every",
+        "currentWordDurationMs": 429,
+        "currentWordRemainingMs": 429,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "Every",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "story",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "begins",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "somewhere.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterNextBlock",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 15466,
+          "remainingMs": 90094,
+          "progress": 0.146514,
+          "isComplete": false,
+          "currentWordIndex": 33,
+          "currentWordId": "word-34",
+          "currentWordText": "Inside",
+          "currentWordKind": "word",
+          "previousWordId": "word-33",
+          "nextWordId": "word-35",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-2",
+          "currentPhraseId": "segment-1-block-2-phrase-1",
+          "nextTransitionMs": 15912,
+          "presentation": {
+            "segmentName": "Act One - The Setup",
+            "blockName": "Context",
+            "phraseText": "Inside each segment,",
+            "visibleWordIds": [
+              "word-34",
+              "word-35",
+              "word-36"
+            ],
+            "visibleWordTexts": [
+              "Inside",
+              "each",
+              "segment,"
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": true,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-34",
+        "focusedWordText": "Inside",
+        "currentWordDurationMs": 446,
+        "currentWordRemainingMs": 446,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 2,
+        "visibleWords": [
+          {
+            "id": "word-34",
+            "text": "Inside",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-35",
+            "text": "each",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-36",
+            "text": "segment,",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterPreviousBlock",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 105560,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "Every",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 429,
+          "presentation": {
+            "segmentName": "Act One - The Setup",
+            "blockName": "Opening",
+            "phraseText": "Every story begins somewhere.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4"
+            ],
+            "visibleWordTexts": [
+              "Every",
+              "story",
+              "begins",
+              "somewhere."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "Every",
+        "currentWordDurationMs": 429,
+        "currentWordRemainingMs": 429,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "Every",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "story",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "begins",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "somewhere.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterIncreaseSpeed",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 105560,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "Every",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 429,
+          "presentation": {
+            "segmentName": "Act One - The Setup",
+            "blockName": "Opening",
+            "phraseText": "Every story begins somewhere.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4"
+            ],
+            "visibleWordTexts": [
+              "Every",
+              "story",
+              "begins",
+              "somewhere."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 150,
+          "speedOffsetWpm": 10,
+          "speedStepWpm": 10,
+          "playbackRate": 1.071429
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "Every",
+        "currentWordDurationMs": 400,
+        "currentWordRemainingMs": 400,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "Every",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "story",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "begins",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "somewhere.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterDecreaseSpeed",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 105560,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "Every",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 429,
+          "presentation": {
+            "segmentName": "Act One - The Setup",
+            "blockName": "Opening",
+            "phraseText": "Every story begins somewhere.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4"
+            ],
+            "visibleWordTexts": [
+              "Every",
+              "story",
+              "begins",
+              "somewhere."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "Every",
+        "currentWordDurationMs": 429,
+        "currentWordRemainingMs": 429,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "Every",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "story",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "begins",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "somewhere.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      }
+    ],
+    "standalone": [
+      {
+        "label": "initial",
+        "status": "idle",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 105560,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "Every",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 429,
+          "presentation": {
+            "segmentName": "Act One - The Setup",
+            "blockName": "Opening",
+            "phraseText": "Every story begins somewhere.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4"
+            ],
+            "visibleWordTexts": [
+              "Every",
+              "story",
+              "begins",
+              "somewhere."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": false,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "Every",
+        "currentWordDurationMs": 429,
+        "currentWordRemainingMs": 429,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "Every",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "story",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "begins",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "somewhere.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterNextWord",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 429,
+          "remainingMs": 105131,
+          "progress": 0.004064,
+          "isComplete": false,
+          "currentWordIndex": 1,
+          "currentWordId": "word-2",
+          "currentWordText": "story",
+          "currentWordKind": "word",
+          "previousWordId": "word-1",
+          "nextWordId": "word-3",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 858,
+          "presentation": {
+            "segmentName": "Act One - The Setup",
+            "blockName": "Opening",
+            "phraseText": "Every story begins somewhere.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4"
+            ],
+            "visibleWordTexts": [
+              "Every",
+              "story",
+              "begins",
+              "somewhere."
+            ],
+            "activeWordInPhrase": 1
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": true,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-2",
+        "focusedWordText": "story",
+        "currentWordDurationMs": 429,
+        "currentWordRemainingMs": 429,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "Every",
+            "isActive": false,
+            "isRead": true,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "story",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "begins",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "somewhere.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterPreviousWord",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 105560,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "Every",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 429,
+          "presentation": {
+            "segmentName": "Act One - The Setup",
+            "blockName": "Opening",
+            "phraseText": "Every story begins somewhere.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4"
+            ],
+            "visibleWordTexts": [
+              "Every",
+              "story",
+              "begins",
+              "somewhere."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "Every",
+        "currentWordDurationMs": 429,
+        "currentWordRemainingMs": 429,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "Every",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "story",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "begins",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "somewhere.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterNextBlock",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 15466,
+          "remainingMs": 90094,
+          "progress": 0.146514,
+          "isComplete": false,
+          "currentWordIndex": 33,
+          "currentWordId": "word-34",
+          "currentWordText": "Inside",
+          "currentWordKind": "word",
+          "previousWordId": "word-33",
+          "nextWordId": "word-35",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-2",
+          "currentPhraseId": "segment-1-block-2-phrase-1",
+          "nextTransitionMs": 15912,
+          "presentation": {
+            "segmentName": "Act One - The Setup",
+            "blockName": "Context",
+            "phraseText": "Inside each segment,",
+            "visibleWordIds": [
+              "word-34",
+              "word-35",
+              "word-36"
+            ],
+            "visibleWordTexts": [
+              "Inside",
+              "each",
+              "segment,"
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": true,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-34",
+        "focusedWordText": "Inside",
+        "currentWordDurationMs": 446,
+        "currentWordRemainingMs": 446,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 2,
+        "visibleWords": [
+          {
+            "id": "word-34",
+            "text": "Inside",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-35",
+            "text": "each",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-36",
+            "text": "segment,",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "focused",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterPreviousBlock",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 105560,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "Every",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 429,
+          "presentation": {
+            "segmentName": "Act One - The Setup",
+            "blockName": "Opening",
+            "phraseText": "Every story begins somewhere.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4"
+            ],
+            "visibleWordTexts": [
+              "Every",
+              "story",
+              "begins",
+              "somewhere."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "Every",
+        "currentWordDurationMs": 429,
+        "currentWordRemainingMs": 429,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "Every",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "story",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "begins",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "somewhere.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterIncreaseSpeed",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 105560,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "Every",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 429,
+          "presentation": {
+            "segmentName": "Act One - The Setup",
+            "blockName": "Opening",
+            "phraseText": "Every story begins somewhere.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4"
+            ],
+            "visibleWordTexts": [
+              "Every",
+              "story",
+              "begins",
+              "somewhere."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 150,
+          "speedOffsetWpm": 10,
+          "speedStepWpm": 10,
+          "playbackRate": 1.071429
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "Every",
+        "currentWordDurationMs": 400,
+        "currentWordRemainingMs": 400,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "Every",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "story",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "begins",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "somewhere.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      },
+      {
+        "label": "afterDecreaseSpeed",
+        "status": "paused",
+        "state": {
+          "label": "state",
+          "elapsedMs": 0,
+          "remainingMs": 105560,
+          "progress": 0,
+          "isComplete": false,
+          "currentWordIndex": 0,
+          "currentWordId": "word-1",
+          "currentWordText": "Every",
+          "currentWordKind": "word",
+          "nextWordId": "word-2",
+          "currentSegmentId": "segment-1",
+          "currentBlockId": "segment-1-block-1",
+          "currentPhraseId": "segment-1-block-1-phrase-1",
+          "nextTransitionMs": 429,
+          "presentation": {
+            "segmentName": "Act One - The Setup",
+            "blockName": "Opening",
+            "phraseText": "Every story begins somewhere.",
+            "visibleWordIds": [
+              "word-1",
+              "word-2",
+              "word-3",
+              "word-4"
+            ],
+            "visibleWordTexts": [
+              "Every",
+              "story",
+              "begins",
+              "somewhere."
+            ],
+            "activeWordInPhrase": 0
+          }
+        },
+        "tempo": {
+          "baseWpm": 140,
+          "effectiveBaseWpm": 140,
+          "speedOffsetWpm": 0,
+          "speedStepWpm": 10,
+          "playbackRate": 1
+        },
+        "controls": {
+          "canPlay": true,
+          "canPause": false,
+          "canStop": true,
+          "canNextWord": true,
+          "canPreviousWord": false,
+          "canNextBlock": true,
+          "canPreviousBlock": true,
+          "canIncreaseSpeed": true,
+          "canDecreaseSpeed": true
+        },
+        "focusedWordId": "word-1",
+        "focusedWordText": "Every",
+        "currentWordDurationMs": 429,
+        "currentWordRemainingMs": 429,
+        "currentSegmentIndex": 0,
+        "currentBlockIndex": 1,
+        "visibleWords": [
+          {
+            "id": "word-1",
+            "text": "Every",
+            "isActive": true,
+            "isRead": false,
+            "isUpcoming": false,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-2",
+            "text": "story",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-3",
+            "text": "begins",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          },
+          {
+            "id": "word-4",
+            "text": "somewhere.",
+            "isActive": false,
+            "isRead": false,
+            "isUpcoming": true,
+            "emotion": "warm",
+            "emphasisLevel": 0,
+            "isHighlighted": false
+          }
+        ]
+      }
+    ]
   }
 }

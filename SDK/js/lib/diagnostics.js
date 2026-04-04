@@ -45,3 +45,4 @@ export function createDiagnostic(code, message, start, end, lineStarts, suggesti
 export function hasErrors(diagnostics) {
     return diagnostics.some((diagnostic) => diagnostic.severity === "error");
 }
+//# sourceMappingURL=diagnostics.js.map

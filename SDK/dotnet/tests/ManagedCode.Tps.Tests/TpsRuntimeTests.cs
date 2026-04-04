@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using ManagedCode.Tps.Models;
 
 namespace ManagedCode.Tps.Tests;
@@ -27,7 +28,122 @@ public sealed class TpsRuntimeTests
         Assert.Equal("Fix it", diagnostic.Suggestion);
 
         var serializedDiagnostic = JsonSerializer.Serialize(diagnostic);
-        Assert.Contains("\"Severity\":\"error\"", serializedDiagnostic, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("\"severity\":\"error\"", serializedDiagnostic, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void JsonConverters_RoundTripPortableSeverityAndPlaybackStatusValues()
+    {
+        Assert.Equal("\"info\"", JsonSerializer.Serialize(TpsSeverity.Info));
+        Assert.Equal("\"warning\"", JsonSerializer.Serialize(TpsSeverity.Warning));
+        Assert.Equal("\"error\"", JsonSerializer.Serialize(TpsSeverity.Error));
+        Assert.Equal(TpsSeverity.Info, JsonSerializer.Deserialize<TpsSeverity>("\"info\""));
+        Assert.Equal(TpsSeverity.Warning, JsonSerializer.Deserialize<TpsSeverity>("\"warning\""));
+        Assert.Equal(TpsSeverity.Error, JsonSerializer.Deserialize<TpsSeverity>("\"error\""));
+        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<TpsSeverity>("\"mystery\""));
+
+        Assert.Equal("\"idle\"", JsonSerializer.Serialize(TpsPlaybackStatus.Idle));
+        Assert.Equal("\"playing\"", JsonSerializer.Serialize(TpsPlaybackStatus.Playing));
+        Assert.Equal("\"paused\"", JsonSerializer.Serialize(TpsPlaybackStatus.Paused));
+        Assert.Equal("\"completed\"", JsonSerializer.Serialize(TpsPlaybackStatus.Completed));
+        Assert.Equal(TpsPlaybackStatus.Idle, JsonSerializer.Deserialize<TpsPlaybackStatus>("\"idle\""));
+        Assert.Equal(TpsPlaybackStatus.Playing, JsonSerializer.Deserialize<TpsPlaybackStatus>("\"playing\""));
+        Assert.Equal(TpsPlaybackStatus.Paused, JsonSerializer.Deserialize<TpsPlaybackStatus>("\"paused\""));
+        Assert.Equal(TpsPlaybackStatus.Completed, JsonSerializer.Deserialize<TpsPlaybackStatus>("\"completed\""));
+        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<TpsPlaybackStatus>("\"mystery\""));
+        Assert.Throws<JsonException>(() => JsonSerializer.Serialize((TpsSeverity)999));
+        Assert.Throws<JsonException>(() => JsonSerializer.Serialize((TpsPlaybackStatus)999));
+    }
+
+    [Fact]
+    public void PlaybackOptions_RejectInvalidModernContractValues()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => new TpsPlaybackSessionOptions { SpeedStepWpm = 0 });
+        Assert.Throws<ArgumentOutOfRangeException>(() => new TpsPlaybackSessionOptions { SpeedStepWpm = -1 });
+        Assert.Throws<ArgumentOutOfRangeException>(() => new TpsPlaybackSessionOptions { TickIntervalMs = 0 });
+        Assert.Throws<ArgumentNullException>(() => new TpsPlaybackSessionOptions { TimeProvider = null! });
+    }
+
+    [Fact]
+    public void RuntimeContracts_SerializeToPortableCamelCaseJsonByDefault()
+    {
+        var compilation = TpsRuntime.Compile("## [Signal]\n### [Body]\nReady now.");
+        using var player = TpsStandalonePlayer.FromCompiledScript(compilation.Script);
+
+        var compilationJson = JsonSerializer.Serialize(compilation);
+        var snapshotJson = JsonSerializer.Serialize(player.Snapshot);
+
+        Assert.Contains("\"document\":", compilationJson, StringComparison.Ordinal);
+        Assert.Contains("\"script\":", compilationJson, StringComparison.Ordinal);
+        Assert.Contains("\"totalDurationMs\":", compilationJson, StringComparison.Ordinal);
+        Assert.Contains("\"currentWordIndex\":0", snapshotJson, StringComparison.Ordinal);
+        Assert.Contains("\"status\":\"idle\"", snapshotJson, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("\"TotalDurationMs\"", compilationJson, StringComparison.Ordinal);
+        Assert.DoesNotContain("\"Status\":", snapshotJson, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void StandalonePlayer_CanStartFromCompiledScriptAndCompiledJson()
+    {
+        var compilation = TpsRuntime.Compile("## [Signal]\n### [Body]\nReady now.");
+        var compiledJson = JsonSerializer.Serialize(compilation.Script);
+
+        using var fromScript = TpsStandalonePlayer.FromCompiledScript(compilation.Script);
+        using var fromJson = TpsStandalonePlayer.FromCompiledJson(compiledJson);
+
+        Assert.Equal(compilation.Script.TotalDurationMs, fromScript.Script.TotalDurationMs);
+        Assert.Equal(compilation.Script.TotalDurationMs, fromJson.Script.TotalDurationMs);
+        Assert.Equal("Ready", fromScript.Snapshot.State.CurrentWord?.CleanText);
+        Assert.Equal("Ready", fromJson.Snapshot.State.CurrentWord?.CleanText);
+        Assert.False(fromScript.HasSourceCompilation);
+        Assert.True(fromScript.HasProjectedDocument);
+        Assert.False(fromJson.HasSourceCompilation);
+        Assert.Equal(compilation.Script.Metadata.Count, fromJson.Document.Metadata.Count);
+        Assert.Equal(compilation.Script.Segments[0].Name, fromJson.Document.Segments[0].Name);
+    }
+
+    [Fact]
+    public void StandalonePlayer_RestorePath_NormalizesDeserializedCompiledGraphs()
+    {
+        var compiledJson = JsonSerializer.Serialize(TpsRuntime.Compile("---\nbase_wpm: 150\n---\n## [Signal]\n### [Body]\nReady now.").Script);
+        var deserialized = JsonSerializer.Deserialize<CompiledScript>(compiledJson)!;
+        var mutableMetadata = Assert.IsType<Dictionary<string, string>>(deserialized.Metadata);
+        var mutableSegments = Assert.IsType<List<CompiledSegment>>(deserialized.Segments);
+        var mutableBlocks = Assert.IsType<List<CompiledBlock>>(mutableSegments[0].Blocks);
+
+        using var player = TpsStandalonePlayer.FromCompiledScript(deserialized);
+
+        mutableMetadata.Clear();
+        mutableBlocks.Clear();
+        mutableSegments.Clear();
+
+        Assert.NotEmpty(player.Script.Metadata);
+        Assert.NotEmpty(player.Script.Segments);
+        Assert.NotEmpty(player.Script.Segments[0].Blocks);
+        Assert.False(player.Script.Metadata is Dictionary<string, string>);
+        Assert.False(player.Script.Segments is List<CompiledSegment>);
+    }
+
+    [Fact]
+    public void StandalonePlayer_FromCompiledJson_RejectsEmptyAndMalformedPayloads()
+    {
+        Assert.Throws<ArgumentException>(() => TpsStandalonePlayer.FromCompiledJson(" "));
+        Assert.Throws<JsonException>(() => TpsStandalonePlayer.FromCompiledJson("{"));
+        Assert.Throws<JsonException>(() => TpsStandalonePlayer.FromCompiledJson("null"));
+    }
+
+    [Fact]
+    public void RuntimeTransport_MatchesAndRestoresTheCanonicalCompiledJsonFixture()
+    {
+        var compiled = TpsRuntime.Compile(ReadFixture("valid", "runtime-parity.tps"));
+        var serialized = JsonNode.Parse(JsonSerializer.Serialize(compiled.Script));
+        var canonical = JsonNode.Parse(ReadFixture("transport", "runtime-parity.compiled.json"));
+
+        Assert.True(JsonNode.DeepEquals(serialized, canonical));
+
+        using var restored = TpsStandalonePlayer.FromCompiledJson(canonical!.ToJsonString());
+        Assert.Equal("Call to Action", restored.Snapshot.State.CurrentSegment?.Name);
+        Assert.Equal(compiled.Script.TotalDurationMs, restored.Script.TotalDurationMs);
     }
 
     [Fact]
@@ -91,6 +207,27 @@ public sealed class TpsRuntimeTests
         Assert.False(compiled.Script.Segments[0].Blocks is List<CompiledBlock>);
         Assert.False(compiled.Script.Segments[0].Blocks[0].Phrases is List<CompiledPhrase>);
         Assert.False(compiled.Script.Segments[0].Blocks[0].Words is List<CompiledWord>);
+    }
+
+    [Fact]
+    public void ParseAndCompile_ExposeNoPublicMutableSettersOnRuntimeModels()
+    {
+        AssertSetterIsNotPublic<TpsSegment>(nameof(TpsSegment.Content));
+        AssertSetterIsNotPublic<TpsSegment>(nameof(TpsSegment.LeadingContent));
+        AssertSetterIsNotPublic<TpsBlock>(nameof(TpsBlock.Content));
+        AssertSetterIsNotPublic<CompiledWord>(nameof(CompiledWord.CleanText));
+        AssertSetterIsNotPublic<CompiledWord>(nameof(CompiledWord.CharacterCount));
+        AssertSetterIsNotPublic<CompiledWord>(nameof(CompiledWord.OrpPosition));
+        AssertSetterIsNotPublic<CompiledWord>(nameof(CompiledWord.PhraseId));
+        AssertSetterIsNotPublic<CompiledBlock>(nameof(CompiledBlock.StartWordIndex));
+        AssertSetterIsNotPublic<CompiledBlock>(nameof(CompiledBlock.EndWordIndex));
+        AssertSetterIsNotPublic<CompiledBlock>(nameof(CompiledBlock.StartMs));
+        AssertSetterIsNotPublic<CompiledBlock>(nameof(CompiledBlock.EndMs));
+        AssertSetterIsNotPublic<CompiledSegment>(nameof(CompiledSegment.StartWordIndex));
+        AssertSetterIsNotPublic<CompiledSegment>(nameof(CompiledSegment.EndWordIndex));
+        AssertSetterIsNotPublic<CompiledSegment>(nameof(CompiledSegment.StartMs));
+        AssertSetterIsNotPublic<CompiledSegment>(nameof(CompiledSegment.EndMs));
+        AssertSetterIsNotPublic<CompiledScript>(nameof(CompiledScript.TotalDurationMs));
     }
 
     [Fact]
@@ -202,30 +339,25 @@ public sealed class TpsRuntimeTests
         Assert.Equal("pause", pauseState.CurrentWord?.Kind);
         Assert.Equal(1000, pauseState.NextTransitionMs);
         Assert.Equal(-1, pauseState.Presentation.ActiveWordInPhrase);
+    }
 
-        var noSegmentsState = new TpsPlayer(new CompiledScript()).GetState(0);
-        Assert.Null(noSegmentsState.CurrentSegment);
-        Assert.Null(noSegmentsState.CurrentBlock);
-        Assert.Null(noSegmentsState.CurrentPhrase);
+    [Fact]
+    public void Player_RejectsInvalidCompiledScripts()
+    {
+        Assert.Throws<ArgumentException>(() => new TpsPlayer(new CompiledScript()));
 
-        var missingSegmentScript = new CompiledScript
+        var negativeDurationScript = new CompiledScript
         {
-            TotalDurationMs = 100,
+            TotalDurationMs = -1,
             Segments =
             [
                 CreateSegment("segment-1")
-            ],
-            Words =
-            [
-                CreateWord("segment-2", "block-2", "phrase-2")
             ]
         };
-        var missingSegmentState = new TpsPlayer(missingSegmentScript).GetState(0);
-        Assert.Null(missingSegmentState.CurrentSegment);
-        Assert.Null(missingSegmentState.CurrentBlock);
-        Assert.Null(missingSegmentState.CurrentPhrase);
 
-        var missingBlockScript = new CompiledScript
+        Assert.Throws<ArgumentException>(() => new TpsPlayer(negativeDurationScript));
+
+        var missingNestedGraph = new CompiledScript
         {
             TotalDurationMs = 100,
             Segments =
@@ -237,10 +369,83 @@ public sealed class TpsRuntimeTests
                 CreateWord("segment-1", "block-2", "phrase-2")
             ]
         };
-        var missingBlockState = new TpsPlayer(missingBlockScript).GetState(0);
-        Assert.NotNull(missingBlockState.CurrentSegment);
-        Assert.Null(missingBlockState.CurrentBlock);
-        Assert.Null(missingBlockState.CurrentPhrase);
+
+        Assert.Throws<ArgumentException>(() => new TpsPlayer(missingNestedGraph));
+    }
+
+    [Fact]
+    public void Player_RejectsNestedGraphsThatDoNotMatchCanonicalCollections()
+    {
+        var compiledJson = JsonSerializer.Serialize(TpsRuntime.Compile("## [Intro]\n### [Lead]\nReady.\n### [Close]\nNow.").Script);
+
+        var reorderedBlocks = JsonSerializer.Deserialize<CompiledScript>(compiledJson)!;
+        var reorderedSegment = Assert.IsType<List<CompiledSegment>>(reorderedBlocks.Segments)[0];
+        Assert.IsType<List<CompiledBlock>>(reorderedSegment.Blocks).Reverse();
+        Assert.Throws<ArgumentException>(() => new TpsPlayer(reorderedBlocks));
+
+        var mismatchedPhraseWords = JsonSerializer.Deserialize<CompiledScript>(compiledJson)!;
+        var firstBlock = Assert.IsType<List<CompiledSegment>>(mismatchedPhraseWords.Segments)[0].Blocks[0];
+        Assert.IsType<List<CompiledWord>>(firstBlock.Phrases[0].Words).Clear();
+        Assert.Throws<ArgumentException>(() => new TpsPlayer(mismatchedPhraseWords));
+    }
+
+    [Fact]
+    public void Player_RejectsAdditionalCompiledGraphDriftCases()
+    {
+        const string source = """
+        ## [Intro]
+        ### [Lead]
+        Ready.
+        ### [Close]
+        Now.
+        ## [Wrap]
+        ### [Body]
+        Done.
+        """;
+        var baseline = JsonNode.Parse(JsonSerializer.Serialize(TpsRuntime.Compile(source).Script))!.AsObject();
+
+        var missingBlocks = MutateCompiledNode(baseline, root => root["segments"]![0]!["blocks"] = new JsonArray());
+        Assert.Throws<ArgumentException>(() => new TpsPlayer(missingBlocks));
+
+        var reorderedSegments = MutateCompiledNode(baseline, root =>
+        {
+            var segments = root["segments"]!.AsArray();
+            var first = segments[0]!.DeepClone();
+            var second = segments[1]!.DeepClone();
+            segments[0] = second;
+            segments[1] = first;
+        });
+        Assert.Throws<ArgumentException>(() => new TpsPlayer(reorderedSegments));
+
+        var wordMissingPhrase = MutateCompiledNode(baseline, root => root["words"]![0]!["phraseId"] = "");
+        Assert.Throws<ArgumentException>(() => new TpsPlayer(wordMissingPhrase));
+
+        var durationMismatch = MutateCompiledNode(baseline, root => root["totalDurationMs"] = 1);
+        Assert.Throws<ArgumentException>(() => new TpsPlayer(durationMismatch));
+
+        var blockTimelineGap = MutateCompiledNode(baseline, root =>
+        {
+            var block = root["segments"]![0]!["blocks"]![1]!;
+            block["startWordIndex"] = block["startWordIndex"]!.GetValue<int>() + 1;
+        });
+        Assert.Throws<ArgumentException>(() => new TpsPlayer(blockTimelineGap));
+
+        var phraseOutsideBlock = MutateCompiledNode(baseline, root =>
+        {
+            var segment = root["segments"]![0]!;
+            var block = segment["blocks"]![1]!;
+            var phrase = block["phrases"]![0]!;
+            phrase["endMs"] = block["endMs"]!.GetValue<int>() + 1;
+        });
+        Assert.Throws<ArgumentException>(() => new TpsPlayer(phraseOutsideBlock));
+
+        var nestedWordMismatch = MutateCompiledNode(baseline, root =>
+        {
+            var segment = root["segments"]![0]!;
+            var block = segment["blocks"]![1]!;
+            block["words"]![0]!["id"] = "ghost-word";
+        });
+        Assert.Throws<ArgumentException>(() => new TpsPlayer(nestedWordMismatch));
     }
 
     [Fact]
@@ -322,6 +527,13 @@ public sealed class TpsRuntimeTests
         }
     }
 
+    private static CompiledScript MutateCompiledNode(JsonObject baseline, Action<JsonObject> mutate)
+    {
+        var clone = baseline.DeepClone().AsObject();
+        mutate(clone);
+        return JsonSerializer.Deserialize<CompiledScript>(clone.ToJsonString())!;
+    }
+
     private static CompiledSegment CreateSegment(string id) =>
         new()
         {
@@ -351,4 +563,11 @@ public sealed class TpsRuntimeTests
             BlockId = blockId,
             PhraseId = phraseId
         };
+
+    private static void AssertSetterIsNotPublic<TContract>(string propertyName)
+    {
+        var property = typeof(TContract).GetProperty(propertyName);
+        Assert.NotNull(property);
+        Assert.Null(property.GetSetMethod(nonPublic: false));
+    }
 }

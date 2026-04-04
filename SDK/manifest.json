@@ -7,14 +7,19 @@
       "id": "typescript",
       "language": "TypeScript",
       "path": "SDK/ts",
+      "runner": "ubuntu-latest",
+      "setup": "node",
       "enabled": true,
       "build": "npm --prefix SDK/js run build:tps",
-      "test": "npm --prefix SDK/js run test:typescript"
+      "test": "npm --prefix SDK/js run test:typescript",
+      "coverage": "npm --prefix SDK/js run coverage:typescript"
     },
     {
       "id": "javascript",
       "language": "JavaScript",
       "path": "SDK/js",
+      "runner": "ubuntu-latest",
+      "setup": "node",
       "enabled": true,
       "build": "npm --prefix SDK/js run build:tps",
       "test": "npm --prefix SDK/js run test:js",
@@ -24,6 +29,8 @@
       "id": "dotnet",
       "language": "C#",
       "path": "SDK/dotnet",
+      "runner": "ubuntu-latest",
+      "setup": "dotnet",
       "enabled": true,
       "build": "dotnet build SDK/dotnet/ManagedCode.Tps.slnx -warnaserror --no-restore",
       "test": "dotnet test SDK/dotnet/ManagedCode.Tps.slnx --no-build --no-restore",
@@ -33,19 +40,34 @@
       "id": "flutter",
       "language": "Flutter",
       "path": "SDK/flutter",
-      "enabled": false
+      "runner": "ubuntu-latest",
+      "setup": "dart",
+      "enabled": true,
+      "build": "sh -c 'cd SDK/flutter && dart pub get && dart analyze'",
+      "test": "sh -c 'cd SDK/flutter && dart pub get && dart test'",
+      "coverage": "sh -c 'cd SDK/flutter && ./coverage.sh'"
     },
     {
       "id": "swift",
       "language": "Swift",
       "path": "SDK/swift",
-      "enabled": false
+      "runner": "macos-latest",
+      "setup": "swift",
+      "enabled": true,
+      "build": "sh -c 'cd SDK/swift && swift build'",
+      "test": "sh -c 'cd SDK/swift && swift test'",
+      "coverage": "sh -c 'cd SDK/swift && ./coverage.sh'"
     },
     {
       "id": "java",
       "language": "Java",
       "path": "SDK/java",
-      "enabled": false
+      "runner": "ubuntu-latest",
+      "setup": "java",
+      "enabled": true,
+      "build": "sh -c 'cd SDK/java && ./build.sh'",
+      "test": "sh -c 'cd SDK/java && ./test.sh'",
+      "coverage": "sh -c 'cd SDK/java && ./coverage.sh'"
     }
   ]
 }

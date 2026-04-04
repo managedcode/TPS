@@ -30,6 +30,9 @@ This file defines the global rules for AI agents working in this repository.
 - SDK projects with local `AGENTS.md` files:
   - `SDK/ts/`
   - `SDK/js/`
+  - `SDK/flutter/`
+  - `SDK/swift/`
+  - `SDK/java/`
   - `SDK/dotnet/src/ManagedCode.Tps/`
   - `SDK/dotnet/tests/ManagedCode.Tps.Tests/`
 
@@ -51,7 +54,7 @@ This file defines the global rules for AI agents working in this repository.
 - Use `ManagedCode.Tps` as the namespace, project, and solution prefix for .NET artifacts.
 - Keep repo-local agent skills under `.codex/skills/`.
 - Keep architecture and workflow guidance durable and versioned in the repository.
-- Keep JS, TS, and C# TPS runtimes feature-aligned: each runtime must expose spec constants, validation APIs, compiler APIs, and player APIs.
+- Keep all active TPS runtimes feature-aligned: each runtime must expose spec constants, validation APIs, compiler APIs, and player APIs.
 - Keep SDK implementation, runtime docs, ADRs, and per-language code grouped under `SDK/`.
 - Keep shared fixtures and runtime-manifest-driven CI under `SDK/` so future runtimes can join without reorganizing the repo again.
 
@@ -89,11 +92,11 @@ List only the skills this repository should actively use.
 
 ### Commands
 
-- `build`: `npm run build && dotnet build SDK/dotnet/ManagedCode.Tps.slnx`
-- `test`: `npm run test && dotnet test SDK/dotnet/ManagedCode.Tps.slnx`
+- `build`: `npm run build`
+- `test`: `npm run test`
 - `format`: `dotnet format SDK/dotnet/ManagedCode.Tps.slnx --verify-no-changes`
 - `analyze`: `dotnet build SDK/dotnet/ManagedCode.Tps.slnx -warnaserror`
-- `coverage`: `dotnet test SDK/dotnet/ManagedCode.Tps.slnx /p:CollectCoverage=true /p:CoverletOutputFormat=json /p:ThresholdType=line%2Cbranch%2Cmethod /p:Threshold=90`
+- `coverage`: `npm run coverage:sdk`
 
 .NET execution details:
 
