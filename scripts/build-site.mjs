@@ -108,6 +108,7 @@ await mkdir(distDir, { recursive: true });
 await mkdir(path.join(distDir, "examples"), { recursive: true });
 await mkdir(path.join(distDir, "sdk"), { recursive: true });
 await mkdir(path.join(distDir, "glossary"), { recursive: true });
+await mkdir(path.join(distDir, "skills"), { recursive: true });
 await cp(publicDir, distDir, { recursive: true });
 
 const page = `<!DOCTYPE html>
@@ -179,6 +180,7 @@ const page = `<!DOCTYPE html>
         <a href="#complete-example">Example</a>
         <a href="./glossary/">Glossary</a>
         <a href="./sdk/">SDK</a>
+        <a href="./skills/">Skills</a>
         <a href="https://github.com/managedcode/PrompterOne" target="_blank" rel="noopener">Prompter One</a>
         <a class="nav-gh" href="https://github.com/managedcode/TPS" target="_blank" rel="noopener">
           <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
@@ -362,6 +364,7 @@ for (const ex of tpsExamples) {
 await writeFile(path.join(distDir, "examples", "index.html"), buildExamplesIndexPage(tpsExamples, styles), "utf8");
 await writeFile(path.join(distDir, "sdk", "index.html"), buildSdkIndexPage(sdkRuntimes, styles), "utf8");
 await writeFile(path.join(distDir, "glossary", "index.html"), buildGlossaryPage(glossaryHtml, styles), "utf8");
+await writeFile(path.join(distDir, "skills", "index.html"), buildSkillsPage(styles), "utf8");
 
 await writeFile(path.join(distDir, "sitemap.xml"), buildSitemapXml(siteUrl, dateModifiedIso, tpsExamples), "utf8");
 await writeFile(path.join(distDir, "robots.txt"), buildRobotsTxt(siteUrl), "utf8");
@@ -726,6 +729,12 @@ function buildSitemapXml(siteUrl, dateModifiedIso, examples = []) {
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>${siteUrl}skills/</loc>
+    <lastmod>${dateModifiedIso}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
 ${exampleUrls}
 </urlset>
 `;
@@ -1009,6 +1018,7 @@ function buildExamplePage(ex, css) {
         <a href="../#specification">Spec</a>
         <a href="../glossary/">Glossary</a>
         <a href="../sdk/">SDK</a>
+        <a href="../skills/">Skills</a>
         <a href="../">Home</a>
         <a href="https://prompter.one" target="_blank" rel="noopener">Prompter One</a>
         <a class="nav-gh" href="https://github.com/managedcode/TPS" target="_blank" rel="noopener">
@@ -1244,6 +1254,7 @@ function buildExamplesIndexPage(examples, css) {
         <a href="../#specification">Spec</a>
         <a href="../glossary/">Glossary</a>
         <a href="../sdk/">SDK</a>
+        <a href="../skills/">Skills</a>
         <a href="../">Home</a>
         <a href="https://prompter.one" target="_blank" rel="noopener">Prompter One</a>
         <a class="nav-gh" href="https://github.com/managedcode/TPS" target="_blank" rel="noopener">
@@ -1469,6 +1480,7 @@ function buildSdkIndexPage(runtimes, css) {
         <a href="../examples/">Examples</a>
         <a href="../glossary/">Glossary</a>
         <a href="./">SDK</a>
+        <a href="../skills/">Skills</a>
         <a href="https://prompter.one" target="_blank" rel="noopener">Prompter One</a>
         <a class="nav-gh" href="${repoUrl}" target="_blank" rel="noopener">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
@@ -1580,6 +1592,7 @@ function buildGlossaryPage(glossaryContentHtml, css) {
         <a href="../examples/">Examples</a>
         <a href="./">Glossary</a>
         <a href="../sdk/">SDK</a>
+        <a href="../skills/">Skills</a>
         <a href="https://prompter.one" target="_blank" rel="noopener">Prompter One</a>
         <a class="nav-gh" href="${repoUrl}" target="_blank" rel="noopener">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
@@ -1600,6 +1613,143 @@ function buildGlossaryPage(glossaryContentHtml, css) {
     <article class="content-card">
       <div class="markdown-body">
         ${glossaryContentHtml}
+      </div>
+    </article>
+  </div>
+
+  <footer class="site-footer examples-index-footer">
+    <span>Copyright &copy; <a href="https://www.managed-code.com/" target="_blank" rel="noopener">Managed Code</a></span>
+    <span>Licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>
+    <span><a href="${repoUrl}">Repository</a></span>
+  </footer>
+</body>
+</html>`;
+}
+
+function buildSkillsPage(css) {
+  const skillsUrl = `${siteUrl}skills/`;
+  const skillFileUrl = `${repoUrl}/blob/main/Skills/tps-convert.md`;
+  const skillRawUrl = `https://raw.githubusercontent.com/managedcode/TPS/main/Skills/tps-convert.md`;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Skills — TPS Format</title>
+  <meta name="description" content="AI skills for converting plain text into TPS teleprompter scripts. Works with Claude Code, ChatGPT, Cursor, Windsurf, and other LLM-powered coding tools.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#faf8f4">
+  <link rel="canonical" href="${skillsUrl}">
+  <meta property="og:title" content="TPS AI Skills">
+  <meta property="og:description" content="AI skills for converting plain text into TPS teleprompter scripts.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="${skillsUrl}">
+  <meta property="og:image" content="${socialImageUrl}">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <style>${css}</style>
+</head>
+<body>
+  <nav class="top-nav scrolled">
+    <div class="nav-inner">
+      <a class="nav-logo" href="../">
+        <svg width="24" height="24" viewBox="0 0 28 28" fill="none" aria-hidden="true"><rect width="28" height="28" rx="8" fill="url(#ng)"/><path d="M7 9h14M7 14h10M7 19h12" stroke="#faf8f4" stroke-width="2.2" stroke-linecap="round"/><defs><linearGradient id="ng" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#8B7355"/><stop offset="1" stop-color="#C4A060"/></linearGradient></defs></svg>
+        <span>TPS Format</span>
+      </a>
+      <div class="nav-links">
+        <a href="../#specification">Spec</a>
+        <a href="../examples/">Examples</a>
+        <a href="../glossary/">Glossary</a>
+        <a href="../sdk/">SDK</a>
+        <a href="./">Skills</a>
+        <a href="https://prompter.one" target="_blank" rel="noopener">Prompter One</a>
+        <a class="nav-gh" href="${repoUrl}" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="example-page">
+    <h1>AI Skills</h1>
+    <p class="example-meta">
+      <a href="../">&larr; Back to spec</a> &middot;
+      Let your AI assistant write TPS scripts for you.
+    </p>
+    <p class="example-desc">If you use an AI coding assistant &mdash; <strong>Claude Code</strong>, <strong>ChatGPT</strong>, <strong>Cursor</strong>, <strong>Windsurf</strong>, or any other LLM-powered tool &mdash; you can install TPS skills so the AI converts plain text into richly formatted <code>.tps</code> scripts automatically.</p>
+
+    <article class="content-card">
+      <div class="markdown-body">
+        <h2>Available Skills</h2>
+        <table>
+          <thead><tr><th>Skill</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><a href="${skillFileUrl}" target="_blank" rel="noopener"><strong>tps-convert</strong></a></td>
+              <td>Converts plain text (speeches, articles, narrations, dialogues) into fully formatted TPS files with dramatic pacing, emotions, pauses, emphasis, volume, delivery modes, pronunciation guides, stress markers, breath marks, edit points, and speaker tags &mdash; all applied intelligently based on content analysis.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>What the Skill Does</h2>
+        <p>The <code>tps-convert</code> skill teaches your AI assistant the <strong>complete TPS format specification</strong>, including every tag, attribute, and formatting rule. When you give it plain text, the AI will:</p>
+        <ol>
+          <li><strong>Analyze</strong> the text for tone, emotional arcs, key moments, and natural structure</li>
+          <li><strong>Structure</strong> the text into TPS segments and blocks based on topic and mood shifts</li>
+          <li><strong>Apply</strong> the full TPS tag vocabulary: 12 emotions, 5 speed presets, 3 volume levels, 4 delivery modes, emphasis, highlights, pauses, breath marks, edit points, pronunciation guides, stress markers, and speaker assignments</li>
+          <li><strong>Generate</strong> complete front matter with metadata, duration estimation, and speed offsets</li>
+          <li><strong>Output</strong> a valid <code>.tps</code> file ready for any TPS-compatible teleprompter</li>
+        </ol>
+
+        <h2>Installation</h2>
+
+        <h3>Claude Code</h3>
+        <p>Copy the skill file into your project&rsquo;s <code>.claude/skills/</code> directory:</p>
+        <pre><code>mkdir -p .claude/skills
+curl -o .claude/skills/tps-convert.md ${skillRawUrl}</code></pre>
+        <p>Then use <code>/tps-convert</code> in Claude Code followed by your text or a file path.</p>
+
+        <h3>ChatGPT / Custom GPTs</h3>
+        <p>Copy the contents of <a href="${skillFileUrl}" target="_blank" rel="noopener">tps-convert.md</a> and paste it into the <strong>Instructions</strong> field of your Custom GPT or into the system prompt of your ChatGPT conversation. The skill contains the complete TPS format specification, so the AI will know how to format scripts correctly.</p>
+
+        <h3>Cursor / Windsurf / Other AI IDEs</h3>
+        <p>Add the skill file to your project&rsquo;s rules or custom instructions:</p>
+        <ul>
+          <li><strong>Cursor</strong> &mdash; copy to <code>.cursor/rules/</code> or add as a project rule</li>
+          <li><strong>Windsurf</strong> &mdash; add to <code>.windsurfrules</code> or project instructions</li>
+          <li><strong>Other tools</strong> &mdash; use the skill contents as a system prompt or custom instruction</li>
+        </ul>
+
+        <h3>Download</h3>
+        <p>
+          <a href="${skillFileUrl}" target="_blank" rel="noopener">View on GitHub</a> &middot;
+          <a href="${skillRawUrl}" target="_blank" rel="noopener">Download raw file</a>
+        </p>
+
+        <h2>TPS Format Coverage</h2>
+        <p>The skill covers the <strong>entire</strong> TPS format specification:</p>
+        <table>
+          <thead><tr><th>Category</th><th>Tags / Features</th></tr></thead>
+          <tbody>
+            <tr><td>Front Matter</td><td><code>title</code>, <code>profile</code>, <code>duration</code>, <code>base_wpm</code>, <code>speed_offsets</code>, <code>author</code>, <code>created</code>, <code>version</code></td></tr>
+            <tr><td>Structure</td><td><code>#</code> title, <code>##</code> segments, <code>###</code> blocks, leading text, phrases, words</td></tr>
+            <tr><td>Header Params</td><td>Name, WPM, Emotion, Timing (<code>MM:SS</code>), <code>Speaker:Name</code></td></tr>
+            <tr><td>Pauses</td><td><code>/</code> (300ms), <code>//</code> (600ms), <code>[pause:Ns]</code>, <code>[pause:Nms]</code></td></tr>
+            <tr><td>Emphasis</td><td><code>[emphasis]</code>, <code>*italic*</code>, <code>**bold**</code>, <code>[highlight]</code></td></tr>
+            <tr><td>Speed</td><td><code>[xslow]</code>, <code>[slow]</code>, <code>[normal]</code>, <code>[fast]</code>, <code>[xfast]</code>, <code>[NWPM]</code></td></tr>
+            <tr><td>Volume</td><td><code>[loud]</code>, <code>[soft]</code>, <code>[whisper]</code></td></tr>
+            <tr><td>Delivery</td><td><code>[sarcasm]</code>, <code>[aside]</code>, <code>[rhetorical]</code>, <code>[building]</code></td></tr>
+            <tr><td>Emotions</td><td>All 12: neutral, warm, professional, focused, concerned, urgent, motivational, excited, happy, sad, calm, energetic</td></tr>
+            <tr><td>Breathing</td><td><code>[breath]</code></td></tr>
+            <tr><td>Edit Points</td><td><code>[edit_point]</code>, <code>[edit_point:high]</code>, <code>[edit_point:medium]</code></td></tr>
+            <tr><td>Pronunciation</td><td><code>[phonetic:IPA]</code>, <code>[pronunciation:GUIDE]</code></td></tr>
+            <tr><td>Stress</td><td><code>[stress]</code> inline wrap, <code>[stress:SYL-LA-ble]</code> guide</td></tr>
+            <tr><td>Speakers</td><td><code>Speaker:Name</code> in headers</td></tr>
+            <tr><td>Escapes</td><td><code>\\[</code>, <code>\\]</code>, <code>\\|</code>, <code>\\/</code>, <code>\\*</code>, <code>\\\\</code></td></tr>
+          </tbody>
+        </table>
       </div>
     </article>
   </div>

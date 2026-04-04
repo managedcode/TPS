@@ -700,6 +700,51 @@ The [`examples/`](examples/) directory contains sample TPS files demonstrating t
 - Primary: `.tps` (TelePrompterScript)
 - Alternative: `.tps.md` (for markdown-aware editors)
 
+## AI Skills
+
+If you use an AI coding assistant (Claude Code, ChatGPT, Cursor, Windsurf, or any LLM-powered tool), you can install TPS skills to let the AI convert plain text into richly formatted `.tps` scripts automatically.
+
+The [`Skills/`](Skills/) directory contains ready-to-use AI skills:
+
+| Skill | Description |
+|-------|-------------|
+| [`tps-convert`](Skills/tps-convert.md) | Converts plain text (speeches, articles, narrations, dialogues) into fully formatted TPS files with dramatic pacing, emotions, pauses, emphasis, volume, delivery modes, pronunciation guides, stress markers, breath marks, edit points, and speaker tags — all applied intelligently based on content analysis. |
+
+### Installation
+
+**Claude Code** — copy the skill file into your project's `.claude/skills/` directory:
+
+```bash
+mkdir -p .claude/skills
+cp Skills/tps-convert.md .claude/skills/
+```
+
+Then use `/tps-convert` in Claude Code followed by your text.
+
+**Codex** — copy the skill into a repo-local `.codex/skills/` folder as a standard skill:
+
+```bash
+mkdir -p .codex/skills/tps-convert
+cp Skills/tps-convert.md .codex/skills/tps-convert/SKILL.md
+```
+
+**GitHub Copilot** — copy the skill into a repo prompt file or use it as custom instructions:
+
+```bash
+mkdir -p .github/prompts
+cp Skills/tps-convert.md .github/prompts/tps-convert.prompt.md
+```
+
+**Other AI assistants** — paste the contents of the skill file as a system prompt or custom instruction. The skill contains the complete TPS format specification, so the AI will know how to format scripts correctly.
+
+### What the Skill Does
+
+1. **Analyzes** your plain text for tone, emotional arcs, key moments, and structure
+2. **Structures** the text into TPS segments (`##`) and blocks (`###`) based on natural topic/mood shifts
+3. **Applies** the full TPS tag vocabulary: emotions, speed, volume, delivery modes, emphasis, highlights, pauses, breath marks, edit points, pronunciation, stress, and speaker assignments
+4. **Generates** complete front matter with metadata, duration estimation, and speed offsets
+5. **Outputs** a valid `.tps` file ready for any TPS-compatible teleprompter
+
 ## SDK
 
 TPS includes the `ManagedCode.Tps` SDK workspace.
