@@ -16,19 +16,6 @@ TPS bridges this gap: it is human-readable markdown that any text editor can ope
 - **Teleprompter app developers** — engineers who parse and render TPS files in real-time reading applications.
 - **Content producers** — video/podcast teams who need structured, reviewable scripts with edit points and timing hints.
 
-## Reference Coverage
-
-This specification is backed by executable fixtures, not just prose:
-
-- `examples/basic.tps` covers the minimal authoring path.
-- `examples/advanced.tps` covers speed tags, pauses, volume, inline emotions, emphasis, pronunciation, stress, breath marks, delivery modes, speaker tags, edit points, and nested formatting.
-- `examples/multi-segment.tps` covers multi-section timing and hierarchy behavior.
-- `SDK/fixtures/invalid/*.tps` covers malformed headers, tags, and diagnostics.
-- `SDK/fixtures/examples/*.snapshot.json` captures normalized compiled output plus live session/standalone playback checkpoints that active runtimes must match.
-- `SDK/fixtures/transport/*.json` captures the canonical compiled JSON transport that active runtimes must serialize and restore.
-
-If TPS syntax changes, update this README, the examples, the shared fixtures, and the SDK tests together.
-
 ## Design Goals
 
 1. **Markdown-compatible** — a `.tps` file renders reasonably in any markdown viewer.
