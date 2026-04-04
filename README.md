@@ -16,23 +16,6 @@ TPS bridges this gap: it is human-readable markdown that any text editor can ope
 - **Teleprompter app developers** — engineers who parse and render TPS files in real-time reading applications.
 - **Content producers** — video/podcast teams who need structured, reviewable scripts with edit points and timing hints.
 
-## SDK
-
-TPS includes the `ManagedCode.Tps` SDK workspace for parsing, validation, compilation, and playback.
-
-- **SDK catalog page:** [tps.managed-code.com/sdk](https://tps.managed-code.com/sdk/)
-- **Workspace overview:** [SDK/README.md](https://github.com/managedcode/TPS/blob/main/SDK/README.md)
-- **Glossary:** [docs/Glossary.md](https://github.com/managedcode/TPS/blob/main/docs/Glossary.md)
-
-### Runtime Links
-
-- **TypeScript:** [SDK/ts](https://github.com/managedcode/TPS/tree/main/SDK/ts)
-- **JavaScript:** [SDK/js](https://github.com/managedcode/TPS/tree/main/SDK/js)
-- **.NET / C#:** [SDK/dotnet](https://github.com/managedcode/TPS/tree/main/SDK/dotnet)
-- **Flutter:** [SDK/flutter](https://github.com/managedcode/TPS/tree/main/SDK/flutter)
-- **Swift:** [SDK/swift](https://github.com/managedcode/TPS/tree/main/SDK/swift)
-- **Java:** [SDK/java](https://github.com/managedcode/TPS/tree/main/SDK/java)
-
 ## Reference Coverage
 
 This specification is backed by executable fixtures, not just prose:
@@ -729,3 +712,16 @@ The [`examples/`](examples/) directory contains sample TPS files demonstrating t
 
 - Primary: `.tps` (TelePrompterScript)
 - Alternative: `.tps.md` (for markdown-aware editors)
+
+## SDK
+
+TPS includes the `ManagedCode.Tps` SDK workspace.
+
+- **SDK catalog page:** [tps.managed-code.com/sdk](https://tps.managed-code.com/sdk/)
+- **Workspace overview:** [SDK/README.md](https://github.com/managedcode/TPS/blob/main/SDK/README.md)
+- **TypeScript:** [SDK/ts](https://github.com/managedcode/TPS/tree/main/SDK/ts)
+- **JavaScript:** [SDK/js](https://github.com/managedcode/TPS/tree/main/SDK/js)
+- **.NET / C#:** [SDK/dotnet](https://github.com/managedcode/TPS/tree/main/SDK/dotnet)
+- **Flutter:** [SDK/flutter](https://github.com/managedcode/TPS/tree/main/SDK/flutter)
+- **Swift:** [SDK/swift](https://github.com/managedcode/TPS/tree/main/SDK/swift)
+- **Java:** [SDK/java](https://github.com/managedcode/TPS/tree/main/SDK/java)
