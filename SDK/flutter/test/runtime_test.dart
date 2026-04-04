@@ -227,6 +227,36 @@ void main() {
     session.dispose();
   });
 
+  test("emits a single snapshot for speed changes and reports completed status transitions", () async {
+    final compilation = compileTps("## [Signal]\n### [Body]\nReady now.");
+    final session = TpsPlaybackSession(compilation.script, const TpsPlaybackSessionOptions(tickIntervalMs: 10));
+    final statuses = <TpsPlaybackStatus>[];
+    var snapshotEvents = 0;
+
+    session.on("statusChanged", (event) {
+      statuses.add((event as Map<String, Object?>)["status"] as TpsPlaybackStatus);
+    });
+    session.on("snapshotChanged", (_) {
+      snapshotEvents += 1;
+    });
+
+    session.increaseSpeed(10);
+    expect(snapshotEvents, 1);
+
+    final completer = Completer<void>();
+    session.on("completed", (_) {
+      if (!completer.isCompleted) {
+        completer.complete();
+      }
+    });
+    session.play();
+    await completer.future.timeout(const Duration(seconds: 3));
+
+    expect(statuses, contains(TpsPlaybackStatus.playing));
+    expect(statuses, contains(TpsPlaybackStatus.completed));
+    session.dispose();
+  });
+
   test("compiles and navigates a large generated script", () {
     final buffer = StringBuffer()
       ..writeln("---")

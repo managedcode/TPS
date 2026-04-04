@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -49,6 +50,7 @@ public final class ManagedCodeTpsTests {
         testAuthoringEdgeCasesAndPlayerGuardRails();
         testCompiledJsonGuardsAndPlaybackLifecycle();
         testPlaybackNavigationAndTimer();
+        testConcurrentControlCommands();
         testLargeGeneratedScript();
         System.out.println("ManagedCode.Tps Java tests passed.");
     }
@@ -253,6 +255,59 @@ public final class ManagedCodeTpsTests {
             session.play();
             assertTrue(latch.await(3, TimeUnit.SECONDS), "playback should complete");
             assertEquals(ManagedCodeTps.TpsPlaybackStatus.COMPLETED, session.status(), "status after completion");
+        } finally {
+            session.dispose();
+        }
+    }
+
+    private static void testConcurrentControlCommands() throws InterruptedException {
+        ManagedCodeTps.TpsCompilationResult compilation = ManagedCodeTps.TpsRuntime.compileTps("""
+            ## [Intro]
+            ### [Lead]
+            Ready now please stay focused for this longer playback sample.
+            ### [Close]
+            Done soon after another phrase lands safely.
+            """);
+        ManagedCodeTps.TpsPlaybackSession session = new ManagedCodeTps.TpsPlaybackSession(compilation.script(), new ManagedCodeTps.TpsPlaybackSessionOptions(1_000, null, null, null, false));
+        try {
+            session.play();
+
+            CountDownLatch start = new CountDownLatch(1);
+            CountDownLatch completed = new CountDownLatch(4);
+            List<Throwable> failures = new CopyOnWriteArrayList<>();
+
+            for (int lane = 0; lane < 4; lane += 1) {
+                final int laneId = lane;
+                Thread thread = new Thread(() -> {
+                    try {
+                        start.await(3, TimeUnit.SECONDS);
+                        for (int iteration = 0; iteration < 40; iteration += 1) {
+                            switch ((laneId + iteration) % 6) {
+                                case 0 -> session.seek((iteration * 37) % Math.max(1, compilation.script().totalDurationMs()));
+                                case 1 -> session.nextWord();
+                                case 2 -> session.previousWord();
+                                case 3 -> session.nextBlock();
+                                case 4 -> session.previousBlock();
+                                default -> session.setSpeedOffsetWpm(((laneId * 5) + iteration) % 41 - 20);
+                            }
+                        }
+                    } catch (Throwable exception) {
+                        failures.add(exception);
+                    } finally {
+                        completed.countDown();
+                    }
+                });
+                thread.start();
+            }
+
+            start.countDown();
+            assertTrue(completed.await(3, TimeUnit.SECONDS), "concurrent control commands should complete");
+            assertTrue(failures.isEmpty(), "concurrent control commands should not fail: " + failures);
+
+            ManagedCodeTps.TpsPlaybackSnapshot snapshot = session.snapshot();
+            assertTrue(snapshot.state().elapsedMs() >= 0 && snapshot.state().elapsedMs() <= compilation.script().totalDurationMs(), "elapsedMs should stay in bounds");
+            assertTrue(snapshot.state().currentWordIndex() >= -1 && snapshot.state().currentWordIndex() < compilation.script().words().size(), "currentWordIndex should stay in bounds");
+            assertTrue(snapshot.tempo().effectiveBaseWpm() >= ManagedCodeTps.TpsSpec.MINIMUM_WPM && snapshot.tempo().effectiveBaseWpm() <= ManagedCodeTps.TpsSpec.MAXIMUM_WPM, "effectiveBaseWpm should stay in bounds");
         } finally {
             session.dispose();
         }

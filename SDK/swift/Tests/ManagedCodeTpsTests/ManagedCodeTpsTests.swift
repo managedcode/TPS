@@ -214,6 +214,37 @@ final class ManagedCodeTpsTests: XCTestCase {
         session.dispose()
     }
 
+    func testPlaybackStatusTransitionsAndSpeedSnapshotsStayCanonical() throws {
+        let compilation = TpsRuntime.compileTps("## [Signal]\n### [Body]\nReady now.")
+        let session = TpsPlaybackSession(compilation.script, options: .init(tickIntervalMs: 10))
+        var statuses: [String] = []
+        var snapshotEvents = 0
+
+        let disposeStatus = session.on("statusChanged") { event in
+            let payload = event as! [String: Any]
+            statuses.append(payload["status"] as! String)
+        }
+        let disposeSnapshot = session.on("snapshotChanged") { _ in
+            snapshotEvents += 1
+        }
+
+        _ = session.increaseSpeed(10)
+        XCTAssertEqual(snapshotEvents, 1)
+
+        let completed = expectation(description: "completed-with-status")
+        let disposeCompleted = session.on("completed") { _ in completed.fulfill() }
+        _ = session.play()
+        wait(for: [completed], timeout: 3)
+
+        disposeCompleted()
+        disposeSnapshot()
+        disposeStatus()
+
+        XCTAssertTrue(statuses.contains(TpsPlaybackStatus.playing.rawValue))
+        XCTAssertTrue(statuses.contains(TpsPlaybackStatus.completed.rawValue))
+        session.dispose()
+    }
+
     func testLargeGeneratedScript() {
         var lines: [String] = ["---", "base_wpm: 140", "---", ""]
         for segmentIndex in 1...8 {

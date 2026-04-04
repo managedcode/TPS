@@ -1206,7 +1206,6 @@ class TpsPlaybackSession {
       _clearTimer();
       _scheduleNextTick();
     }
-    _emitSnapshotChanged();
     return snapshot;
   }
 
@@ -1275,11 +1274,18 @@ class TpsPlaybackSession {
   }
 
   void _updateStatus(TpsPlaybackStatus nextStatus) {
-    if (status == nextStatus) {
+    final previousStatus = status;
+    if (previousStatus == nextStatus) {
       return;
     }
-    final previousStatus = status;
     status = nextStatus;
+    if (nextStatus != TpsPlaybackStatus.playing) {
+      _playbackOffsetMs = currentState.elapsedMs;
+      _playbackStartedAtMs = 0;
+    }
+    if (nextStatus == TpsPlaybackStatus.completed && previousStatus == TpsPlaybackStatus.playing) {
+      _clearTimer();
+    }
     _emit("statusChanged", {
       "state": currentState,
       "previousStatus": previousStatus,
@@ -1291,8 +1297,11 @@ class TpsPlaybackSession {
     final previousState = currentState;
     final nextState = player.getState(elapsedMs);
     final previousStatus = status;
+    final resolvedStatus = nextStatus == TpsPlaybackStatus.playing && nextState.isComplete
+        ? TpsPlaybackStatus.completed
+        : nextStatus;
     currentState = nextState;
-    _updateStatus(nextStatus);
+    _updateStatus(resolvedStatus);
     if (nextState.currentWord?.id != previousState.currentWord?.id) {
       _emit("wordChanged", {"state": nextState, "previousState": previousState, "status": status});
     }
@@ -1308,8 +1317,7 @@ class TpsPlaybackSession {
     if (nextState.elapsedMs != previousState.elapsedMs || status != previousStatus) {
       _emit("stateChanged", {"state": nextState, "previousState": previousState, "status": status});
     }
-    if (!previousState.isComplete && nextState.isComplete) {
-      status = TpsPlaybackStatus.completed;
+    if (!previousState.isComplete && resolvedStatus == TpsPlaybackStatus.completed) {
       _emit("completed", {"state": nextState, "previousState": previousState, "status": status});
     }
     _emitSnapshotChanged();

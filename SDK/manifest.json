@@ -33,8 +33,8 @@
       "setup": "dotnet",
       "enabled": true,
       "build": "dotnet build SDK/dotnet/ManagedCode.Tps.slnx -warnaserror --no-restore",
-      "test": "dotnet test SDK/dotnet/ManagedCode.Tps.slnx --no-build --no-restore",
-      "coverage": "dotnet test SDK/dotnet/ManagedCode.Tps.slnx --no-build --no-restore /p:CollectCoverage=true /p:CoverletOutputFormat=json /p:ThresholdType=line%2Cbranch%2Cmethod /p:Threshold=90"
+      "test": "dotnet test SDK/dotnet/ManagedCode.Tps.slnx --no-restore",
+      "coverage": "dotnet test SDK/dotnet/ManagedCode.Tps.slnx --no-restore /p:CollectCoverage=true /p:CoverletOutputFormat=json /p:ThresholdType=line%2Cbranch%2Cmethod /p:Threshold=90"
     },
     {
       "id": "flutter",

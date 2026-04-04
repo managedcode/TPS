@@ -43,7 +43,7 @@ Compiled TPS output is meant to be portable. The active runtimes treat the compi
 |--------|---------|----------------|---------------|
 | `SDK/ts` | canonical runtime source | changing TPS behavior or runtime contract | `npm --prefix SDK/js run build:tps`, `npm --prefix SDK/js run coverage:typescript` |
 | `SDK/js` | JavaScript package and Node validation | changing JS packaging or JS-specific tests | `npm --prefix SDK/js run test:js`, `npm --prefix SDK/js run coverage:js` |
-| `SDK/dotnet` | C# runtime and tests | changing .NET API or .NET behavior | `dotnet build SDK/dotnet/ManagedCode.Tps.slnx -warnaserror --no-restore`, `dotnet test SDK/dotnet/ManagedCode.Tps.slnx --no-build --no-restore` |
+| `SDK/dotnet` | C# runtime and tests | changing .NET API or .NET behavior | `dotnet build SDK/dotnet/ManagedCode.Tps.slnx -warnaserror --no-restore`, `dotnet test SDK/dotnet/ManagedCode.Tps.slnx --no-restore` |
 | `SDK/flutter` | Dart runtime for Flutter hosts | changing Flutter/Dart behavior or tests | `cd SDK/flutter && dart pub get && ./coverage.sh` |
 | `SDK/swift` | Swift runtime package | changing Apple-platform runtime behavior or tests | `cd SDK/swift && ./coverage.sh` |
 | `SDK/java` | Java runtime package | changing Java behavior or tests | `cd SDK/java && ./coverage.sh` |
@@ -108,7 +108,7 @@ On .NET UI hosts, also wire `TpsPlaybackSessionOptions.EventSynchronizationConte
 
 - TypeScript: `npm --prefix SDK/js run coverage:typescript`
 - JavaScript: `npm --prefix SDK/js run coverage:js`
-- C#: `dotnet test SDK/dotnet/ManagedCode.Tps.slnx --no-build --no-restore /p:CollectCoverage=true /p:CoverletOutputFormat=json /p:ThresholdType=line%2Cbranch%2Cmethod /p:Threshold=90`
+- C#: `dotnet test SDK/dotnet/ManagedCode.Tps.slnx --no-restore /p:CollectCoverage=true /p:CoverletOutputFormat=json /p:ThresholdType=line%2Cbranch%2Cmethod /p:Threshold=90`
 - Flutter: `cd SDK/flutter && ./coverage.sh`
 - Swift: `cd SDK/swift && ./coverage.sh`
 - Java: `cd SDK/java && ./coverage.sh`

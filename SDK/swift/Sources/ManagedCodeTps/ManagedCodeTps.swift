@@ -657,7 +657,6 @@ public final class TpsPlaybackSession {
             clearTimer()
             scheduleNextTick()
         }
-        emitSnapshotChanged()
         return snapshot
     }
 
@@ -714,9 +713,16 @@ public final class TpsPlaybackSession {
     }
 
     private func updateStatus(_ nextStatus: TpsPlaybackStatus) {
-        guard status != nextStatus else { return }
         let previousStatus = status
+        guard previousStatus != nextStatus else { return }
         status = nextStatus
+        if nextStatus != .playing {
+            playbackOffsetMs = currentState.elapsedMs
+            playbackStartedAtMs = 0
+        }
+        if nextStatus == .completed && previousStatus == .playing {
+            clearTimer()
+        }
         emit("statusChanged", event: ["state": currentState, "previousStatus": previousStatus.rawValue, "status": nextStatus.rawValue])
     }
 
@@ -724,8 +730,9 @@ public final class TpsPlaybackSession {
         let previousState = currentState
         let previousStatus = status
         let nextState = player.getState(elapsedMs)
+        let resolvedStatus: TpsPlaybackStatus = nextStatus == .playing && nextState.isComplete ? .completed : nextStatus
         currentState = nextState
-        updateStatus(nextStatus)
+        updateStatus(resolvedStatus)
         if nextState.currentWord?.id != previousState.currentWord?.id {
             emit("wordChanged", event: ["state": nextState, "previousState": previousState, "status": status.rawValue])
         }
@@ -741,8 +748,7 @@ public final class TpsPlaybackSession {
         if nextState.elapsedMs != previousState.elapsedMs || status != previousStatus {
             emit("stateChanged", event: ["state": nextState, "previousState": previousState, "status": status.rawValue])
         }
-        if !previousState.isComplete && nextState.isComplete {
-            status = .completed
+        if !previousState.isComplete && resolvedStatus == .completed {
             emit("completed", event: ["state": nextState, "previousState": previousState, "status": status.rawValue])
         }
         emitSnapshotChanged()

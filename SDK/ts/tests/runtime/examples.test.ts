@@ -5,6 +5,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { compileTps, TpsPlaybackSession, TpsPlayer, TpsStandalonePlayer } from "../../src/index.ts";
+import { parseCompiledScriptJson } from "../../src/compiled-script.ts";
 import { buildExampleSnapshot, EXAMPLE_FILES, loadExampleSnapshot } from "../../../scripts/example-snapshot-utils.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -147,4 +148,17 @@ test("source TypeScript standalone player can restore from compiled script and J
   playerFromScript.dispose();
   playerFromJson.dispose();
   fromCanonicalTransport.dispose();
+});
+
+test("source TypeScript runtime rejects malformed compiled JSON and invalid fixtures", () => {
+  const invalid = compileTps(readFixture("invalid", "unknown-tag.tps"));
+  assert.equal(invalid.ok, false);
+  assert.ok(invalid.diagnostics.some((diagnostic) => diagnostic.code === "unknown-tag"));
+
+  assert.throws(() => parseCompiledScriptJson(""), /non-empty string/i);
+  assert.throws(() => parseCompiledScriptJson("[]"), /script object/i);
+
+  const canonicalTransport = JSON.parse(readFixture("transport", "runtime-parity.compiled.json"));
+  canonicalTransport.segments = [];
+  assert.throws(() => parseCompiledScriptJson(JSON.stringify(canonicalTransport)), /at least one segment/i);
 });

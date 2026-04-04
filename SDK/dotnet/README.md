@@ -92,8 +92,8 @@ The root [README.md](/Users/ksemenenko/Developer/TPS/README.md) is the authorita
 ## Local Commands
 
 - `dotnet build ManagedCode.Tps.slnx -warnaserror --no-restore`
-- `dotnet test ManagedCode.Tps.slnx --no-build --no-restore`
-- `dotnet test ManagedCode.Tps.slnx --no-build --no-restore /p:CollectCoverage=true /p:CoverletOutputFormat=json /p:ThresholdType=line%2Cbranch%2Cmethod /p:Threshold=90`
+- `dotnet test ManagedCode.Tps.slnx --no-restore`
+- `dotnet test ManagedCode.Tps.slnx --no-restore /p:CollectCoverage=true /p:CoverletOutputFormat=json /p:ThresholdType=line%2Cbranch%2Cmethod /p:Threshold=90`
 
 ## Target Runtime
 
