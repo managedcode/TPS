@@ -18,7 +18,44 @@ The user provides plain text. It can be:
 - A dialogue or multi-speaker conversation
 - Any prose that needs to be read aloud from a teleprompter
 
+The user may also provide additional context:
+- **Target duration** — "make it 30 seconds" or "2-minute read"
+- **Tone override** — "make it urgent" or "keep it calm and professional"
+- **Archetype preference** — "format as a coach" or "I want Friend style throughout"
+- **Audience** — "for a TED talk" or "internal team update"
+
 If the user provides a file path, read the file first.
+
+### Content Type Presets
+
+When the content type is clear, start with these default archetype + emotion combinations:
+
+| Content type | Default flow | base_wpm |
+|-------------|-------------|----------|
+| **TED-style talk** | Friend → Storyteller → Educator → Motivator → Friend | 140 |
+| **Product pitch** | Friend → Educator → Motivator → Coach → Friend | 140 |
+| **Tutorial / how-to** | Educator throughout, Coach for action steps | 125 |
+| **News report** | Educator throughout with `professional` emotion | 145 |
+| **Toast / wedding speech** | Friend → Storyteller → Motivator → Friend | 130 |
+| **Sales call script** | Friend → Educator → Motivator → Coach | 140 |
+| **Internal team update** | Educator → Coach | 135 |
+| **Motivational speech** | Friend → Motivator → Storyteller → Motivator → Coach → Friend | 140 |
+| **Advertisement (30s)** | Motivator → Coach | 155 |
+| **Podcast intro** | Friend → Entertainer | 145 |
+
+These are starting points — adjust based on the actual text content.
+
+### Short Text (< 100 words)
+
+For very short texts, use a **single segment** with one archetype. Don't force multiple segments — a 3-sentence text doesn't need 5 segments. Apply inline tags (articulation, energy, melody, volume, pauses) but keep the structure simple.
+
+### Dialogue / Multi-Speaker
+
+For text with multiple speakers (interviews, dialogues, Q&A):
+1. Each speaker gets a `Speaker:Name` tag
+2. Each speaker can have their own archetype — e.g., interviewer as `Friend`, expert as `Educator`
+3. Use blocks (`###`) to alternate speakers within a segment
+4. Match delivery tags to each speaker's character — the interviewer might be `[legato]` while the expert is neutral
 
 ## Your Task
 
@@ -204,6 +241,14 @@ Visual background overlay. Makes text stand out. Does NOT imply a specific deliv
 | `[xfast]...[/xfast]` | 1.5x | 210 WPM | Rapid transitions, low-importance text |
 
 Multiplier formula: `1 + (offset / 100)`. Tags stack multiplicatively when nested.
+
+**WPM resolution priority** (highest wins):
+1. Inline speed tag (`[150WPM]`, `[slow]`, etc.)
+2. Block header WPM
+3. Segment header WPM
+4. Archetype recommended WPM
+5. `base_wpm` from front matter
+6. Default: 140 WPM
 
 **Absolute speed:**
 
@@ -450,6 +495,48 @@ Based on the content analysis, determine the **vocal archetype sequence** for th
 >
 > Does this feel right, or would you like to adjust?
 
+### Step 2b: Detect and Assign Emotions
+
+For each segment, detect the appropriate **emotion** from the text content. Emotions control visual styling (colors, background) and are independent of archetypes — the same archetype can have different emotions depending on context.
+
+**Auto-detection rules:**
+
+| Text signals | Emotion |
+|-------------|---------|
+| Greeting, thank you, personal, friendly | `warm` |
+| Data, reports, formal language, official | `professional` |
+| Technical details, step-by-step, precise | `focused` |
+| Problems, risks, bad news, warnings | `concerned` |
+| Deadline, breaking, critical, must act now | `urgent` |
+| Vision, together we can, you have the power | `motivational` |
+| Announcement, reveal, great news, launch | `excited` |
+| Celebration, congratulations, success | `happy` |
+| Loss, memorial, disappointment, farewell | `sad` |
+| Reassurance, meditation, steady, peace | `calm` |
+| Demo, action, rapid-fire, let's go | `energetic` |
+| Default / no strong signal | `neutral` |
+
+**Natural archetype-emotion pairings** (use as defaults when the text doesn't signal otherwise):
+
+| Archetype | Default emotion | Alternative emotions |
+|-----------|----------------|---------------------|
+| Friend | `warm` | `happy`, `calm` |
+| Motivator | `motivational` | `excited`, `energetic` |
+| Educator | `professional` | `focused`, `neutral` |
+| Coach | `focused` | `energetic`, `urgent` |
+| Storyteller | `warm` | `concerned`, `excited`, `sad` (varies with narrative) |
+| Entertainer | `happy` | `energetic`, `warm` |
+
+**User overrides:** If the user specifies a tone (e.g., "make it urgent," "keep it calm," "I want this to feel serious"), override the auto-detected emotions. Apply the user's specified emotion to all segments, or to specific segments if they indicate which parts should change.
+
+Present the proposed emotion map alongside the archetype sequence in Step 2. Example:
+
+> 1. Opening (Friend / warm) — build connection
+> 2. The Problem (Educator / concerned) — present the data
+> 3. Why It Matters (Motivator / motivational) — inspire action
+> 4. Next Steps (Coach / focused) — give clear instructions
+> 5. Closing (Friend / warm) — end with warmth
+
 ### Step 3: Format with Tags
 
 Once the archetype flow is confirmed, format the text using the full TPS vocabulary. Apply articulation, energy, and melody tags to match each archetype's profile:
@@ -553,6 +640,25 @@ Each archetype has a distinct rhythm. When formatting text, actively **restructu
 2. Base time = `total_words / base_wpm` (in minutes)
 3. Add all pause durations (`/` = 0.3s, `//` = 0.6s, `[pause:Ns]` = Ns)
 4. Round to nearest 30 seconds for the `duration` front matter field
+
+### Target Duration Mode
+
+If the user specifies a target duration (e.g., "I need this to fit in 30 seconds" or "make it a 2-minute read"), adjust `base_wpm` to match:
+
+1. Count the words in the text
+2. Calculate required WPM: `required_wpm = total_words / (target_seconds / 60)`
+3. Subtract estimated pause time from target duration before calculating
+4. If `required_wpm` falls within 80–170 (teleprompter range), set it as `base_wpm`
+5. If `required_wpm` is too high (> 170), warn the user: "This text has N words — at a comfortable teleprompter pace, it needs at least X seconds. To fit in Y seconds, you'd need to cut ~Z words."
+6. If `required_wpm` is too low (< 80), suggest adding more pauses or content
+
+**Example:** User says "30 seconds, 80 words":
+- Required: `80 / (30/60)` = 160 WPM — within range, set `base_wpm: 160`
+- Use minimal pauses (`/` only, no `[pause:2s]`) to stay within time budget
+
+**Example:** User says "30 seconds, 120 words":
+- Required: `120 / (30/60)` = 240 WPM — too fast for teleprompter
+- Respond: "120 words at a comfortable pace need at least 50 seconds. To fit 30 seconds, cut ~50 words or increase to 45 seconds."
 
 ---
 
@@ -671,12 +777,16 @@ with [phonetic:ˌɛskjuːˈɛl]SQL[/phonetic] backing stores. //
 
 Write the converted TPS content to a `.tps` file. If the user specified a filename, use that. Otherwise, derive a snake_case filename from the title with `.tps` extension.
 
-After writing, briefly summarize:
-- Segments and blocks count
-- Archetype sequence chosen (e.g., Friend → Educator → Coach → Friend)
-- Emotional arc (emotions used per segment)
-- Key formatting decisions (articulation, energy/melody levels, speed variations, volume shifts, delivery modes used)
-- Estimated duration
+After writing, briefly summarize. Example output summary:
+
+> **TPS conversion complete** — saved to `product_launch.tps`
+>
+> - **5 segments, 12 blocks, ~275 words**
+> - **Archetype flow:** Friend → Motivator → Educator → Coach → Friend
+> - **Emotions:** warm → motivational → concerned → focused → warm
+> - **Delivery:** legato for opening/closing, staccato for action items, energy 3–9 range, melody 2–8 range
+> - **Tags used:** emphasis, highlight, building, rhetorical, aside, slow, xslow, loud, soft, phonetic, stress, breath marks, edit points
+> - **Estimated duration:** ~3:30 at base 140 WPM
 
 ---
 

@@ -2,7 +2,7 @@ using ManagedCode.Tps.Models;
 
 namespace ManagedCode.Tps.Internal;
 
-internal static class CompiledScriptValidator
+internal static partial class CompiledScriptValidator
 {
     public static void ValidateOrThrow(CompiledScript script)
     {
@@ -56,51 +56,9 @@ internal static class CompiledScriptValidator
             }
 
             var expectedBlockStartWordIndex = words.Count == 0 ? 0 : segment.StartWordIndex;
-
             foreach (var block in segment.Blocks)
             {
-                ValidateIdentifier(block.Id, "block", nameof(script), blockIds);
-                ValidateTimeRange("block", block.StartWordIndex, block.EndWordIndex, block.StartMs, block.EndMs, words.Count, nameof(script));
-                ValidateCanonicalScopeWords("block", block.Id, block.Words, block.StartWordIndex, block.EndWordIndex, block.StartMs, block.EndMs, words, nameof(script), segment.Id, block.Id);
-
-                if (block.Words.Count > 0 && (block.StartMs < segment.StartMs || block.EndMs > segment.EndMs))
-                {
-                    throw new ArgumentException("Compiled TPS blocks must stay inside their parent segment range.", nameof(script));
-                }
-
-                if (words.Count > 0 && block.Words.Count > 0 && block.StartWordIndex != expectedBlockStartWordIndex)
-                {
-                    throw new ArgumentException("Compiled TPS blocks must be ordered by their canonical timeline.", nameof(script));
-                }
-
-                var previousPhraseEndWordIndex = block.StartWordIndex - 1;
-
-                foreach (var phrase in block.Phrases)
-                {
-                    ValidateIdentifier(phrase.Id, "phrase", nameof(script), phraseIds);
-                    ValidateTimeRange("phrase", phrase.StartWordIndex, phrase.EndWordIndex, phrase.StartMs, phrase.EndMs, words.Count, nameof(script));
-                    if (phrase.Words.Count > 0 && (phrase.StartMs < block.StartMs || phrase.EndMs > block.EndMs))
-                    {
-                        throw new ArgumentException("Compiled TPS phrases must stay inside their parent block range.", nameof(script));
-                    }
-
-                    ValidateCanonicalScopeWords("phrase", phrase.Id, phrase.Words, phrase.StartWordIndex, phrase.EndWordIndex, phrase.StartMs, phrase.EndMs, words, nameof(script), segment.Id, block.Id, phrase.Id);
-
-                    if (words.Count > 0 && phrase.Words.Count > 0 && phrase.StartWordIndex <= previousPhraseEndWordIndex)
-                    {
-                        throw new ArgumentException("Compiled TPS phrases must be ordered by their canonical timeline.", nameof(script));
-                    }
-
-                    if (phrase.Words.Count > 0)
-                    {
-                        previousPhraseEndWordIndex = phrase.EndWordIndex;
-                    }
-                }
-
-                if (block.Words.Count > 0)
-                {
-                    expectedBlockStartWordIndex = block.EndWordIndex + 1;
-                }
+                ValidateBlock(block, segment, words, blockIds, phraseIds, ref expectedBlockStartWordIndex);
             }
 
             expectedSegmentStartWordIndex = segment.Words.Count == 0 ? segment.StartWordIndex : segment.EndWordIndex + 1;
@@ -119,188 +77,65 @@ internal static class CompiledScriptValidator
         ValidateWordReferences(words, segmentIds, blockIds, phraseIds);
     }
 
-    private static void ValidateWords(IReadOnlyList<CompiledWord> words, ISet<string> wordIds)
-    {
-        CompiledWord? previousWord = null;
-        for (var index = 0; index < words.Count; index++)
-        {
-            var word = words[index];
-            ValidateIdentifier(word.Id, "word", nameof(words), wordIds);
-
-            if (word.Index != index)
-            {
-                throw new ArgumentException("Compiled TPS words must have sequential indexes that match their order.", nameof(words));
-            }
-
-            if (string.IsNullOrWhiteSpace(word.SegmentId) || string.IsNullOrWhiteSpace(word.BlockId))
-            {
-                throw new ArgumentException("Compiled TPS words must reference a segment and block.", nameof(words));
-            }
-
-            if (string.Equals(word.Kind, "word", StringComparison.Ordinal) && string.IsNullOrWhiteSpace(word.PhraseId))
-            {
-                throw new ArgumentException("Compiled TPS spoken words must reference a phrase.", nameof(words));
-            }
-
-            if (word.StartMs < 0 || word.EndMs < word.StartMs)
-            {
-                throw new ArgumentException("Compiled TPS words must define a non-negative time range.", nameof(words));
-            }
-
-            if (word.EndMs - word.StartMs != word.DisplayDurationMs)
-            {
-                throw new ArgumentException("Compiled TPS words must keep display duration aligned with their start and end timestamps.", nameof(words));
-            }
-
-            if (previousWord is not null && word.StartMs != previousWord.EndMs)
-            {
-                throw new ArgumentException("Compiled TPS words must form a contiguous timeline.", nameof(words));
-            }
-
-            previousWord = word;
-        }
-    }
-
-    private static void ValidateTimeRange(
-        string scope,
-        int startWordIndex,
-        int endWordIndex,
-        int startMs,
-        int endMs,
-        int wordCount,
-        string parameterName)
-    {
-        if (startWordIndex < 0 || endWordIndex < startWordIndex || startMs < 0 || endMs < startMs)
-        {
-            throw new ArgumentException($"Compiled TPS {scope} ranges must be non-negative and ordered.", parameterName);
-        }
-
-        if (wordCount == 0)
-        {
-            if (startWordIndex != 0 || endWordIndex != 0 || startMs != 0 || endMs != 0)
-            {
-                throw new ArgumentException($"Compiled TPS empty {scope} ranges must stay at zero.", parameterName);
-            }
-
-            return;
-        }
-
-        if (startWordIndex >= wordCount || endWordIndex >= wordCount)
-        {
-            throw new ArgumentException($"Compiled TPS {scope} ranges must reference words inside the canonical timeline.", parameterName);
-        }
-    }
-
-    private static void ValidateIdentifier(string id, string scope, string parameterName, ISet<string> seen)
-    {
-        if (string.IsNullOrWhiteSpace(id))
-        {
-            throw new ArgumentException($"Compiled TPS {scope} identifiers cannot be empty.", parameterName);
-        }
-
-        if (!seen.Add(id))
-        {
-            throw new ArgumentException($"Compiled TPS {scope} identifiers must be unique.", parameterName);
-        }
-    }
-
-    private static void ValidateWordReferences(
+    private static void ValidateBlock(
+        CompiledBlock block,
+        CompiledSegment segment,
         IReadOnlyList<CompiledWord> words,
-        IReadOnlySet<string> segmentIds,
-        IReadOnlySet<string> blockIds,
-        IReadOnlySet<string> phraseIds)
+        ISet<string> blockIds,
+        ISet<string> phraseIds,
+        ref int expectedBlockStartWordIndex)
     {
-        foreach (var word in words)
+        ValidateIdentifier(block.Id, "block", nameof(words), blockIds);
+        ValidateTimeRange("block", block.StartWordIndex, block.EndWordIndex, block.StartMs, block.EndMs, words.Count, nameof(words));
+        ValidateCanonicalScopeWords("block", block.Id, block.Words, block.StartWordIndex, block.EndWordIndex, block.StartMs, block.EndMs, words, nameof(words), segment.Id, block.Id);
+
+        if (block.Words.Count > 0 && (block.StartMs < segment.StartMs || block.EndMs > segment.EndMs))
         {
-            if (!segmentIds.Contains(word.SegmentId))
-            {
-                throw new ArgumentException($"Compiled TPS word '{word.Id}' references an unknown segment '{word.SegmentId}'.", nameof(words));
-            }
+            throw new ArgumentException("Compiled TPS blocks must stay inside their parent segment range.", nameof(words));
+        }
 
-            if (!blockIds.Contains(word.BlockId))
-            {
-                throw new ArgumentException($"Compiled TPS word '{word.Id}' references an unknown block '{word.BlockId}'.", nameof(words));
-            }
+        if (words.Count > 0 && block.Words.Count > 0 && block.StartWordIndex != expectedBlockStartWordIndex)
+        {
+            throw new ArgumentException("Compiled TPS blocks must be ordered by their canonical timeline.", nameof(words));
+        }
 
-            if (!string.IsNullOrWhiteSpace(word.PhraseId) && !phraseIds.Contains(word.PhraseId))
-            {
-                throw new ArgumentException($"Compiled TPS word '{word.Id}' references an unknown phrase '{word.PhraseId}'.", nameof(words));
-            }
+        var previousPhraseEndWordIndex = block.StartWordIndex - 1;
+        foreach (var phrase in block.Phrases)
+        {
+            ValidatePhrase(phrase, block, segment.Id, words, phraseIds, ref previousPhraseEndWordIndex);
+        }
+
+        if (block.Words.Count > 0)
+        {
+            expectedBlockStartWordIndex = block.EndWordIndex + 1;
         }
     }
 
-    private static void ValidateCanonicalScopeWords(
-        string scope,
-        string ownerId,
-        IReadOnlyList<CompiledWord> scopeWords,
-        int startWordIndex,
-        int endWordIndex,
-        int startMs,
-        int endMs,
-        IReadOnlyList<CompiledWord> canonicalWords,
-        string parameterName,
-        string expectedSegmentId,
-        string? expectedBlockId = null,
-        string? expectedPhraseId = null)
+    private static void ValidatePhrase(
+        CompiledPhrase phrase,
+        CompiledBlock block,
+        string segmentId,
+        IReadOnlyList<CompiledWord> words,
+        ISet<string> phraseIds,
+        ref int previousPhraseEndWordIndex)
     {
-        if (canonicalWords.Count == 0)
+        ValidateIdentifier(phrase.Id, "phrase", nameof(words), phraseIds);
+        ValidateTimeRange("phrase", phrase.StartWordIndex, phrase.EndWordIndex, phrase.StartMs, phrase.EndMs, words.Count, nameof(words));
+        if (phrase.Words.Count > 0 && (phrase.StartMs < block.StartMs || phrase.EndMs > block.EndMs))
         {
-            if (scopeWords.Count != 0)
-            {
-                throw new ArgumentException($"Compiled TPS {scope} '{ownerId}' cannot reference words when the canonical timeline is empty.", parameterName);
-            }
-
-            return;
+            throw new ArgumentException("Compiled TPS phrases must stay inside their parent block range.", nameof(words));
         }
 
-        if (scopeWords.Count == 0)
-        {
-            if (startWordIndex != 0 || endWordIndex != 0 || startMs != 0 || endMs != 0)
-            {
-                throw new ArgumentException($"Compiled TPS empty {scope} '{ownerId}' ranges must stay at zero.", parameterName);
-            }
+        ValidateCanonicalScopeWords("phrase", phrase.Id, phrase.Words, phrase.StartWordIndex, phrase.EndWordIndex, phrase.StartMs, phrase.EndMs, words, nameof(words), segmentId, block.Id, phrase.Id);
 
-            return;
+        if (words.Count > 0 && phrase.Words.Count > 0 && phrase.StartWordIndex <= previousPhraseEndWordIndex)
+        {
+            throw new ArgumentException("Compiled TPS phrases must be ordered by their canonical timeline.", nameof(words));
         }
 
-        var expectedWordCount = endWordIndex - startWordIndex + 1;
-        if (scopeWords.Count != expectedWordCount)
+        if (phrase.Words.Count > 0)
         {
-            throw new ArgumentException($"Compiled TPS {scope} '{ownerId}' words must match the canonical range they claim to cover.", parameterName);
-        }
-
-        if (startMs != canonicalWords[startWordIndex].StartMs || endMs != canonicalWords[endWordIndex].EndMs)
-        {
-            throw new ArgumentException($"Compiled TPS {scope} '{ownerId}' timestamps must match the canonical word range they claim to cover.", parameterName);
-        }
-
-        for (var offset = 0; offset < scopeWords.Count; offset++)
-        {
-            var expectedWord = canonicalWords[startWordIndex + offset];
-            var actualWord = scopeWords[offset];
-
-            if (!string.Equals(actualWord.Id, expectedWord.Id, StringComparison.Ordinal) ||
-                actualWord.Index != expectedWord.Index ||
-                actualWord.StartMs != expectedWord.StartMs ||
-                actualWord.EndMs != expectedWord.EndMs)
-            {
-                throw new ArgumentException($"Compiled TPS {scope} '{ownerId}' words must stay aligned with the canonical word timeline.", parameterName);
-            }
-
-            if (!string.Equals(actualWord.SegmentId, expectedSegmentId, StringComparison.Ordinal))
-            {
-                throw new ArgumentException($"Compiled TPS {scope} '{ownerId}' words must reference segment '{expectedSegmentId}'.", parameterName);
-            }
-
-            if (expectedBlockId is not null && !string.Equals(actualWord.BlockId, expectedBlockId, StringComparison.Ordinal))
-            {
-                throw new ArgumentException($"Compiled TPS {scope} '{ownerId}' words must reference block '{expectedBlockId}'.", parameterName);
-            }
-
-            if (expectedPhraseId is not null && !string.Equals(actualWord.PhraseId, expectedPhraseId, StringComparison.Ordinal))
-            {
-                throw new ArgumentException($"Compiled TPS {scope} '{ownerId}' words must reference phrase '{expectedPhraseId}'.", parameterName);
-            }
+            previousPhraseEndWordIndex = phrase.EndWordIndex;
         }
     }
 }

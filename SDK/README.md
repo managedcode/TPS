@@ -21,7 +21,7 @@ This folder is where TPS runtime implementations live. The goal is parity across
 - TPS compilation into a JSON-friendly state machine
 - player/runtime APIs for both deterministic sampling and live timed playback
 
-The TypeScript runtime is the canonical implementation. The JavaScript runtime is the consumer-facing built artifact of that source. The .NET, Flutter, Swift, and Java runtimes are independent implementations that are kept aligned through shared fixtures and parity tests.
+The `.NET` runtime is the canonical TPS implementation and source layout. TypeScript mirrors the same runtime contract as the canonical source runtime for web-focused development, and the JavaScript runtime is the consumer-facing built artifact of that TypeScript source. Flutter, Swift, and Java are independent implementations kept aligned through shared fixtures and parity tests.
 
 Compiled TPS output is meant to be portable. The active runtimes treat the compiled state machine as the shared transport format for `compile -> json -> restore -> play` flows.
 
@@ -29,9 +29,9 @@ The root [README.md](/Users/ksemenenko/Developer/TPS/README.md) is the canonical
 
 ## Workspace Layout
 
-- `ts/`: canonical TypeScript implementation
+- `ts/`: TypeScript runtime that mirrors the canonical .NET contract for web-oriented consumers
 - `js/`: generated JavaScript runtime, Node tests, and package metadata
-- `dotnet/`: .NET runtime, solution, and xUnit tests
+- `dotnet/`: canonical .NET runtime, solution, and xUnit tests
 - `flutter/`: Dart runtime for Flutter hosts
 - `swift/`: Swift runtime package
 - `java/`: Java runtime package
@@ -43,9 +43,9 @@ The root [README.md](/Users/ksemenenko/Developer/TPS/README.md) is the canonical
 
 | Folder | Purpose | Edit Here When | Main Commands |
 |--------|---------|----------------|---------------|
-| `SDK/ts` | canonical runtime source | changing TPS behavior or runtime contract | `npm --prefix SDK/js run build:tps`, `npm --prefix SDK/js run coverage:typescript` |
+| `SDK/ts` | TypeScript mirror of the canonical runtime contract | changing TPS behavior for TS/JS consumers | `npm --prefix SDK/js run build:tps`, `npm --prefix SDK/js run coverage:typescript` |
 | `SDK/js` | JavaScript package and Node validation | changing JS packaging or JS-specific tests | `npm --prefix SDK/js run test:js`, `npm --prefix SDK/js run coverage:js` |
-| `SDK/dotnet` | C# runtime and tests | changing .NET API or .NET behavior | `dotnet build SDK/dotnet/ManagedCode.Tps.slnx -warnaserror --no-restore`, `dotnet test SDK/dotnet/ManagedCode.Tps.slnx --no-restore` |
+| `SDK/dotnet` | canonical C# runtime and tests | changing the shared runtime contract, .NET API, or canonical behavior | `dotnet build SDK/dotnet/ManagedCode.Tps.slnx -warnaserror --no-restore`, `dotnet test SDK/dotnet/ManagedCode.Tps.slnx --no-restore` |
 | `SDK/flutter` | Dart runtime for Flutter hosts | changing Flutter/Dart behavior or tests | `cd SDK/flutter && dart pub get && ./coverage.sh` |
 | `SDK/swift` | Swift runtime package | changing Apple-platform runtime behavior or tests | `cd SDK/swift && ./coverage.sh` |
 | `SDK/java` | Java runtime package | changing Java behavior or tests | `cd SDK/java && ./coverage.sh` |
@@ -73,9 +73,7 @@ Across the active runtimes, the shared contract today includes:
 - timed playback via `TpsPlaybackSession`
 - compile-and-play embedding via `TpsStandalonePlayer`
 
-Archetype parsing, inheritance, and recommended-WPM defaults are part of the current parity contract.
-
-The advisory archetype-profile mismatch warnings and rhythm-analysis warnings described in the root spec are format-level guidance and are not yet enforced uniformly across every runtime.
+Archetype parsing, inheritance, recommended-WPM defaults, advisory archetype-profile mismatch warnings, and rhythm-analysis warnings are part of the current active-runtime contract and are covered by shared fixtures.
 
 ## Compiled Model
 

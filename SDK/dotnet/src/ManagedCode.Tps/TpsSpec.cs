@@ -1,6 +1,6 @@
 namespace ManagedCode.Tps;
 
-public static class TpsSpec
+public static partial class TpsSpec
 {
     public const int DefaultBaseWpm = 140;
     public const int MaximumWpm = 220;
@@ -13,6 +13,11 @@ public static class TpsSpec
     public const string ArchetypePrefix = "Archetype:";
     public const string SpeakerPrefix = "Speaker:";
     public const string WpmSuffix = "WPM";
+    public const int EnergyLevelMin = 1;
+    public const int EnergyLevelMax = 10;
+    public const int MelodyLevelMin = 1;
+    public const int MelodyLevelMax = 10;
+    public const int ArchetypeRhythmMinimumWords = 12;
 
     public static class EmotionNames
     {
@@ -141,6 +146,27 @@ public static class TpsSpec
         public const string Xslow = "xslow";
     }
 
+    public static class WordKinds
+    {
+        public const string Word = "word";
+        public const string Pause = "pause";
+        public const string Breath = "breath";
+        public const string EditPoint = "edit-point";
+    }
+
+    public static class Markers
+    {
+        public const string ClosingTagPrefix = "/";
+        public const char ShortPauseMarker = '/';
+        public const char TagArgumentSeparator = ':';
+        public const string MarkdownStrongScope = "__markdown-strong__";
+    }
+
+    public static class NumericComparisons
+    {
+        public const double SpeedMultiplierTolerance = 0.0001d;
+    }
+
     public static class DiagnosticCodes
     {
         public const string ArchetypeArticulationMismatch = "archetype-articulation-mismatch";
@@ -167,206 +193,4 @@ public static class TpsSpec
         public const string UnknownTag = "unknown-tag";
         public const string UnterminatedTag = "unterminated-tag";
     }
-
-    public static IReadOnlySet<string> WarningDiagnosticCodes { get; } =
-        new HashSet<string>(StringComparer.Ordinal)
-        {
-            DiagnosticCodes.InvalidHeaderParameter,
-            DiagnosticCodes.ArchetypeArticulationMismatch,
-            DiagnosticCodes.ArchetypeEnergyMismatch,
-            DiagnosticCodes.ArchetypeMelodyMismatch,
-            DiagnosticCodes.ArchetypeVolumeMismatch,
-            DiagnosticCodes.ArchetypeSpeedMismatch,
-            DiagnosticCodes.ArchetypeRhythmPhraseLength,
-            DiagnosticCodes.ArchetypeRhythmPauseFrequency,
-            DiagnosticCodes.ArchetypeRhythmPauseDuration,
-            DiagnosticCodes.ArchetypeRhythmEmphasisDensity,
-            DiagnosticCodes.ArchetypeRhythmSpeedVariation
-        };
-
-    public static IReadOnlyList<string> Emotions { get; } =
-    [
-        EmotionNames.Neutral,
-        EmotionNames.Warm,
-        EmotionNames.Professional,
-        EmotionNames.Focused,
-        EmotionNames.Concerned,
-        EmotionNames.Urgent,
-        EmotionNames.Motivational,
-        EmotionNames.Excited,
-        EmotionNames.Happy,
-        EmotionNames.Sad,
-        EmotionNames.Calm,
-        EmotionNames.Energetic
-    ];
-
-    public static IReadOnlyList<string> DeliveryModes { get; } =
-    [
-        Tags.Sarcasm,
-        Tags.Aside,
-        Tags.Rhetorical,
-        Tags.Building
-    ];
-
-    public static IReadOnlyList<string> VolumeLevels { get; } =
-    [
-        Tags.Loud,
-        Tags.Soft,
-        Tags.Whisper
-    ];
-
-    public static IReadOnlyList<string> RelativeSpeedTags { get; } =
-    [
-        Tags.Xslow,
-        Tags.Slow,
-        Tags.Fast,
-        Tags.Xfast,
-        Tags.Normal
-    ];
-
-    public static IReadOnlyList<string> EditPointPriorities { get; } =
-    [
-        EditPointPriorityNames.High,
-        EditPointPriorityNames.Medium,
-        EditPointPriorityNames.Low
-    ];
-
-    public static IReadOnlyList<string> ArticulationStyles { get; } = [Tags.Legato, Tags.Staccato];
-
-    public static class ArchetypeNames
-    {
-        public const string Friend = "friend";
-        public const string Motivator = "motivator";
-        public const string Educator = "educator";
-        public const string Coach = "coach";
-        public const string Storyteller = "storyteller";
-        public const string Entertainer = "entertainer";
-    }
-
-    public static IReadOnlyList<string> Archetypes { get; } =
-    [
-        ArchetypeNames.Friend,
-        ArchetypeNames.Motivator,
-        ArchetypeNames.Educator,
-        ArchetypeNames.Coach,
-        ArchetypeNames.Storyteller,
-        ArchetypeNames.Entertainer
-    ];
-
-    public static IReadOnlyDictionary<string, int> ArchetypeRecommendedWpm { get; } =
-        new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
-        {
-            [ArchetypeNames.Friend] = 135,
-            [ArchetypeNames.Motivator] = 155,
-            [ArchetypeNames.Educator] = 120,
-            [ArchetypeNames.Coach] = 145,
-            [ArchetypeNames.Storyteller] = 125,
-            [ArchetypeNames.Entertainer] = 150
-        };
-
-    public static class ArchetypeArticulationExpectations
-    {
-        public const string Flexible = "flexible";
-        public const string Legato = "legato";
-        public const string Neutral = "neutral";
-        public const string Staccato = "staccato";
-    }
-
-    public static class ArchetypeVolumeExpectations
-    {
-        public const string DefaultOnly = "default-only";
-        public const string Flexible = "flexible";
-        public const string LoudOnly = "loud-only";
-        public const string SoftOrDefault = "soft-or-default";
-    }
-
-    public static IReadOnlyDictionary<string, TpsArchetypeProfile> ArchetypeProfiles { get; } =
-        new Dictionary<string, TpsArchetypeProfile>(StringComparer.OrdinalIgnoreCase)
-        {
-            [ArchetypeNames.Friend] = new(ArchetypeArticulationExpectations.Legato, new NumericRange(4, 6), new NumericRange(6, 8), ArchetypeVolumeExpectations.SoftOrDefault, new NumericRange(125, 150)),
-            [ArchetypeNames.Motivator] = new(ArchetypeArticulationExpectations.Legato, new NumericRange(7, 10), new NumericRange(7, 9), ArchetypeVolumeExpectations.LoudOnly, new NumericRange(145, 170)),
-            [ArchetypeNames.Educator] = new(ArchetypeArticulationExpectations.Neutral, new NumericRange(3, 5), new NumericRange(2, 4), ArchetypeVolumeExpectations.DefaultOnly, new NumericRange(110, 135)),
-            [ArchetypeNames.Coach] = new(ArchetypeArticulationExpectations.Staccato, new NumericRange(7, 9), new NumericRange(1, 3), ArchetypeVolumeExpectations.LoudOnly, new NumericRange(135, 160)),
-            [ArchetypeNames.Storyteller] = new(ArchetypeArticulationExpectations.Flexible, new NumericRange(4, 7), new NumericRange(8, 10), ArchetypeVolumeExpectations.Flexible, new NumericRange(100, 150)),
-            [ArchetypeNames.Entertainer] = new(ArchetypeArticulationExpectations.Flexible, new NumericRange(6, 8), new NumericRange(7, 9), ArchetypeVolumeExpectations.Flexible, new NumericRange(140, 165))
-        };
-
-    public const int ArchetypeRhythmMinimumWords = 12;
-
-    public static IReadOnlyDictionary<string, TpsArchetypeRhythmProfile> ArchetypeRhythmProfiles { get; } =
-        new Dictionary<string, TpsArchetypeRhythmProfile>(StringComparer.OrdinalIgnoreCase)
-        {
-            [ArchetypeNames.Friend] = new(new NumericRange(8, 15), new NumericRange(4, 8), new NumericRange(300, 600), new NumericRange(3, 8), new NumericRange(0, 1)),
-            [ArchetypeNames.Motivator] = new(new NumericRange(8, 20), new NumericRange(3, 6), new NumericRange(600, 2000), new NumericRange(10, 20), new NumericRange(0, 2)),
-            [ArchetypeNames.Educator] = new(new NumericRange(10, 25), new NumericRange(6, 12), new NumericRange(400, 800), new NumericRange(3, 8), new NumericRange(0, 2)),
-            [ArchetypeNames.Coach] = new(new NumericRange(3, 8), new NumericRange(8, 15), new NumericRange(200, 400), new NumericRange(15, 30), new NumericRange(0, 2)),
-            [ArchetypeNames.Storyteller] = new(new NumericRange(5, 20), new NumericRange(4, 10), new NumericRange(500, 3000), new NumericRange(5, 12), new NumericRange(3, 6)),
-            [ArchetypeNames.Entertainer] = new(new NumericRange(5, 15), new NumericRange(5, 10), new NumericRange(300, 2000), new NumericRange(5, 15), new NumericRange(2, 4))
-        };
-
-    public const int EnergyLevelMin = 1;
-    public const int EnergyLevelMax = 10;
-    public const int MelodyLevelMin = 1;
-    public const int MelodyLevelMax = 10;
-
-    public static IReadOnlyDictionary<string, int> DefaultSpeedOffsets { get; } =
-        new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
-        {
-            [Tags.Xslow] = -40,
-            [Tags.Slow] = -20,
-            [Tags.Fast] = 25,
-            [Tags.Xfast] = 50
-        };
-
-    public static IReadOnlyDictionary<string, EmotionPalette> EmotionPalettes { get; } =
-        new Dictionary<string, EmotionPalette>(StringComparer.OrdinalIgnoreCase)
-        {
-            [EmotionNames.Neutral] = new(PaletteHex.AccentBlue, PaletteHex.TextSlate900, PaletteHex.BackgroundBlue400),
-            [EmotionNames.Warm] = new(PaletteHex.AccentOrange600, PaletteHex.TextStone900, PaletteHex.BackgroundOrange300),
-            [EmotionNames.Professional] = new(PaletteHex.AccentBlue700, PaletteHex.TextSlate900, PaletteHex.BackgroundBlue300),
-            [EmotionNames.Focused] = new(PaletteHex.AccentGreen700, PaletteHex.TextGreen950, PaletteHex.BackgroundGreen300),
-            [EmotionNames.Concerned] = new(PaletteHex.AccentRed700, PaletteHex.TextRose950, PaletteHex.BackgroundRed300),
-            [EmotionNames.Urgent] = new(PaletteHex.AccentRed600, PaletteHex.TextWhiteRose, PaletteHex.BackgroundRed300),
-            [EmotionNames.Motivational] = new(PaletteHex.AccentViolet600, PaletteHex.TextWhite, PaletteHex.BackgroundViolet300),
-            [EmotionNames.Excited] = new(PaletteHex.AccentPink600, PaletteHex.TextWhitePink, PaletteHex.BackgroundPink300),
-            [EmotionNames.Happy] = new(PaletteHex.AccentAmber600, PaletteHex.TextStone900, PaletteHex.BackgroundAmber300),
-            [EmotionNames.Sad] = new(PaletteHex.AccentIndigo600, PaletteHex.TextIndigo50, PaletteHex.BackgroundIndigo300),
-            [EmotionNames.Calm] = new(PaletteHex.AccentTeal700, PaletteHex.TextTeal50, PaletteHex.BackgroundTeal200),
-            [EmotionNames.Energetic] = new(PaletteHex.AccentOrange700, PaletteHex.TextOrange50, PaletteHex.BackgroundOrange300)
-        };
-
-    public static IReadOnlyDictionary<string, string> EmotionHeadCues { get; } =
-        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            [EmotionNames.Neutral] = HeadCueCodes.H0,
-            [EmotionNames.Calm] = HeadCueCodes.H0,
-            [EmotionNames.Professional] = HeadCueCodes.H9,
-            [EmotionNames.Focused] = HeadCueCodes.H5,
-            [EmotionNames.Motivational] = HeadCueCodes.H9,
-            [EmotionNames.Urgent] = HeadCueCodes.H4,
-            [EmotionNames.Concerned] = HeadCueCodes.H1,
-            [EmotionNames.Sad] = HeadCueCodes.H1,
-            [EmotionNames.Warm] = HeadCueCodes.H7,
-            [EmotionNames.Happy] = HeadCueCodes.H6,
-            [EmotionNames.Excited] = HeadCueCodes.H6,
-            [EmotionNames.Energetic] = HeadCueCodes.H8
-        };
 }
-
-public sealed record EmotionPalette(string Accent, string Text, string Background);
-
-public sealed record NumericRange(int Min, int Max);
-
-public sealed record TpsArchetypeProfile(
-    string Articulation,
-    NumericRange Energy,
-    NumericRange Melody,
-    string Volume,
-    NumericRange Speed);
-
-public sealed record TpsArchetypeRhythmProfile(
-    NumericRange PhraseLength,
-    NumericRange PauseFrequencyPer100Words,
-    NumericRange AveragePauseDurationMs,
-    NumericRange EmphasisDensityPercent,
-    NumericRange SpeedVariationPer100Words);

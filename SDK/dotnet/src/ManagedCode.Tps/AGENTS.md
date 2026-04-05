@@ -67,10 +67,8 @@ For this .NET project:
 - Do not place test helpers or test-only code in this project.
 - Prefer small, composable types over large utility buckets.
 - Do not add new TPS catalog literals inline when the value is part of the public runtime contract; expose and reuse named constants instead.
+- Treat the .NET runtime module layout as the canonical source structure that the other SDKs should mirror where practical.
 
 ## Exception Record
 
-- Size exception:
-  - scope: `TpsPlaybackSession.cs`, `Internal/TpsContentCompiler.cs`, `Internal/TpsParser.cs`, `Models/Contracts.cs`
-  - reason: these files still concentrate the parity-first .NET implementation of the runtime contract
-  - removal plan: split playback transition/publish code, parser header/front-matter code, content-scope handling, and transport contracts into smaller cohesive types
+- No active size exceptions in `src/ManagedCode.Tps`.

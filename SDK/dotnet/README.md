@@ -9,7 +9,7 @@ Package identity: `ManagedCode.Tps`
 
 ## What This Project Is
 
-`SDK/dotnet` is the C# implementation of the TPS runtime. It provides the same functional surface as the active TypeScript/JavaScript SDKs, but as a native .NET library under the `ManagedCode.Tps` namespace.
+`SDK/dotnet` is the canonical C# implementation of the TPS runtime. It defines the reference module layout and runtime behavior that the other SDKs mirror where practical, while still shipping as a native .NET library under the `ManagedCode.Tps` namespace.
 
 This is the project to change when the .NET API, serialization behavior, or .NET runtime semantics need to evolve.
 
@@ -35,6 +35,13 @@ This is the project to change when the .NET API, serialization behavior, or .NET
 ## Project Layout
 
 - `src/ManagedCode.Tps/`: runtime implementation
+- `src/ManagedCode.Tps/TpsSpec*.cs`: public constants, tags, palettes, and archetype catalogs
+- `src/ManagedCode.Tps/Models/*Contracts.cs`: public JSON/runtime models
+- `src/ManagedCode.Tps/Internal/TpsParser*.cs`: parser pipeline split by responsibility
+- `src/ManagedCode.Tps/Internal/TpsContentCompiler*.cs`: compiler pipeline split by responsibility
+- `src/ManagedCode.Tps/Internal/TpsArchetypeAnalyzer*.cs`: advisory archetype diagnostics
+- `src/ManagedCode.Tps/TpsRuntime*.cs`: compile pipeline and state-machine assembly
+- `src/ManagedCode.Tps/TpsPlaybackSession*.cs`: playback transport, loop, and event dispatch
 - `tests/ManagedCode.Tps.Tests/`: xUnit coverage and parity tests
 
 ## Technical Scope
@@ -52,7 +59,7 @@ This is the project to change when the .NET API, serialization behavior, or .NET
 ## How To Work With This Project
 
 1. Update `src/ManagedCode.Tps/` for runtime or API changes.
-2. Keep behavior aligned with the active TPS contract used by the TS/JS SDKs.
+2. Treat this runtime as the canonical contract and keep the other SDKs aligned with behavior changes made here.
 3. Run build, tests, and coverage checks after changes.
 4. Keep example snapshot parity with the shared fixtures under `SDK/fixtures/examples`.
 5. Keep the canonical compiled JSON transport fixture under `SDK/fixtures/transport` aligned with the runtime serializer.
