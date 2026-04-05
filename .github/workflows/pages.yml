@@ -35,7 +35,7 @@ jobs:
           cache: npm
 
       - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Install dependencies
         run: npm ci
@@ -43,10 +43,17 @@ jobs:
       - name: Build site
         run: npm run build:site
 
+      - name: Package Pages artifact
+        run: |
+          tar --directory dist -cvf github-pages.tar .
+          gzip -f github-pages.tar
+
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          path: ./dist
+          name: github-pages
+          path: ./github-pages.tar.gz
+          retention-days: 1
 
   deploy:
     if: github.event_name != 'pull_request'
@@ -58,4 +65,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
