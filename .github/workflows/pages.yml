@@ -43,17 +43,10 @@ jobs:
       - name: Build site
         run: npm run build:site
 
-      - name: Package Pages artifact
-        run: |
-          tar --directory dist -cvf github-pages.tar .
-          gzip -f github-pages.tar
-
       - name: Upload Pages artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-pages-artifact@v4
         with:
-          name: github-pages
-          path: ./github-pages.tar.gz
-          retention-days: 1
+          path: ./dist
 
   deploy:
     if: github.event_name != 'pull_request'
