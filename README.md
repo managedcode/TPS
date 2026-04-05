@@ -424,11 +424,13 @@ Two — update the docs. //
 Three — notify the team.[/loud][/melody][/energy][/staccato]
 ```
 
-A **vocal archetype** defines a composite delivery persona for a segment or block. The concept originates from [Vinh Giang's](https://www.vinhgiang.com/) vocal communication framework — the idea that skilled speakers move between distinct delivery modes depending on their **communicative intent**: connect, inspire, inform, or instruct. Giang describes four core archetypes (Friend, Motivator, Educator, Coach), each with distinct rate, volume, articulation, and energy patterns ([LinkedIn](https://www.linkedin.com/posts/vinhgiang_what-are-vocal-archetypes-activity-7095585018655223808-4rnD), [Facebook](https://www.facebook.com/askvinh/videos/vocal-archetypes/404161770260317/)).
+A **vocal archetype** defines the overall delivery persona for a segment or block.
 
-The underlying vocal mechanics — pitch, pace, tone, melody, volume — align with [Roger Love's](https://rogerlove.com/) 5 Building Blocks of Voice framework ([rogerlove.com](https://rogerlove.com/how-to-use-your-voice-more-effectively/)), which provides the measurable parameters that TPS encodes as inline tags.
+TPS uses the idea from [Vinh Giang](https://www.vinhgiang.com/)'s vocal communication framework: strong speakers switch delivery style based on **communicative intent**. In practice that means moving between modes such as connecting, inspiring, informing, or instructing. Giang describes four core archetypes: Friend, Motivator, Educator, and Coach. See his archetype explanations on [LinkedIn](https://www.linkedin.com/posts/vinhgiang_what-are-vocal-archetypes-activity-7095585018655223808-4rnD) and [Facebook](https://www.facebook.com/askvinh/videos/vocal-archetypes/404161770260317/).
 
-TPS extends Giang's original four archetypes with two additional delivery personas (Storyteller, Entertainer) commonly used in broadcast and voiceover coaching.
+TPS maps those personas onto measurable vocal controls using [Roger Love](https://rogerlove.com/)'s 5 Building Blocks of Voice framework: pitch, pace, tone, melody, and volume. See [How to Use Your Voice More Effectively](https://rogerlove.com/how-to-use-your-voice-more-effectively/) for the underlying vocal mechanics that TPS encodes through inline tags and playback metadata.
+
+TPS extends Giang's original set with two extra delivery personas used frequently in broadcast and voiceover coaching: Storyteller and Entertainer.
 
 The `Archetype:Name` parameter is added to segment or block headers using the same `|`-separated syntax. The parser identifies it by the `Archetype:` prefix.
 

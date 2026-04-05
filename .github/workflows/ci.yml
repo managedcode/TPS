@@ -1,4 +1,4 @@
-name: CI
+name: SDK CI
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -10,29 +10,55 @@ on:
       - master
       - "codex/**"
   pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: sdk-ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  runtime-matrix:
-    name: Runtime Matrix
+  prepare:
+    name: Prepare Matrices
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.matrix.outputs.matrix }}
+      runtime_matrix: ${{ steps.runtime-matrix.outputs.matrix }}
+      coverage_matrix: ${{ steps.coverage-matrix.outputs.matrix }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: 22
-      - id: matrix
+      - id: runtime-matrix
         run: echo "matrix=$(node SDK/scripts/runtime-matrix.mjs --compact)" >> "$GITHUB_OUTPUT"
+      - id: coverage-matrix
+        run: echo "matrix=$(node SDK/scripts/runtime-matrix.mjs --coverage --compact)" >> "$GITHUB_OUTPUT"
+
+  quality:
+    name: Quality Gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+      - run: npm ci
+      - run: npm ci --prefix SDK/js
+      - run: dotnet restore SDK/dotnet/ManagedCode.Tps.slnx
+      - run: npm run build:site
+      - run: dotnet format SDK/dotnet/ManagedCode.Tps.slnx --verify-no-changes
+      - run: dotnet build SDK/dotnet/ManagedCode.Tps.slnx -c Release -warnaserror --no-restore
 
   runtimes:
     name: Runtime ${{ matrix.runtime.language }}
-    needs: runtime-matrix
+    needs: prepare
     runs-on: ${{ matrix.runtime.runner }}
     strategy:
       fail-fast: false
       matrix:
-        runtime: ${{ fromJson(needs.runtime-matrix.outputs.matrix) }}
+        runtime: ${{ fromJson(needs.prepare.outputs.runtime_matrix) }}
     steps:
       - uses: actions/checkout@v6
       - if: matrix.runtime.setup == 'node' || matrix.runtime.setup == 'dotnet'
@@ -57,21 +83,46 @@ jobs:
       - run: ${{ matrix.runtime.build }}
       - run: ${{ matrix.runtime.test }}
 
-  quality:
-    name: Quality
-    runs-on: ubuntu-latest
+  coverage:
+    name: Coverage ${{ matrix.runtime.language }}
+    needs: prepare
+    runs-on: ${{ matrix.runtime.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: ${{ fromJson(needs.prepare.outputs.coverage_matrix) }}
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - if: matrix.runtime.setup == 'node' || matrix.runtime.setup == 'dotnet'
+        uses: actions/setup-node@v6
         with:
           node-version: 22
-      - uses: actions/setup-dotnet@v5
+      - if: matrix.runtime.setup == 'dotnet'
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
-      - run: npm ci
-      - run: npm ci --prefix SDK/js
-      - run: dotnet restore SDK/dotnet/ManagedCode.Tps.slnx
-      - run: npm run build:site
-      - run: dotnet format SDK/dotnet/ManagedCode.Tps.slnx --verify-no-changes
-      - run: dotnet build SDK/dotnet/ManagedCode.Tps.slnx -warnaserror --no-restore
-      - run: dotnet test SDK/dotnet/ManagedCode.Tps.slnx --no-build --no-restore
+      - if: matrix.runtime.setup == 'dart'
+        uses: dart-lang/setup-dart@v1
+      - if: matrix.runtime.setup == 'java'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - if: matrix.runtime.setup == 'node'
+        run: npm ci --prefix SDK/js
+      - if: matrix.runtime.setup == 'dotnet'
+        run: dotnet restore SDK/dotnet/ManagedCode.Tps.slnx
+      - run: ${{ matrix.runtime.build }}
+      - run: ${{ matrix.runtime.coverage }}
+      - name: Coverage Policy
+        run: |
+          {
+            echo "## Coverage Policy"
+            echo ""
+            echo "- TypeScript: minimum 90% statements, branches, functions, and lines"
+            echo "- JavaScript: minimum 90% statements, branches, functions, and lines"
+            echo "- C#: minimum 90% line, branch, and method coverage"
+            echo "- Flutter: minimum 90% line coverage for SDK source files"
+            echo "- Swift: minimum 90% line coverage for SDK source files"
+            echo "- Java: minimum 90% line coverage for SDK source files"
+          } >> "$GITHUB_STEP_SUMMARY"

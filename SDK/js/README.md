@@ -1,7 +1,6 @@
 # ManagedCode.Tps JavaScript SDK
 
-[![SDK JavaScript](https://github.com/managedcode/TPS/actions/workflows/sdk-javascript.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-javascript.yml)
-[![SDK JavaScript Coverage](https://github.com/managedcode/TPS/actions/workflows/sdk-javascript-coverage.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-javascript-coverage.yml)
+[![SDK CI](https://github.com/managedcode/TPS/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/ci.yml)
 
 This folder exposes the JavaScript-consumable TPS runtime built from the TypeScript source.
 

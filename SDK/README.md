@@ -1,13 +1,15 @@
 # ManagedCode.Tps SDK
 
-| Runtime | Status | Build/Test | Coverage |
-|---------|--------|------------|----------|
-| TypeScript | Active | [![SDK TypeScript](https://github.com/managedcode/TPS/actions/workflows/sdk-typescript.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-typescript.yml) | [![SDK TypeScript Coverage](https://github.com/managedcode/TPS/actions/workflows/sdk-typescript-coverage.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-typescript-coverage.yml) |
-| JavaScript | Active | [![SDK JavaScript](https://github.com/managedcode/TPS/actions/workflows/sdk-javascript.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-javascript.yml) | [![SDK JavaScript Coverage](https://github.com/managedcode/TPS/actions/workflows/sdk-javascript-coverage.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-javascript-coverage.yml) |
-| C# | Active | [![SDK CSharp](https://github.com/managedcode/TPS/actions/workflows/sdk-dotnet.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-dotnet.yml) | [![SDK CSharp Coverage](https://github.com/managedcode/TPS/actions/workflows/sdk-dotnet-coverage.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-dotnet-coverage.yml) |
-| Flutter | Active | [![SDK Flutter](https://github.com/managedcode/TPS/actions/workflows/sdk-flutter.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-flutter.yml) | [![SDK Flutter Coverage](https://github.com/managedcode/TPS/actions/workflows/sdk-flutter-coverage.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-flutter-coverage.yml) |
-| Swift | Active | [![SDK Swift](https://github.com/managedcode/TPS/actions/workflows/sdk-swift.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-swift.yml) | [![SDK Swift Coverage](https://github.com/managedcode/TPS/actions/workflows/sdk-swift-coverage.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-swift-coverage.yml) |
-| Java | Active | [![SDK Java](https://github.com/managedcode/TPS/actions/workflows/sdk-java.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-java.yml) | [![SDK Java Coverage](https://github.com/managedcode/TPS/actions/workflows/sdk-java-coverage.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-java-coverage.yml) |
+[![SDK CI](https://github.com/managedcode/TPS/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/ci.yml)
+
+| Runtime | Status | Verification |
+|---------|--------|--------------|
+| TypeScript | Active | Shared `SDK CI` runtime and coverage stages |
+| JavaScript | Active | Shared `SDK CI` runtime and coverage stages |
+| C# | Active | Shared `SDK CI` runtime and coverage stages |
+| Flutter | Active | Shared `SDK CI` runtime and coverage stages |
+| Swift | Active | Shared `SDK CI` runtime and coverage stages |
+| Java | Active | Shared `SDK CI` runtime and coverage stages |
 
 `SDK/` is the multi-runtime workspace for `ManagedCode.Tps`.
 
@@ -152,17 +154,6 @@ Regenerate them with:
 
 ## GitHub Workflows
 
-- `.github/workflows/ci.yml`: repo-wide build/test matrix
-- `.github/workflows/coverage.yml`: repo-wide coverage matrix
-- `.github/workflows/sdk-typescript.yml`: TypeScript build and typecheck badge target
-- `.github/workflows/sdk-typescript-coverage.yml`: TypeScript coverage badge target
-- `.github/workflows/sdk-javascript.yml`: JavaScript build/test badge target
-- `.github/workflows/sdk-javascript-coverage.yml`: JavaScript coverage badge target
-- `.github/workflows/sdk-dotnet.yml`: C# build/test badge target
-- `.github/workflows/sdk-dotnet-coverage.yml`: C# coverage badge target
-- `.github/workflows/sdk-flutter.yml`: Flutter build/test badge target
-- `.github/workflows/sdk-flutter-coverage.yml`: Flutter coverage badge target
-- `.github/workflows/sdk-swift.yml`: Swift build/test badge target
-- `.github/workflows/sdk-swift-coverage.yml`: Swift coverage badge target
-- `.github/workflows/sdk-java.yml`: Java build/test badge target
-- `.github/workflows/sdk-java-coverage.yml`: Java coverage badge target
+- `.github/workflows/ci.yml`: compact SDK workflow with quality, runtime build/test, and coverage stages
+- `.github/workflows/pages.yml`: static site publishing
+- `.github/workflows/release.yml`: version-tagged GitHub releases

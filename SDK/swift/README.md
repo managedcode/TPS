@@ -1,7 +1,6 @@
 # ManagedCode.Tps Swift SDK
 
-[![SDK Swift](https://github.com/managedcode/TPS/actions/workflows/sdk-swift.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-swift.yml)
-[![SDK Swift Coverage](https://github.com/managedcode/TPS/actions/workflows/sdk-swift-coverage.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-swift-coverage.yml)
+[![SDK CI](https://github.com/managedcode/TPS/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/ci.yml)
 
 This folder contains the Swift TPS runtime package.
 

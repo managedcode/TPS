@@ -1,7 +1,6 @@
 # ManagedCode.Tps TypeScript SDK
 
-[![SDK TypeScript](https://github.com/managedcode/TPS/actions/workflows/sdk-typescript.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-typescript.yml)
-[![SDK TypeScript Coverage](https://github.com/managedcode/TPS/actions/workflows/sdk-typescript-coverage.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-typescript-coverage.yml)
+[![SDK CI](https://github.com/managedcode/TPS/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/ci.yml)
 
 This folder contains the canonical TPS implementation.
 

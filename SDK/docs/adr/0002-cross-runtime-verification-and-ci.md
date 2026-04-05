@@ -16,30 +16,32 @@ The user also requires:
 
 ## Decision
 
-We verify TPS runtimes from manifest-driven matrices and split GitHub automation into separate build/test and coverage pipelines.
+We verify TPS runtimes from manifest-driven matrices and keep GitHub automation compact around one staged SDK workflow plus separate Pages and Release workflows.
 
 ### Runtime Verification Rules
 
 - TypeScript verifies the typed public contract.
 - JavaScript verifies the built artifact and enforces at least 90% coverage with `c8`.
 - C# verifies the .NET runtime and enforces at least 90% line, branch, and method coverage with `coverlet.msbuild`.
+- Flutter verifies the Dart runtime and enforces at least 90% line coverage.
+- Swift verifies the Swift runtime and enforces at least 90% line coverage.
+- Java verifies the JVM runtime and enforces at least 90% line coverage.
 
 ### CI Orchestration
 
 - `SDK/manifest.json` is the source of truth for enabled runtimes.
 - `SDK/scripts/runtime-matrix.mjs` converts the manifest into the GitHub Actions matrices.
-- `.github/workflows/ci.yml` runs build and test checks.
-- `.github/workflows/coverage.yml` runs the separate coverage pipeline and enforces the `>= 90%` threshold.
-- Disabled future runtimes stay documented but do not participate in CI until implemented.
+- `.github/workflows/ci.yml` runs quality, build/test, and coverage stages from one workflow.
+- Future runtimes stay manifest-driven and can join CI without redesigning the workflow.
 
 ## Consequences
 
 ### Positive
 
 - runtime enablement is declarative
-- adding Flutter, Swift, or Java later does not require redesigning CI
+- adding more runtimes later does not require redesigning CI
 - shared fixtures keep behavior parity testable across runtimes
-- the C# and JS runtimes have hard coverage gates rather than best-effort reporting
+- active runtimes keep hard coverage gates rather than best-effort reporting
 
 ### Negative
 
@@ -52,15 +54,12 @@ We verify TPS runtimes from manifest-driven matrices and split GitHub automation
 flowchart LR
   Manifest["SDK/manifest.json"] --> Matrix["runtime-matrix.mjs"]
   Matrix --> CI["ci.yml"]
-  Matrix --> Coverage["coverage.yml"]
   Fixtures["SDK/fixtures"] --> TS["TypeScript checks"]
   Fixtures --> JS["JavaScript coverage"]
   Fixtures --> CS["dotnet coverage"]
   CI --> TS
   CI --> JS
   CI --> CS
-  Coverage --> JS
-  Coverage --> CS
 ```
 
 ## Follow-up

@@ -1694,14 +1694,29 @@ function buildSkillsPage(css) {
         </table>
 
         <h2>What the Skill Does</h2>
-        <p>The <code>tps-convert</code> skill teaches your AI assistant the <strong>complete TPS format specification</strong>, including every tag, attribute, and formatting rule. When you give it plain text, the AI will:</p>
+        <p>The <code>tps-convert</code> skill teaches your AI assistant the <strong>complete TPS format specification</strong>, including every tag, attribute, formatting rule, and delivery heuristic used by the SDK.</p>
+        <p>It is not just a formatter. It is meant to take raw prose, analyze how it should be spoken, and then emit a ready-to-use TPS file with structure, pacing, emotional intent, and authoring metadata already filled in.</p>
         <ol>
-          <li><strong>Analyze</strong> the text for tone, emotional arcs, key moments, and natural structure</li>
-          <li><strong>Structure</strong> the text into TPS segments and blocks based on topic and mood shifts</li>
-          <li><strong>Apply</strong> the full TPS tag vocabulary: 12 emotions, 5 speed presets, 3 volume levels, 4 delivery modes, emphasis, highlights, pauses, breath marks, edit points, pronunciation guides, stress markers, and speaker assignments</li>
-          <li><strong>Generate</strong> complete front matter with metadata, duration estimation, and speed offsets</li>
-          <li><strong>Output</strong> a valid <code>.tps</code> file ready for any TPS-compatible teleprompter</li>
+          <li><strong>Read plain text or a file path</strong> and treat speeches, presentations, narrations, blogs, articles, dialogue, and voiceover copy as valid inputs</li>
+          <li><strong>Honor extra direction</strong> such as target duration, tone override, archetype preference, and intended audience</li>
+          <li><strong>Analyze delivery intent</strong> for emotional arc, key beats, transitions, pacing changes, and likely speaker structure</li>
+          <li><strong>Choose TPS structure</strong> with front matter, title, segments, blocks, and leading text where the source naturally needs them</li>
+          <li><strong>Apply the full TPS authoring vocabulary</strong> including emotions, speed presets and explicit WPM tags, volume, delivery modes, emphasis, highlight, pauses, breath marks, edit points, pronunciation, stress markers, articulation, energy, melody, speaker assignments, and archetypes</li>
+          <li><strong>Generate useful metadata</strong> such as duration, base WPM, speed offsets, profile, authoring version, and other front matter fields when they make sense</li>
+          <li><strong>Preserve literal text safely</strong> by using TPS escape sequences when brackets, slashes, pipes, or markdown markers must stay literal</li>
+          <li><strong>Output one valid <code>.tps</code> document</strong> that is ready for the TPS SDK and TPS-compatible teleprompters without requiring manual post-formatting</li>
         </ol>
+
+        <h2>Expected Output Shape</h2>
+        <p>A good conversion should usually produce:</p>
+        <ul>
+          <li>complete YAML front matter</li>
+          <li>a display title with <code>#</code></li>
+          <li><code>##</code> segment headers with emotion, WPM, timing, speaker, or archetype hints where appropriate</li>
+          <li><code>###</code> block headers when the text shifts topic, mood, or speaker</li>
+          <li>inline delivery tags placed only where they improve how the script is spoken</li>
+          <li>a final TPS file that passes SDK validation instead of an approximate markdown sketch</li>
+        </ul>
 
         <h2>Installation</h2>
 
@@ -1711,16 +1726,18 @@ function buildSkillsPage(css) {
 curl -o .claude/skills/tps-convert.md ${skillRawUrl}</code></pre>
         <p>Then use <code>/tps-convert</code> in Claude Code followed by your text or a file path.</p>
 
-        <h3>ChatGPT / Custom GPTs</h3>
-        <p>Copy the contents of <a href="${skillFileUrl}" target="_blank" rel="noopener">tps-convert.md</a> and paste it into the <strong>Instructions</strong> field of your Custom GPT or into the system prompt of your ChatGPT conversation. The skill contains the complete TPS format specification, so the AI will know how to format scripts correctly.</p>
+        <h3>Codex</h3>
+        <p>Install the same skill as a standard repo-local Codex skill:</p>
+        <pre><code>mkdir -p .codex/skills/tps-convert
+curl -o .codex/skills/tps-convert/SKILL.md ${skillRawUrl}</code></pre>
 
-        <h3>Cursor / Windsurf / Other AI IDEs</h3>
-        <p>Add the skill file to your project&rsquo;s rules or custom instructions:</p>
-        <ul>
-          <li><strong>Cursor</strong> &mdash; copy to <code>.cursor/rules/</code> or add as a project rule</li>
-          <li><strong>Windsurf</strong> &mdash; add to <code>.windsurfrules</code> or project instructions</li>
-          <li><strong>Other tools</strong> &mdash; use the skill contents as a system prompt or custom instruction</li>
-        </ul>
+        <h3>GitHub Copilot</h3>
+        <p>Store the skill as a reusable repository prompt:</p>
+        <pre><code>mkdir -p .github/prompts
+curl -o .github/prompts/tps-convert.prompt.md ${skillRawUrl}</code></pre>
+
+        <h3>Other AI assistants</h3>
+        <p>Use the contents of <a href="${skillFileUrl}" target="_blank" rel="noopener">tps-convert.md</a> as a system prompt, project instruction, or custom rule. That covers ChatGPT, Cursor, Windsurf, and other LLM-powered editors.</p>
 
         <h3>Download</h3>
         <p>

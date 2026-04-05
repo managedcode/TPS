@@ -1,7 +1,6 @@
 # ManagedCode.Tps Flutter SDK
 
-[![SDK Flutter](https://github.com/managedcode/TPS/actions/workflows/sdk-flutter.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-flutter.yml)
-[![SDK Flutter Coverage](https://github.com/managedcode/TPS/actions/workflows/sdk-flutter-coverage.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-flutter-coverage.yml)
+[![SDK CI](https://github.com/managedcode/TPS/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/ci.yml)
 
 This folder contains the Dart runtime intended for Flutter hosts.
 

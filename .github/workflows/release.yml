@@ -7,12 +7,14 @@ on:
   push:
     branches:
       - main
-    paths:
-      - VERSION
   workflow_dispatch:
 
 permissions:
   contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   release:
@@ -48,6 +50,23 @@ jobs:
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Check whether the tag already exists
+        id: tag
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/${{ steps.version.outputs.tag }}" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create and push version tag
+        if: steps.tag.outputs.exists != 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "${{ steps.version.outputs.tag }}" "$GITHUB_SHA"
+          git push origin "refs/tags/${{ steps.version.outputs.tag }}"
+
       - name: Create GitHub release
         if: steps.existing.outputs.exists != 'true'
         env:
@@ -56,8 +75,8 @@ jobs:
           for attempt in 1 2 3; do
             if gh release create "${{ steps.version.outputs.tag }}" \
               --repo "$GITHUB_REPOSITORY" \
-              --target "$GITHUB_SHA" \
               --title "TPS ${{ steps.version.outputs.tag }}" \
+              --verify-tag \
               --generate-notes; then
               exit 0
             fi

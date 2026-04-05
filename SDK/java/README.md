@@ -1,7 +1,6 @@
 # ManagedCode.Tps Java SDK
 
-[![SDK Java](https://github.com/managedcode/TPS/actions/workflows/sdk-java.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-java.yml)
-[![SDK Java Coverage](https://github.com/managedcode/TPS/actions/workflows/sdk-java-coverage.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/sdk-java-coverage.yml)
+[![SDK CI](https://github.com/managedcode/TPS/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/managedcode/TPS/actions/workflows/ci.yml)
 
 This folder contains the Java TPS runtime.
 

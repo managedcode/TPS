@@ -149,9 +149,10 @@ List only the skills this repository should actively use.
 - Durable repository documentation lives in `docs/`.
 - SDK-specific architecture, ADRs, and language rollout docs live in `SDK/docs/`.
 - Runtime-facing usage docs live in `SDK/README.md` and `SDK/<Language>/README.md`.
-- GitHub Actions pipelines are split by concern:
-  - `.github/workflows/ci.yml` for build/test
-  - `.github/workflows/coverage.yml` for coverage gates
+- GitHub Actions workflows stay compact by delivery surface:
+  - `.github/workflows/ci.yml` for SDK quality, runtime build/test, and coverage stages
+  - `.github/workflows/pages.yml` for site publishing
+  - `.github/workflows/release.yml` for versioned GitHub releases
 - `docs/Architecture.md` is the global architecture map for this repository.
 - Architecture docs, feature docs, and ADRs must include Mermaid diagrams when they describe non-trivial structure or flow.
 - Keep one canonical source of truth for each important fact and link rather than duplicating.
