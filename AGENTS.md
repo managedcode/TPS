@@ -149,6 +149,13 @@ List only the skills this repository should actively use.
 - Durable repository documentation lives in `docs/`.
 - SDK-specific architecture, ADRs, and language rollout docs live in `SDK/docs/`.
 - Runtime-facing usage docs live in `SDK/README.md` and `SDK/<Language>/README.md`.
+- Site pages must be generated from canonical checked-in source documents instead of hand-maintained duplicated prose inside the site builder.
+- Preferred source mapping:
+  - `/` from `README.md`
+  - `/glossary/` from `docs/Glossary.md`
+  - `/sdk/` from `SDK/README.md` plus `SDK/manifest.json`
+  - `/skills/` from `README.md` AI Skills content and the canonical files under `Skills/`
+- If a page needs copy that does not fit an existing source document, add a dedicated versioned markdown source file first and generate from that file.
 - GitHub Actions workflows stay compact by delivery surface:
   - `.github/workflows/ci.yml` for SDK quality, runtime build/test, and coverage stages
   - `.github/workflows/pages.yml` for site publishing

@@ -43,8 +43,16 @@ It is intended to be complete for the current TPS specification, including headi
 | **Breath Mark** | A `[breath]` marker that indicates a natural breathing point without adding display time. |
 | **Emotion** | A named delivery profile such as `warm`, `urgent`, or `focused`. |
 | **Emotion Preset** | A predefined emotion value recognized by the TPS validator and compiler. |
+| **Vocal Archetype** | A composite delivery persona such as `Friend`, `Motivator`, `Educator`, `Coach`, `Storyteller`, or `Entertainer`. |
+| **Archetype Profile** | The expected delivery ranges attached to a vocal archetype, including speed, articulation, energy, melody, and volume tendencies. |
 | **Emphasis** | A visual and delivery emphasis span created by tags such as `[emphasis]`, `*text*`, or `**text**`. |
 | **Highlight** | A presentation tag such as `[highlight]...[/highlight]` that increases visual prominence without changing timing. |
+| **Articulation** | The way words connect during delivery, expressed in TPS as styles such as `legato` or `staccato`. |
+| **Articulation Tag** | An inline tag such as `[legato]...[/legato]` or `[staccato]...[/staccato]`. |
+| **Energy** | A delivery intensity level on the TPS 1–10 scale. |
+| **Energy Tag** | An inline tag such as `[energy:7]...[/energy]` that sets energy level for a span. |
+| **Melody** | A pitch-variation or inflection level on the TPS 1–10 scale. |
+| **Melody Tag** | An inline tag such as `[melody:8]...[/melody]` that sets melodic contour for a span. |
 | **Volume Level** | A loudness modifier such as `loud`, `soft`, or `whisper`. |
 | **Volume Tag** | An inline tag that applies a volume level to a span of text. |
 | **Delivery Mode** | A delivery-shaping tag such as `aside`, `rhetorical`, `sarcasm`, or `building`. |
@@ -74,6 +82,9 @@ It is intended to be complete for the current TPS specification, including headi
 | **Unknown Tag** | An inline tag that is not part of the TPS contract and should be reported by validation logic. |
 | **Malformed Tag** | A tag-like construct with invalid syntax, for example a broken closing tag or invalid pause payload. |
 | **Unknown Header Token** | A segment or block header parameter that is not recognized as name, speed, emotion, timing, or speaker. |
+| **Unknown Archetype** | A header `Archetype:Name` value that is not part of the closed TPS archetype set. |
+| **Archetype Warning** | A non-fatal validation result emitted when inline delivery tags conflict with the expected profile of an archetype. |
+| **Rhythm Analysis Warning** | A non-fatal validation result emitted when phrase length, pause density, emphasis density, or speed variation diverge from an archetype’s expected rhythm profile. |
 
 ## Compiler And Player Terms
 
@@ -84,9 +95,13 @@ It is intended to be complete for the current TPS specification, including headi
 | **Parser** | The TPS component that turns markdown TPS text into a structured document model. |
 | **Compiler** | The TPS component that converts a parsed document into a timed, JSON-friendly playback model. |
 | **Compiled Script** | The full compiled output containing metadata, segments, blocks, phrases, words, and total duration. |
+| **Compiled JSON** | The serialized JSON form of a compiled TPS state machine used for storage, transport, and cross-runtime restore. |
 | **State Machine** | The compiled playback model that lets a runtime resolve what should be visible at a given elapsed time. |
 | **Player** | The runtime component that reads the compiled script and returns the current presentation state. |
+| **Playback Session** | The stateful runtime component that owns a timer loop and exposes play/pause/seek/navigation commands plus runtime events. |
+| **Standalone Player** | A higher-level runtime component that can compile TPS source or restore compiled JSON and expose one embeddable playback surface. |
 | **Presentation Model** | The player output describing the active segment, block, phrase, visible words, active word, and remaining time. |
+| **Snapshot** | The bindable runtime view-model emitted by playback sessions or standalone players for host UIs. |
 | **Current Word Index** | The zero-based index of the active compiled word, or `-1` when no active word exists. |
 | **Elapsed Time** | The playback time passed into a player when resolving the current presentation model. |
 | **Remaining Time** | The difference between compiled duration and elapsed playback time. |
@@ -103,3 +118,5 @@ It is intended to be complete for the current TPS specification, including headi
 | **Runtime Matrix** | The CI-generated list of enabled runtimes used for build, test, and coverage workflows. |
 | **Shared Fixtures** | Canonical test inputs and runtime expectations stored under `SDK/fixtures/`. |
 | **Parity** | The requirement that all active SDKs expose the same TPS contract: constants, validation, parser, compiler, and player APIs. |
+| **TimeProvider** | The .NET time abstraction used by TPS playback sessions when a host needs deterministic or externally controlled playback timing. |
+| **EventSynchronizationContext** | The .NET dispatcher target used to marshal playback events back onto a UI thread or host synchronization context. |
