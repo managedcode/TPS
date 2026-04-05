@@ -33,13 +33,13 @@ public sealed class TpsPlayer
         var clampedElapsed = Math.Clamp(elapsedMs, 0, Script.TotalDurationMs);
         var currentWord = FindCurrentWord(clampedElapsed);
         var currentSegment = currentWord is null
-            ? Script.Segments.FirstOrDefault()
+            ? Script.Segments.Count > 0 ? Script.Segments[0] : null
             : _segmentById.GetValueOrDefault(currentWord.SegmentId);
         var currentBlock = currentWord is null
-            ? currentSegment?.Blocks.FirstOrDefault()
+            ? currentSegment is not null && currentSegment.Blocks.Count > 0 ? currentSegment.Blocks[0] : null
             : _blockById.GetValueOrDefault(currentWord.BlockId);
         var currentPhrase = currentWord is null
-            ? currentBlock?.Phrases.FirstOrDefault()
+            ? currentBlock is not null && currentBlock.Phrases.Count > 0 ? currentBlock.Phrases[0] : null
             : _phraseById.GetValueOrDefault(currentWord.PhraseId);
         var currentWordIndex = currentWord?.Index ?? -1;
         var previousWord = currentWordIndex > 0 ? Script.Words[currentWordIndex - 1] : null;

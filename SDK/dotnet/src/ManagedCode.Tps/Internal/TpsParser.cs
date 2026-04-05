@@ -7,7 +7,7 @@ namespace ManagedCode.Tps.Internal;
 
 internal sealed partial class TpsParser
 {
-    public DocumentAnalysis Parse(string source)
+    public static DocumentAnalysis Parse(string source)
     {
         var normalized = TpsSupport.NormalizeLineEndings(source);
         var lineStarts = TpsSupport.CreateLineStarts(normalized);

@@ -7,7 +7,7 @@ public static class TpsRuntime
 {
     public static TpsValidationResult Validate(string source)
     {
-        var analysis = new TpsParser().Parse(source);
+        var analysis = TpsParser.Parse(source);
         CompileAnalysis(analysis);
         return new TpsValidationResult
         {
@@ -18,7 +18,7 @@ public static class TpsRuntime
 
     public static TpsParseResult Parse(string source)
     {
-        var analysis = new TpsParser().Parse(source);
+        var analysis = TpsParser.Parse(source);
         CompileAnalysis(analysis);
         return new TpsParseResult
         {
@@ -30,7 +30,7 @@ public static class TpsRuntime
 
     public static TpsCompilationResult Compile(string source)
     {
-        var analysis = new TpsParser().Parse(source);
+        var analysis = TpsParser.Parse(source);
         var script = CompileAnalysis(analysis);
         return new TpsCompilationResult
         {
@@ -144,7 +144,7 @@ public static class TpsRuntime
             inherited.SpeedOffsets,
             blockArchetype);
 
-        var content = new TpsContentCompiler().Compile(
+        var content = TpsContentCompiler.Compile(
             definition.Content?.Text ?? string.Empty,
             definition.Content?.StartOffset ?? 0,
             blockInherited,

@@ -5,7 +5,7 @@ namespace ManagedCode.Tps.Internal;
 
 internal sealed class TpsContentCompiler
 {
-    public ContentCompilationResult Compile(
+    public static ContentCompilationResult Compile(
         string rawText,
         int startOffset,
         InheritedFormattingState inherited,
