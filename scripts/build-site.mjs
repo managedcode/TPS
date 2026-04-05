@@ -1752,19 +1752,24 @@ curl -o .github/prompts/tps-convert.prompt.md ${skillRawUrl}</code></pre>
           <tbody>
             <tr><td>Front Matter</td><td><code>title</code>, <code>profile</code>, <code>duration</code>, <code>base_wpm</code>, <code>speed_offsets</code>, <code>author</code>, <code>created</code>, <code>version</code></td></tr>
             <tr><td>Structure</td><td><code>#</code> title, <code>##</code> segments, <code>###</code> blocks, leading text, phrases, words</td></tr>
-            <tr><td>Header Params</td><td>Name, WPM, Emotion, Timing (<code>MM:SS</code>), <code>Speaker:Name</code></td></tr>
+            <tr><td>Header Params</td><td>Name, WPM, Emotion, Timing (<code>MM:SS</code>), <code>Speaker:Name</code>, <code>Archetype:Name</code></td></tr>
             <tr><td>Pauses</td><td><code>/</code> (300ms), <code>//</code> (600ms), <code>[pause:Ns]</code>, <code>[pause:Nms]</code></td></tr>
             <tr><td>Emphasis</td><td><code>[emphasis]</code>, <code>*italic*</code>, <code>**bold**</code>, <code>[highlight]</code></td></tr>
             <tr><td>Speed</td><td><code>[xslow]</code>, <code>[slow]</code>, <code>[normal]</code>, <code>[fast]</code>, <code>[xfast]</code>, <code>[NWPM]</code></td></tr>
             <tr><td>Volume</td><td><code>[loud]</code>, <code>[soft]</code>, <code>[whisper]</code></td></tr>
             <tr><td>Delivery</td><td><code>[sarcasm]</code>, <code>[aside]</code>, <code>[rhetorical]</code>, <code>[building]</code></td></tr>
             <tr><td>Emotions</td><td>All 12: neutral, warm, professional, focused, concerned, urgent, motivational, excited, happy, sad, calm, energetic</td></tr>
+            <tr><td>Articulation</td><td><code>[legato]</code>, <code>[staccato]</code></td></tr>
+            <tr><td>Energy</td><td><code>[energy:N]</code> with validated 1&ndash;10 range</td></tr>
+            <tr><td>Melody</td><td><code>[melody:N]</code> with validated 1&ndash;10 range</td></tr>
+            <tr><td>Archetypes</td><td><code>Archetype:Friend</code>, <code>Motivator</code>, <code>Educator</code>, <code>Coach</code>, <code>Storyteller</code>, <code>Entertainer</code></td></tr>
             <tr><td>Breathing</td><td><code>[breath]</code></td></tr>
             <tr><td>Edit Points</td><td><code>[edit_point]</code>, <code>[edit_point:high]</code>, <code>[edit_point:medium]</code></td></tr>
             <tr><td>Pronunciation</td><td><code>[phonetic:IPA]</code>, <code>[pronunciation:GUIDE]</code></td></tr>
             <tr><td>Stress</td><td><code>[stress]</code> inline wrap, <code>[stress:SYL-LA-ble]</code> guide</td></tr>
             <tr><td>Speakers</td><td><code>Speaker:Name</code> in headers</td></tr>
             <tr><td>Escapes</td><td><code>\\[</code>, <code>\\]</code>, <code>\\|</code>, <code>\\/</code>, <code>\\*</code>, <code>\\\\</code></td></tr>
+            <tr><td>Authoring Diagnostics</td><td>Unknown tags, malformed attributes, invalid ranges, unknown archetypes, archetype-profile warnings, and rhythm-analysis warnings</td></tr>
           </tbody>
         </table>
       </div>
