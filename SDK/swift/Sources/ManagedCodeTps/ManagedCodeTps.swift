@@ -193,6 +193,22 @@ public enum TpsPlaybackStatus: String, Codable {
     case completed
 }
 
+public enum TpsPlaybackDefaults {
+    public static let defaultSpeedStepWpm = 10
+    public static let defaultTickIntervalMs = 16
+}
+
+public enum TpsPlaybackEventNames {
+    public static let stateChanged = "stateChanged"
+    public static let wordChanged = "wordChanged"
+    public static let phraseChanged = "phraseChanged"
+    public static let blockChanged = "blockChanged"
+    public static let segmentChanged = "segmentChanged"
+    public static let statusChanged = "statusChanged"
+    public static let completed = "completed"
+    public static let snapshotChanged = "snapshotChanged"
+}
+
 public struct TpsPlaybackSessionOptions {
     public let tickIntervalMs: Int?
     public let baseWpm: Int?
@@ -594,7 +610,7 @@ public final class TpsPlaybackSession {
 
     @discardableResult
     public func observeSnapshot(emitCurrent: Bool = true, _ listener: @escaping (TpsPlaybackSnapshot) -> Void) -> () -> Void {
-        let unsubscribe = on("snapshotChanged") { event in
+        let unsubscribe = on(TpsPlaybackEventNames.snapshotChanged) { event in
             if let snapshot = event as? TpsPlaybackSnapshot {
                 listener(snapshot)
             }
@@ -723,7 +739,7 @@ public final class TpsPlaybackSession {
         }
     }
 
-    private func emitSnapshotChanged() { emit("snapshotChanged", event: createSnapshot()) }
+    private func emitSnapshotChanged() { emit(TpsPlaybackEventNames.snapshotChanged, event: createSnapshot()) }
 
     private func scheduleNextTick() {
         guard status == .playing else { return }
@@ -758,7 +774,7 @@ public final class TpsPlaybackSession {
         if nextStatus == .completed && previousStatus == .playing {
             clearTimer()
         }
-        emit("statusChanged", event: ["state": currentState, "previousStatus": previousStatus.rawValue, "status": nextStatus.rawValue])
+        emit(TpsPlaybackEventNames.statusChanged, event: ["state": currentState, "previousStatus": previousStatus.rawValue, "status": nextStatus.rawValue])
     }
 
     private func updatePosition(_ elapsedMs: Int, _ nextStatus: TpsPlaybackStatus) -> PlayerState {
@@ -769,22 +785,22 @@ public final class TpsPlaybackSession {
         currentState = nextState
         updateStatus(resolvedStatus)
         if nextState.currentWord?.id != previousState.currentWord?.id {
-            emit("wordChanged", event: ["state": nextState, "previousState": previousState, "status": status.rawValue])
+            emit(TpsPlaybackEventNames.wordChanged, event: ["state": nextState, "previousState": previousState, "status": status.rawValue])
         }
         if nextState.currentPhrase?.id != previousState.currentPhrase?.id {
-            emit("phraseChanged", event: ["state": nextState, "previousState": previousState, "status": status.rawValue])
+            emit(TpsPlaybackEventNames.phraseChanged, event: ["state": nextState, "previousState": previousState, "status": status.rawValue])
         }
         if nextState.currentBlock?.id != previousState.currentBlock?.id {
-            emit("blockChanged", event: ["state": nextState, "previousState": previousState, "status": status.rawValue])
+            emit(TpsPlaybackEventNames.blockChanged, event: ["state": nextState, "previousState": previousState, "status": status.rawValue])
         }
         if nextState.currentSegment?.id != previousState.currentSegment?.id {
-            emit("segmentChanged", event: ["state": nextState, "previousState": previousState, "status": status.rawValue])
+            emit(TpsPlaybackEventNames.segmentChanged, event: ["state": nextState, "previousState": previousState, "status": status.rawValue])
         }
         if nextState.elapsedMs != previousState.elapsedMs || status != previousStatus {
-            emit("stateChanged", event: ["state": nextState, "previousState": previousState, "status": status.rawValue])
+            emit(TpsPlaybackEventNames.stateChanged, event: ["state": nextState, "previousState": previousState, "status": status.rawValue])
         }
         if !previousState.isComplete && resolvedStatus == .completed {
-            emit("completed", event: ["state": nextState, "previousState": previousState, "status": status.rawValue])
+            emit(TpsPlaybackEventNames.completed, event: ["state": nextState, "previousState": previousState, "status": status.rawValue])
         }
         emitSnapshotChanged()
         return nextState
@@ -1737,8 +1753,8 @@ private func isSpokenWord(_ word: WordSeed) -> Bool { word.kind == "word" && !wo
 private func clamp(_ value: Int, minimum: Int, maximum: Int) -> Int { min(max(value, minimum), maximum) }
 private func clampWpm(_ candidate: Int, fallback: Int) -> Int { clamp(candidate, minimum: TpsSpec.minimumWpm, maximum: TpsSpec.maximumWpm) }
 private func normalizeBaseWpm(_ value: Int) -> Int { clampWpm(value, fallback: TpsSpec.defaultBaseWpm) }
-private func normalizeTickInterval(_ value: Int?) -> Int { guard let value, value > 0 else { return 16 }; return value }
-private func normalizeSpeedStep(_ value: Int?) -> Int { guard let value, value > 0 else { return 10 }; return value }
+private func normalizeTickInterval(_ value: Int?) -> Int { guard let value, value > 0 else { return TpsPlaybackDefaults.defaultTickIntervalMs }; return value }
+private func normalizeSpeedStep(_ value: Int?) -> Int { guard let value, value > 0 else { return TpsPlaybackDefaults.defaultSpeedStepWpm }; return value }
 private func normalizeSpeedOffset(_ baseWpm: Int, _ offset: Int) -> Int { clamp(baseWpm + offset, minimum: TpsSpec.minimumWpm, maximum: TpsSpec.maximumWpm) - baseWpm }
 private func nowMs() -> Int { Int(Date().timeIntervalSince1970 * 1000) }
 private func resolveStatusAfterSeek(_ current: TpsPlaybackStatus, totalDurationMs: Int, elapsedMs: Int) -> TpsPlaybackStatus { if totalDurationMs == 0 || elapsedMs >= totalDurationMs { return .completed }; if elapsedMs <= 0 && current == .idle { return .idle }; return .paused }

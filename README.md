@@ -936,8 +936,10 @@ Renderers should use **text size, letter spacing, weight, and animation** to com
 | `[legato]` | Normal | Tighter (-0.5px) | Normal | Smooth underline or wave |
 | `[staccato]` | Normal | Wider (+1–2px) | Bold | Dotted underline or dashes between words |
 | `[energy:1–4]` | Smaller (90%) | Normal | Light | Lower opacity |
+| `[energy:5–6]` | Normal | Normal | Normal | Default styling (no special treatment) |
 | `[energy:7–10]` | Larger (110–130%) | Normal | Bold | Glow or pulsing effect |
 | `[melody:1–3]` | Normal | Normal | Normal | Flat visual indicator (dash) |
+| `[melody:4–6]` | Normal | Normal | Normal | Default styling (no special treatment) |
 | `[melody:7–10]` | Normal | Normal | Normal | Wave or oscillating indicator |
 
 These are **recommendations**, not requirements. Renderers may adapt the visual treatment to their platform. The key principle: the reader should **feel** the delivery instruction from the visual presentation alone.

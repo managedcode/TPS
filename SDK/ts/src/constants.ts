@@ -195,6 +195,24 @@ export const TpsDiagnosticCodes = Object.freeze({
   unclosedTag: "unclosed-tag"
 });
 
+export const TpsPlaybackDefaults = Object.freeze({
+  defaultSpeedStepWpm: 10,
+  defaultTickIntervalMs: 16,
+  minimumSpeedStepWpm: 1,
+  minimumTickIntervalMs: 1
+});
+
+export const TpsPlaybackEventNames = Object.freeze({
+  stateChanged: "stateChanged",
+  wordChanged: "wordChanged",
+  phraseChanged: "phraseChanged",
+  blockChanged: "blockChanged",
+  segmentChanged: "segmentChanged",
+  statusChanged: "statusChanged",
+  completed: "completed",
+  snapshotChanged: "snapshotChanged"
+});
+
 export const TpsKeywords = Object.freeze({
   frontMatterKeys: TpsFrontMatterKeys,
   legacyKeys: TpsLegacyKeys,
@@ -207,7 +225,8 @@ export const TpsKeywords = Object.freeze({
   archetypes: TpsArchetypes,
   relativeSpeedTags: TpsRelativeSpeedTags,
   editPointPriorities: TpsEditPointPriorities,
-  controlMarkers: TpsControlMarkers
+  controlMarkers: TpsControlMarkers,
+  playbackEventNames: TpsPlaybackEventNames
 });
 
 export const TpsSpec = Object.freeze({
@@ -239,6 +258,8 @@ export const TpsSpec = Object.freeze({
   articulationStyles: TpsArticulationStyles,
   archetypes: TpsArchetypes,
   archetypeRecommendedWpm: TpsArchetypeRecommendedWpm,
+  playbackDefaults: TpsPlaybackDefaults,
+  playbackEventNames: TpsPlaybackEventNames,
   energyLevels: TpsEnergyLevels,
   melodyLevels: TpsMelodyLevels
 });

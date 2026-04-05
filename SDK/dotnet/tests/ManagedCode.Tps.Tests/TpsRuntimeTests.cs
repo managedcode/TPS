@@ -12,6 +12,9 @@ public sealed class TpsRuntimeTests
         Assert.Equal(140, TpsSpec.DefaultBaseWpm);
         Assert.Equal("neutral", TpsSpec.DefaultEmotion);
         Assert.Equal("WPM", TpsSpec.WpmSuffix);
+        Assert.Equal(10, TpsPlaybackDefaults.DefaultSpeedStepWpm);
+        Assert.Equal(16, TpsPlaybackDefaults.DefaultTickIntervalMs);
+        Assert.Equal("snapshotChanged", TpsPlaybackEventNames.SnapshotChanged);
         Assert.Contains(TpsSpec.Tags.Building, TpsSpec.DeliveryModes);
         Assert.Contains(TpsSpec.Tags.Loud, TpsSpec.VolumeLevels);
         Assert.Contains(TpsSpec.Tags.Normal, TpsSpec.RelativeSpeedTags);

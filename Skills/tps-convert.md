@@ -278,14 +278,14 @@ Set on segment or block headers with `Archetype:Name`. Each archetype defines a 
 |-----------|------|-----------------|--------------|--------|--------|
 | `Friend` | Connect | 135 | legato | 4–6 | 6–8 |
 | `Motivator` | Inspire | 155 | legato | 7–10 | 7–9 |
-| `Educator` | Inform | 120 | neutral | 3–5 | 2–4 |
-| `Coach` | Guide | 145 | staccato | 7–9 | 1–3 |
-| `Storyteller` | Engage | 125 | mixed | 4–7 | 8–10 |
-| `Entertainer` | Delight | 150 | mixed | 6–8 | 7–9 |
+| `Educator` | Inform | 120 | none expected | 3–5 | 2–4 |
+| `Coach` | Guide & instruct | 145 | staccato | 7–9 | 1–3 |
+| `Storyteller` | Transport & engage | 125 | both valid | 4–7 | 8–10 |
+| `Entertainer` | Delight | 150 | both valid | 6–8 | 7–9 |
 
 When Archetype is set without explicit WPM, the archetype's recommended WPM is used automatically.
 
-**Recommended sequencing:** Friend → Motivator → Educator → Coach → Friend (connect → inspire → inform → instruct → close with connection).
+**Recommended sequencing:** Friend → Motivator → Educator → Coach → Friend (connect → inspire → inform → instruct → close with connection). Transition between archetypes every 3–5 minutes for maximum audience engagement.
 
 ### 12. Inline Emotion Override Tags
 
@@ -396,7 +396,7 @@ Escape sequences apply **only in plain text**, not inside tag parameters or head
 
 ### 19. Tag Nesting Rules
 
-- Tags can nest up to 2 levels: `[loud][emphasis]text[/emphasis][/loud]` is valid
+- Tags can nest freely: `[loud][emphasis]text[/emphasis][/loud]` is valid
 - No cross-nesting: `[loud][emphasis]text[/loud][/emphasis]` is INVALID
 - All tags must be properly closed
 - Unclosed tags implicitly close at end of current block
@@ -439,7 +439,7 @@ Based on the content analysis, determine the **vocal archetype sequence** for th
 | Narrative, story, journey, case study | `Storyteller` |
 | Humor, light moments, audience engagement | `Entertainer` |
 
-**Ask the user** before proceeding: present the proposed archetype sequence and let them confirm or adjust. Example:
+**Ask the user** before proceeding: present the proposed archetype sequence and let them confirm or adjust. If the user explicitly requests a direct conversion without review (e.g., "just convert it"), skip the confirmation and proceed with the proposed sequence. Example:
 
 > I've analyzed your text and here's the proposed delivery structure:
 > 1. Opening (Friend) — build connection
@@ -456,10 +456,10 @@ Once the archetype flow is confirmed, format the text using the full TPS vocabul
 
 **Friend segments**: `[legato]`, `[energy:5]`, `[melody:7]`, soft/default volume
 **Motivator segments**: `[legato]`, `[energy:8-9]`, `[melody:8]`, `[loud]`
-**Educator segments**: no articulation tags, `[energy:3-4]`, `[melody:3]`, default volume
+**Educator segments**: no articulation tags, `[energy:3-5]`, `[melody:3]`, default volume
 **Coach segments**: `[staccato]`, `[energy:8]`, `[melody:2]`, `[loud]`
-**Storyteller segments**: mixed articulation, `[energy:5-7]`, `[melody:9]`, variable volume
-**Entertainer segments**: mixed articulation, `[energy:7]`, `[melody:8]`, variable volume
+**Storyteller segments**: both `[legato]` and `[staccato]` valid, `[energy:5-7]`, `[melody:9]`, variable volume
+**Entertainer segments**: both `[legato]` and `[staccato]` valid, `[energy:7]`, `[melody:8]`, variable volume
 
 ### Step 4: Shape Text Rhythm to Match Archetype
 
@@ -467,14 +467,14 @@ Each archetype has a distinct rhythm. When formatting text, actively **restructu
 
 **Rhythm targets per archetype:**
 
-| Archetype | Phrase length | Pause frequency | Pause duration | Emphasis density |
-|-----------|--------------|-----------------|----------------|-----------------|
-| **Friend** | 8–15 words | 4–8 per 100w | 300–600 ms (`/`, `//`) | Low (3–8%) |
-| **Motivator** | 8–20 words | 3–6 per 100w | 600–2000 ms (`//`, `[pause:2s]`) | High (10–20%) |
-| **Educator** | 10–25 words | 6–12 per 100w | 400–800 ms (`/`, `//`) | Low (3–8%) |
-| **Coach** | 3–8 words | 8–15 per 100w | 200–400 ms (`/`) | Very high (15–30%) |
-| **Storyteller** | 5–20 words | 4–10 per 100w | 500–3000 ms (variable) | Medium (5–12%) |
-| **Entertainer** | 5–15 words | 5–10 per 100w | 300–2000 ms (variable) | Medium (5–15%) |
+| Archetype | Phrase length | Pause frequency | Pause duration | Emphasis density | Speed variation |
+|-----------|--------------|-----------------|----------------|-----------------|-----------------|
+| **Friend** | 8–15 words | 4–8 per 100w | 300–600 ms (`/`, `//`) | Low (3–8%) | Very low (0–1) |
+| **Motivator** | 8–20 words | 3–6 per 100w | 600–2000 ms (`//`, `[pause:2s]`) | High (10–20%) | Low (0–2) |
+| **Educator** | 10–25 words | 6–12 per 100w | 400–800 ms (`/`, `//`) | Low (3–8%) | Low (0–2) |
+| **Coach** | 3–8 words | 8–15 per 100w | 200–400 ms (`/`) | Very high (15–30%) | Low (0–2) |
+| **Storyteller** | 5–20 words | 4–10 per 100w | 500–3000 ms (variable) | Medium (5–12%) | High (3–6) |
+| **Entertainer** | 5–15 words | 5–10 per 100w | 300–2000 ms (variable) | Medium (5–15%) | Medium (2–4) |
 
 **How to apply rhythm:**
 
@@ -493,6 +493,14 @@ Each archetype has a distinct rhythm. When formatting text, actively **restructu
 - **Friend text**: Natural conversational flow. Light pauses. Minimal emphasis. Example:
   - Before: "Hey, thanks for being here. Let me tell you what we've been working on."
   - After: `Hey, / thanks for being here today. // So, / let me tell you what we've been working on...`
+
+- **Storyteller text**: Highly variable pacing. Long dramatic pauses. Wide speed variation. Example:
+  - Before: "The team started small. They had no funding. But they had a vision."
+  - After: `The team started small. [pause:2s] They had [emphasis]no[/emphasis] funding. / [breath] [slow]But they had a vision.[/slow] [pause:3s]`
+
+- **Entertainer text**: Rhythmic, comedic timing. Pauses before/after punchlines. Sudden volume drops. Example:
+  - Before: "And then the server went down. On launch day. In front of the CEO."
+  - After: `And then the server went down. [pause:1s] On [emphasis]launch day[/emphasis]. / [pause:2s] [soft]In front of the CEO.[/soft]`
 
 ### Dramatic Pacing Principles
 
@@ -527,7 +535,7 @@ Each archetype has a distinct rhythm. When formatting text, actively **restructu
 
 ### Tag Usage Balance
 
-- **Emphasis**: use on ~15-20% of text maximum. Focus on truly important words.
+- **Emphasis**: density varies by archetype — Friend/Educator: 3–8%, Motivator: 10–20%, Coach: 15–30%, Storyteller: 5–12%, Entertainer: 5–15%. See rhythm table.
 - **Highlight**: use very sparingly, max ~5-10% of text. Only for must-not-miss phrases.
 - **Volume tags**: use for genuine projection/intimacy shifts, not decoration.
 - **Speed tags**: cover phrases or sentences, not individual words.
@@ -535,7 +543,7 @@ Each archetype has a distinct rhythm. When formatting text, actively **restructu
 - **Articulation**: use `[legato]` for flowing passages, `[staccato]` for punchy directives. Don't use both in the same phrase.
 - **Energy/Melody**: set once per segment or block scope. Don't change every sentence.
 - **Archetypes**: set on every segment header. Blocks only override if the delivery intent changes within a segment.
-- **Nesting**: max 2 levels deep. Don't over-nest.
+- **Nesting**: keep nesting shallow where possible. Don't over-nest.
 - **Breath marks**: every 20-30 words in continuous passages.
 - **Edit points**: at every major section boundary. `high` for critical cuts, `medium` for optional.
 
@@ -575,8 +583,8 @@ Let's begin.[/melody][/energy][/legato] //
 
 ### [Opening Block]
 
-[legato][energy:5][melody:7]Good morning everyone, / and [emphasis]welcome[/emphasis] to what I believe /
-will be a [emphasis]transformative moment[/emphasis] for our company.[/melody][/energy][/legato] //
+Good morning everyone, / and [emphasis]welcome[/emphasis] to what I believe /
+will be a [emphasis]transformative moment[/emphasis] for our company. //
 
 [pause:2s]
 
@@ -595,15 +603,15 @@ Our industry has been [emphasis]struggling[/emphasis] with a fundamental problem
 
 [edit_point:high]
 
-[energy:4]According to recent studies, /
+[energy:4][melody:3]According to recent studies, /
 [slow][emphasis]73% of users a[stress]ban[/stress]don[/emphasis] applications
 within the first three interactions[/slow] /
-due to [highlight]complexity and poor user experience[/highlight].[/energy] //
+due to [highlight]complexity and poor user experience[/highlight].[/melody][/energy] //
 
 ### [Impact Block]
 
 This affects [emphasis]millions[/emphasis] of people worldwide, /
-costing businesses [loud][emphasis]billions[/emphasis] in revenue[/loud] annually. //
+costing businesses [urgent][loud][emphasis]billions[/emphasis] in revenue[/loud][/urgent] annually. //
 
 [pause:2s]
 
@@ -643,7 +651,7 @@ with [phonetic:ˌɛskjuːˈɛl]SQL[/phonetic] backing stores. //
 [staccato][energy:8][melody:2][loud]**Three** things. **Today.** //
 **One** — download the **beta**. //
 **Two** — run the **benchmark**. //
-**Three** — share your **feedback**.[/loud][/melody][/energy][/staccato] //
+**Three** — share your **feedback**.[/loud][/melody][/energy][/staccato]
 
 ## [Closing|Warm|Archetype:Friend]
 
@@ -665,8 +673,9 @@ Write the converted TPS content to a `.tps` file. If the user specified a filena
 
 After writing, briefly summarize:
 - Segments and blocks count
-- Emotional arc chosen
-- Key formatting decisions (speed variations, volume shifts, delivery modes used)
+- Archetype sequence chosen (e.g., Friend → Educator → Coach → Friend)
+- Emotional arc (emotions used per segment)
+- Key formatting decisions (articulation, energy/melody levels, speed variations, volume shifts, delivery modes used)
 - Estimated duration
 
 ---

@@ -1,5 +1,6 @@
 import { normalizeCompiledScript, parseCompiledScriptJson } from "./compiled-script.js";
 import { compileTps } from "./compiler.js";
+import { TpsPlaybackEventNames } from "./constants.js";
 import { TpsPlaybackSession } from "./playback-session.js";
 export class TpsStandalonePlayer {
     diagnostics;
@@ -54,7 +55,7 @@ export class TpsStandalonePlayer {
         this.session.off(eventName, listener);
     }
     onSnapshotChanged(listener) {
-        return this.session.on("snapshotChanged", (event) => listener(event.snapshot));
+        return this.session.on(TpsPlaybackEventNames.snapshotChanged, (event) => listener(event.snapshot));
     }
     observeSnapshot(listener, emitCurrent = true) {
         return this.session.observeSnapshot(listener, emitCurrent);

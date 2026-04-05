@@ -24,10 +24,14 @@ test("publishes the TPS keyword catalog and spec constants", () => {
   assert.equal(TpsSpec.defaultBaseWpm, 140);
   assert.equal(TpsSpec.defaultEmotion, "neutral");
   assert.equal(TpsSpec.wpmSuffix, "WPM");
+  assert.equal(TpsSpec.playbackDefaults.defaultSpeedStepWpm, 10);
+  assert.equal(TpsSpec.playbackDefaults.defaultTickIntervalMs, 16);
+  assert.equal(TpsSpec.playbackEventNames.snapshotChanged, "snapshotChanged");
   assert.equal(TpsKeywords.tags.pause, "pause");
   assert.ok(TpsKeywords.emotions.includes("motivational"));
   assert.ok(TpsKeywords.deliveryModes.includes("building"));
   assert.ok(TpsKeywords.volumeLevels.includes("loud"));
+  assert.equal(TpsKeywords.playbackEventNames.completed, "completed");
 });
 
 test("compiles the runtime parity fixture into a deterministic state machine", () => {
@@ -290,6 +294,26 @@ test("playback session exposes standalone controls, speed correction, and snapsh
   assert.equal(observedSnapshots[0]?.state.currentWord?.cleanText, "Ready.");
   assert.ok(observedSnapshots.some((snapshot) => snapshot.tempo.effectiveBaseWpm === 150));
   assert.ok(snapshots.length >= 1);
+  disposeObservation();
+  session.dispose();
+});
+
+test("playback session supports non-eager observation and explicit event unsubscription", () => {
+  const { script } = compileTps("## [Signal]\n### [Body]\nReady now.");
+  const session = new TpsPlaybackSession(script);
+  const observedSnapshots = [];
+  const snapshotStatuses = [];
+  const snapshotListener = (event) => snapshotStatuses.push(event.snapshot.status);
+
+  const disposeObservation = session.observeSnapshot((snapshot) => observedSnapshots.push(snapshot), false);
+  session.on(TpsSpec.playbackEventNames.snapshotChanged, snapshotListener);
+  session.nextWord();
+  session.off(TpsSpec.playbackEventNames.snapshotChanged, snapshotListener);
+  session.previousWord();
+
+  assert.equal(observedSnapshots[0]?.state.currentWord?.cleanText, "now.");
+  assert.deepEqual(snapshotStatuses, ["paused"]);
+
   disposeObservation();
   session.dispose();
 });

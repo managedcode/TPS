@@ -188,6 +188,22 @@ export declare const TpsDiagnosticCodes: Readonly<{
     mismatchedClosingTag: "mismatched-closing-tag";
     unclosedTag: "unclosed-tag";
 }>;
+export declare const TpsPlaybackDefaults: Readonly<{
+    defaultSpeedStepWpm: 10;
+    defaultTickIntervalMs: 16;
+    minimumSpeedStepWpm: 1;
+    minimumTickIntervalMs: 1;
+}>;
+export declare const TpsPlaybackEventNames: Readonly<{
+    stateChanged: "stateChanged";
+    wordChanged: "wordChanged";
+    phraseChanged: "phraseChanged";
+    blockChanged: "blockChanged";
+    segmentChanged: "segmentChanged";
+    statusChanged: "statusChanged";
+    completed: "completed";
+    snapshotChanged: "snapshotChanged";
+}>;
 export declare const TpsKeywords: Readonly<{
     frontMatterKeys: Readonly<{
         title: "title";
@@ -257,6 +273,16 @@ export declare const TpsKeywords: Readonly<{
     controlMarkers: Readonly<{
         shortPause: "/";
         mediumPause: "//";
+    }>;
+    playbackEventNames: Readonly<{
+        stateChanged: "stateChanged";
+        wordChanged: "wordChanged";
+        phraseChanged: "phraseChanged";
+        blockChanged: "blockChanged";
+        segmentChanged: "segmentChanged";
+        statusChanged: "statusChanged";
+        completed: "completed";
+        snapshotChanged: "snapshotChanged";
     }>;
 }>;
 export declare const TpsSpec: Readonly<{
@@ -504,6 +530,16 @@ export declare const TpsSpec: Readonly<{
             shortPause: "/";
             mediumPause: "//";
         }>;
+        playbackEventNames: Readonly<{
+            stateChanged: "stateChanged";
+            wordChanged: "wordChanged";
+            phraseChanged: "phraseChanged";
+            blockChanged: "blockChanged";
+            segmentChanged: "segmentChanged";
+            statusChanged: "statusChanged";
+            completed: "completed";
+            snapshotChanged: "snapshotChanged";
+        }>;
     }>;
     articulationStyles: readonly ["legato", "staccato"];
     archetypes: readonly ["friend", "motivator", "educator", "coach", "storyteller", "entertainer"];
@@ -514,6 +550,22 @@ export declare const TpsSpec: Readonly<{
         coach: 145;
         storyteller: 125;
         entertainer: 150;
+    }>;
+    playbackDefaults: Readonly<{
+        defaultSpeedStepWpm: 10;
+        defaultTickIntervalMs: 16;
+        minimumSpeedStepWpm: 1;
+        minimumTickIntervalMs: 1;
+    }>;
+    playbackEventNames: Readonly<{
+        stateChanged: "stateChanged";
+        wordChanged: "wordChanged";
+        phraseChanged: "phraseChanged";
+        blockChanged: "blockChanged";
+        segmentChanged: "segmentChanged";
+        statusChanged: "statusChanged";
+        completed: "completed";
+        snapshotChanged: "snapshotChanged";
     }>;
     energyLevels: Readonly<{
         min: 1;

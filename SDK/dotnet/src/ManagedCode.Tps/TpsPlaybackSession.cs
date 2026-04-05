@@ -104,7 +104,7 @@ public sealed class TpsPlaybackSession : IDisposable
 
         if (emitCurrent)
         {
-            InvokeSnapshotObserver("observeSnapshot", observer, CreateSnapshot(), subscription);
+            InvokeSnapshotObserver(TpsPlaybackEventNames.ObserveSnapshot, observer, CreateSnapshot(), subscription);
         }
 
         return subscription;
@@ -685,45 +685,45 @@ public sealed class TpsPlaybackSession : IDisposable
     {
         if (transition.StatusChangedRaised)
         {
-            InvokeHandlers("statusChanged", StatusChanged, new TpsPlaybackStatusChangedEventArgs(transition.State, transition.PreviousStatus, transition.Status), transition.Snapshot);
+            InvokeHandlers(TpsPlaybackEventNames.StatusChanged, StatusChanged, new TpsPlaybackStatusChangedEventArgs(transition.State, transition.PreviousStatus, transition.Status), transition.Snapshot);
         }
 
         if (transition.StateChangedRaised)
         {
             var args = new TpsPlaybackStateChangedEventArgs(transition.State, transition.PreviousState, transition.Status);
-            InvokeHandlers("stateChanged", StateChanged, args, transition.Snapshot);
+            InvokeHandlers(TpsPlaybackEventNames.StateChanged, StateChanged, args, transition.Snapshot);
 
             if (transition.WordChangedRaised)
             {
-                InvokeHandlers("wordChanged", WordChanged, args, transition.Snapshot);
+                InvokeHandlers(TpsPlaybackEventNames.WordChanged, WordChanged, args, transition.Snapshot);
             }
 
             if (transition.PhraseChangedRaised)
             {
-                InvokeHandlers("phraseChanged", PhraseChanged, args, transition.Snapshot);
+                InvokeHandlers(TpsPlaybackEventNames.PhraseChanged, PhraseChanged, args, transition.Snapshot);
             }
 
             if (transition.BlockChangedRaised)
             {
-                InvokeHandlers("blockChanged", BlockChanged, args, transition.Snapshot);
+                InvokeHandlers(TpsPlaybackEventNames.BlockChanged, BlockChanged, args, transition.Snapshot);
             }
 
             if (transition.SegmentChangedRaised)
             {
-                InvokeHandlers("segmentChanged", SegmentChanged, args, transition.Snapshot);
+                InvokeHandlers(TpsPlaybackEventNames.SegmentChanged, SegmentChanged, args, transition.Snapshot);
             }
 
             if (transition.CompletedRaised)
             {
-                InvokeHandlers("completed", Completed, args, transition.Snapshot);
+                InvokeHandlers(TpsPlaybackEventNames.Completed, Completed, args, transition.Snapshot);
             }
         }
         else if (transition.CompletedRaised)
         {
-            InvokeHandlers("completed", Completed, new TpsPlaybackStateChangedEventArgs(transition.State, transition.PreviousState, transition.Status), transition.Snapshot);
+            InvokeHandlers(TpsPlaybackEventNames.Completed, Completed, new TpsPlaybackStateChangedEventArgs(transition.State, transition.PreviousState, transition.Status), transition.Snapshot);
         }
 
-        InvokeHandlers("snapshotChanged", SnapshotChanged, new TpsPlaybackSnapshotChangedEventArgs(transition.Snapshot), transition.Snapshot);
+        InvokeHandlers(TpsPlaybackEventNames.SnapshotChanged, SnapshotChanged, new TpsPlaybackSnapshotChangedEventArgs(transition.Snapshot), transition.Snapshot);
     }
 
     private void InvokeHandlers<TEventArgs>(string eventName, EventHandler<TEventArgs>? handlers, TEventArgs args, TpsPlaybackSnapshot snapshot)

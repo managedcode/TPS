@@ -375,6 +375,26 @@ public sealed class TpsPlaybackSessionTests
     }
 
     [Fact]
+    public void PlaybackSession_ObserveSnapshot_CanSkipInitialReplay_AndExplicitOffStopsFurtherEvents()
+    {
+        var script = TpsRuntime.Compile("## [Signal]\n### [Body]\nReady now.").Script;
+        using var session = new TpsPlaybackSession(script);
+        var snapshots = new List<TpsPlaybackSnapshot>();
+        var statuses = new List<TpsPlaybackStatus>();
+
+        using var subscription = session.ObserveSnapshot(snapshot => snapshots.Add(snapshot), emitCurrent: false);
+        EventHandler<TpsPlaybackSnapshotChangedEventArgs> handler = (_, args) => statuses.Add(args.Snapshot.Status);
+        session.SnapshotChanged += handler;
+
+        session.NextWord();
+        session.SnapshotChanged -= handler;
+        session.PreviousWord();
+
+        Assert.Equal("now.", snapshots[0].State.CurrentWord?.CleanText);
+        Assert.Equal([TpsPlaybackStatus.Paused], statuses);
+    }
+
+    [Fact]
     public void StandalonePlayer_CompilesSourceAndExposesRuntimeSnapshotAndControls()
     {
         using var player = TpsStandalonePlayer.Compile("""

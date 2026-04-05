@@ -1,4 +1,4 @@
-import { TpsSpec } from "./constants.js";
+import { TpsPlaybackDefaults, TpsPlaybackEventNames, TpsSpec } from "./constants.js";
 import type {
   CompiledBlock,
   CompiledScript,
@@ -17,9 +17,6 @@ import type {
 import { resolveBaseWpm } from "./runtime-helpers.js";
 import { TpsPlayer } from "./player.js";
 
-const DEFAULT_SPEED_STEP_WPM = 10;
-const DEFAULT_TICK_INTERVAL_MS = 16;
-
 type ListenerMap = {
   [K in TpsPlaybackEventName]: Set<(event: TpsPlaybackEventMap[K]) => void>;
 };
@@ -30,14 +27,14 @@ export class TpsPlaybackSession {
   private readonly blocks: CompiledBlock[];
 
   private readonly listeners: ListenerMap = {
-    stateChanged: new Set(),
-    wordChanged: new Set(),
-    phraseChanged: new Set(),
-    blockChanged: new Set(),
-    segmentChanged: new Set(),
-    statusChanged: new Set(),
-    completed: new Set(),
-    snapshotChanged: new Set()
+    [TpsPlaybackEventNames.stateChanged]: new Set(),
+    [TpsPlaybackEventNames.wordChanged]: new Set(),
+    [TpsPlaybackEventNames.phraseChanged]: new Set(),
+    [TpsPlaybackEventNames.blockChanged]: new Set(),
+    [TpsPlaybackEventNames.segmentChanged]: new Set(),
+    [TpsPlaybackEventNames.statusChanged]: new Set(),
+    [TpsPlaybackEventNames.completed]: new Set(),
+    [TpsPlaybackEventNames.snapshotChanged]: new Set()
   };
 
   private readonly now = resolveNow();
@@ -112,7 +109,7 @@ export class TpsPlaybackSession {
   }
 
   public observeSnapshot(listener: (snapshot: TpsPlaybackSnapshot) => void, emitCurrent = true): () => void {
-    const unsubscribe = this.on("snapshotChanged", (event) => listener(event.snapshot));
+    const unsubscribe = this.on(TpsPlaybackEventNames.snapshotChanged, (event) => listener(event.snapshot));
     if (emitCurrent) {
       listener(this.snapshot);
     }
@@ -346,7 +343,7 @@ export class TpsPlaybackSession {
   }
 
   private emitSnapshotChanged(): void {
-    this.emit("snapshotChanged", { snapshot: this.createSnapshot() });
+    this.emit(TpsPlaybackEventNames.snapshotChanged, { snapshot: this.createSnapshot() });
   }
 
   private scheduleNextTick(): void {
@@ -386,23 +383,23 @@ export class TpsPlaybackSession {
         previousState,
         status: this.status
       };
-      this.emit("stateChanged", stateEvent);
+      this.emit(TpsPlaybackEventNames.stateChanged, stateEvent);
       if (previousState.currentWord?.id !== nextState.currentWord?.id) {
-        this.emit("wordChanged", stateEvent);
+        this.emit(TpsPlaybackEventNames.wordChanged, stateEvent);
       }
       if (previousState.currentPhrase?.id !== nextState.currentPhrase?.id) {
-        this.emit("phraseChanged", stateEvent);
+        this.emit(TpsPlaybackEventNames.phraseChanged, stateEvent);
       }
       if (previousState.currentBlock?.id !== nextState.currentBlock?.id) {
-        this.emit("blockChanged", stateEvent);
+        this.emit(TpsPlaybackEventNames.blockChanged, stateEvent);
       }
       if (previousState.currentSegment?.id !== nextState.currentSegment?.id) {
-        this.emit("segmentChanged", stateEvent);
+        this.emit(TpsPlaybackEventNames.segmentChanged, stateEvent);
       }
     }
 
     if (this.status === "completed" && !previousState.isComplete) {
-      this.emit("completed", {
+      this.emit(TpsPlaybackEventNames.completed, {
         state: nextState,
         previousState,
         status: this.status
@@ -425,7 +422,7 @@ export class TpsPlaybackSession {
       previousStatus,
       status: nextStatus
     };
-    this.emit("statusChanged", event);
+    this.emit(TpsPlaybackEventNames.statusChanged, event);
 
     if (nextStatus !== "playing") {
       this.playbackOffsetMs = nextState.elapsedMs;
@@ -497,26 +494,26 @@ function normalizeSpeedOffset(baseWpm: number, offsetWpm: number): number {
 
 function normalizeSpeedStep(value: number | undefined): number {
   if (value === undefined) {
-    return DEFAULT_SPEED_STEP_WPM;
+    return TpsPlaybackDefaults.defaultSpeedStepWpm;
   }
 
   if (!Number.isFinite(value) || value <= 0) {
     throw new RangeError("speedStepWpm must be greater than 0.");
   }
 
-  return Math.max(1, Math.round(value));
+  return Math.max(TpsPlaybackDefaults.minimumSpeedStepWpm, Math.round(value));
 }
 
 function normalizeTickInterval(value: number | undefined): number {
   if (value === undefined) {
-    return DEFAULT_TICK_INTERVAL_MS;
+    return TpsPlaybackDefaults.defaultTickIntervalMs;
   }
 
   if (!Number.isFinite(value) || value <= 0) {
     throw new RangeError("tickIntervalMs must be greater than 0.");
   }
 
-  return Math.max(1, Math.round(value));
+  return Math.max(TpsPlaybackDefaults.minimumTickIntervalMs, Math.round(value));
 }
 
 function resolveStatusAfterSeek(previousStatus: TpsPlaybackStatus, totalDurationMs: number, elapsedMs: number): TpsPlaybackStatus {

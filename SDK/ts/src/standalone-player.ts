@@ -11,6 +11,7 @@ import type {
   TpsStandalonePlayerOptions
 } from "./models.js";
 import { compileTps } from "./compiler.js";
+import { TpsPlaybackEventNames } from "./constants.js";
 import { TpsPlaybackSession } from "./playback-session.js";
 
 export class TpsStandalonePlayer {
@@ -81,7 +82,7 @@ export class TpsStandalonePlayer {
   }
 
   public onSnapshotChanged(listener: (snapshot: TpsPlaybackSnapshot) => void): () => void {
-    return this.session.on("snapshotChanged", (event: TpsPlaybackSnapshotChangedEvent) => listener(event.snapshot));
+    return this.session.on(TpsPlaybackEventNames.snapshotChanged, (event: TpsPlaybackSnapshotChangedEvent) => listener(event.snapshot));
   }
 
   public observeSnapshot(listener: (snapshot: TpsPlaybackSnapshot) => void, emitCurrent = true): () => void {

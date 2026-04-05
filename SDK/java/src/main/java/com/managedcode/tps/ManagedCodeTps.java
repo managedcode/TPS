@@ -400,6 +400,28 @@ public final class ManagedCodeTps {
     ) {
     }
 
+    public static final class TpsPlaybackDefaults {
+        public static final int DEFAULT_SPEED_STEP_WPM = 10;
+        public static final int DEFAULT_TICK_INTERVAL_MS = 16;
+
+        private TpsPlaybackDefaults() {
+        }
+    }
+
+    public static final class TpsPlaybackEventNames {
+        public static final String STATE_CHANGED = "stateChanged";
+        public static final String WORD_CHANGED = "wordChanged";
+        public static final String PHRASE_CHANGED = "phraseChanged";
+        public static final String BLOCK_CHANGED = "blockChanged";
+        public static final String SEGMENT_CHANGED = "segmentChanged";
+        public static final String STATUS_CHANGED = "statusChanged";
+        public static final String COMPLETED = "completed";
+        public static final String SNAPSHOT_CHANGED = "snapshotChanged";
+
+        private TpsPlaybackEventNames() {
+        }
+    }
+
     public static final class TpsPlaybackSessionOptions {
         public static final TpsPlaybackSessionOptions DEFAULT = new TpsPlaybackSessionOptions(null, null, null, null, false);
 
@@ -596,9 +618,6 @@ public final class ManagedCodeTps {
     }
 
     public static final class TpsPlaybackSession implements Closeable {
-        private static final int DEFAULT_SPEED_STEP_WPM = 10;
-        private static final int DEFAULT_TICK_INTERVAL_MS = 16;
-
         private final TpsPlayer player;
         private final int tickIntervalMs;
         private final int baseWpm;
@@ -686,7 +705,7 @@ public final class ManagedCodeTps {
         }
 
         public Runnable observeSnapshot(Consumer<TpsPlaybackSnapshot> listener, boolean emitCurrent) {
-            Runnable unsubscribe = on("snapshotChanged", event -> listener.accept((TpsPlaybackSnapshot) event));
+            Runnable unsubscribe = on(TpsPlaybackEventNames.SNAPSHOT_CHANGED, event -> listener.accept((TpsPlaybackSnapshot) event));
             if (emitCurrent) {
                 listener.accept(snapshot());
             }
@@ -881,7 +900,7 @@ public final class ManagedCodeTps {
         }
 
         private void emitSnapshotChanged() {
-            emit("snapshotChanged", createSnapshot());
+            emit(TpsPlaybackEventNames.SNAPSHOT_CHANGED, createSnapshot());
         }
 
         private synchronized void scheduleNextTick() {
@@ -911,22 +930,22 @@ public final class ManagedCodeTps {
             updateStatus(nextStatus, nextState);
             if (hasStateChanged(previousState, nextState)) {
                 Map<String, Object> stateEvent = Map.of("state", nextState, "previousState", previousState, "status", status.wire());
-                emit("stateChanged", stateEvent);
+                emit(TpsPlaybackEventNames.STATE_CHANGED, stateEvent);
                 if (!Objects.equals(id(previousState.currentWord()), id(nextState.currentWord()))) {
-                    emit("wordChanged", stateEvent);
+                    emit(TpsPlaybackEventNames.WORD_CHANGED, stateEvent);
                 }
                 if (!Objects.equals(id(previousState.currentPhrase()), id(nextState.currentPhrase()))) {
-                    emit("phraseChanged", stateEvent);
+                    emit(TpsPlaybackEventNames.PHRASE_CHANGED, stateEvent);
                 }
                 if (!Objects.equals(id(previousState.currentBlock()), id(nextState.currentBlock()))) {
-                    emit("blockChanged", stateEvent);
+                    emit(TpsPlaybackEventNames.BLOCK_CHANGED, stateEvent);
                 }
                 if (!Objects.equals(id(previousState.currentSegment()), id(nextState.currentSegment()))) {
-                    emit("segmentChanged", stateEvent);
+                    emit(TpsPlaybackEventNames.SEGMENT_CHANGED, stateEvent);
                 }
             }
             if (status == TpsPlaybackStatus.COMPLETED && !previousState.isComplete()) {
-                emit("completed", Map.of("state", nextState, "previousState", previousState, "status", status.wire()));
+                emit(TpsPlaybackEventNames.COMPLETED, Map.of("state", nextState, "previousState", previousState, "status", status.wire()));
             }
             emitSnapshotChanged();
             return nextState;
@@ -938,7 +957,7 @@ public final class ManagedCodeTps {
             if (previousStatus == nextStatus) {
                 return;
             }
-            emit("statusChanged", Map.of("state", nextState, "previousStatus", previousStatus.wire(), "status", nextStatus.wire()));
+            emit(TpsPlaybackEventNames.STATUS_CHANGED, Map.of("state", nextState, "previousStatus", previousStatus.wire(), "status", nextStatus.wire()));
             if (nextStatus != TpsPlaybackStatus.PLAYING) {
                 playbackOffsetMs = nextState.elapsedMs();
                 playbackStartedAtMs = 0L;
@@ -2429,8 +2448,8 @@ public final class ManagedCodeTps {
     private static int clampWpm(int value) { return clamp(Math.round(value), TpsSpec.MINIMUM_WPM, TpsSpec.MAXIMUM_WPM); }
     private static int normalizeBaseWpm(int value) { return clampWpm(value); }
     private static int normalizeSpeedOffset(int baseWpm, int offsetWpm) { return clampWpm(baseWpm + offsetWpm) - baseWpm; }
-    private static int normalizeSpeedStep(Integer value) { if (value == null) return 10; if (value <= 0) throw new IllegalArgumentException("speedStepWpm must be greater than 0."); return Math.max(1, value); }
-    private static int normalizeTickInterval(Integer value) { if (value == null) return 16; if (value <= 0) throw new IllegalArgumentException("tickIntervalMs must be greater than 0."); return Math.max(1, value); }
+    private static int normalizeSpeedStep(Integer value) { if (value == null) return TpsPlaybackDefaults.DEFAULT_SPEED_STEP_WPM; if (value <= 0) throw new IllegalArgumentException("speedStepWpm must be greater than 0."); return Math.max(1, value); }
+    private static int normalizeTickInterval(Integer value) { if (value == null) return TpsPlaybackDefaults.DEFAULT_TICK_INTERVAL_MS; if (value <= 0) throw new IllegalArgumentException("tickIntervalMs must be greater than 0."); return Math.max(1, value); }
     private static long nowMs() { return System.currentTimeMillis(); }
     private static String protectEscapes(String text) { return text.replace("\\\\", "\uE006").replace("\\[", "\uE001").replace("\\]", "\uE002").replace("\\|", "\uE003").replace("\\/", "\uE004").replace("\\*", "\uE005"); }
     private static String restoreEscapes(String text) { return text.replace("\uE001", "[").replace("\uE002", "]").replace("\uE003", "|").replace("\uE004", "/").replace("\uE005", "*").replace("\uE006", "\\"); }

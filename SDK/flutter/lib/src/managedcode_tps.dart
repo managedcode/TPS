@@ -4,6 +4,22 @@ import "dart:math" as math;
 
 enum TpsPlaybackStatus { idle, playing, paused, completed }
 
+abstract final class TpsPlaybackDefaults {
+  static const defaultSpeedStepWpm = 10;
+  static const defaultTickIntervalMs = 16;
+}
+
+abstract final class TpsPlaybackEventNames {
+  static const stateChanged = "stateChanged";
+  static const wordChanged = "wordChanged";
+  static const phraseChanged = "phraseChanged";
+  static const blockChanged = "blockChanged";
+  static const segmentChanged = "segmentChanged";
+  static const statusChanged = "statusChanged";
+  static const completed = "completed";
+  static const snapshotChanged = "snapshotChanged";
+}
+
 class TpsPosition {
   const TpsPosition({
     required this.line,
@@ -1070,7 +1086,7 @@ class TpsPlayer {
 class TpsPlaybackSession {
   TpsPlaybackSession(CompiledScript scriptOrPlayer, [TpsPlaybackSessionOptions options = const TpsPlaybackSessionOptions()])
       : player = TpsPlayer(scriptOrPlayer),
-        tickIntervalMs = options.tickIntervalMs ?? 16,
+        tickIntervalMs = options.tickIntervalMs ?? TpsPlaybackDefaults.defaultTickIntervalMs,
         baseWpm = _normalizeBaseWpm(options.baseWpm),
         speedStepWpm = _normalizeSpeedStep(options.speedStepWpm),
         speedOffsetWpm = 0 {
@@ -1123,7 +1139,7 @@ class TpsPlaybackSession {
   }
 
   VoidCallback observeSnapshot(void Function(TpsPlaybackSnapshot) listener, [bool emitCurrent = true]) {
-    final unsubscribe = on("snapshotChanged", (event) => listener(event as TpsPlaybackSnapshot));
+    final unsubscribe = on(TpsPlaybackEventNames.snapshotChanged, (event) => listener(event as TpsPlaybackSnapshot));
     if (emitCurrent) {
       listener(snapshot);
     }
@@ -1306,7 +1322,7 @@ class TpsPlaybackSession {
     }
   }
 
-  void _emitSnapshotChanged() => _emit("snapshotChanged", createSnapshot());
+  void _emitSnapshotChanged() => _emit(TpsPlaybackEventNames.snapshotChanged, createSnapshot());
 
   int _readLiveElapsedMs() {
     final deltaMs = ((_nowMs() - _playbackStartedAtMs) * playbackRate).round();
@@ -1346,7 +1362,7 @@ class TpsPlaybackSession {
     if (nextStatus == TpsPlaybackStatus.completed && previousStatus == TpsPlaybackStatus.playing) {
       _clearTimer();
     }
-    _emit("statusChanged", {
+    _emit(TpsPlaybackEventNames.statusChanged, {
       "state": currentState,
       "previousStatus": previousStatus,
       "status": nextStatus,
@@ -1363,22 +1379,22 @@ class TpsPlaybackSession {
     currentState = nextState;
     _updateStatus(resolvedStatus);
     if (nextState.currentWord?.id != previousState.currentWord?.id) {
-      _emit("wordChanged", {"state": nextState, "previousState": previousState, "status": status});
+      _emit(TpsPlaybackEventNames.wordChanged, {"state": nextState, "previousState": previousState, "status": status});
     }
     if (nextState.currentPhrase?.id != previousState.currentPhrase?.id) {
-      _emit("phraseChanged", {"state": nextState, "previousState": previousState, "status": status});
+      _emit(TpsPlaybackEventNames.phraseChanged, {"state": nextState, "previousState": previousState, "status": status});
     }
     if (nextState.currentBlock?.id != previousState.currentBlock?.id) {
-      _emit("blockChanged", {"state": nextState, "previousState": previousState, "status": status});
+      _emit(TpsPlaybackEventNames.blockChanged, {"state": nextState, "previousState": previousState, "status": status});
     }
     if (nextState.currentSegment?.id != previousState.currentSegment?.id) {
-      _emit("segmentChanged", {"state": nextState, "previousState": previousState, "status": status});
+      _emit(TpsPlaybackEventNames.segmentChanged, {"state": nextState, "previousState": previousState, "status": status});
     }
     if (nextState.elapsedMs != previousState.elapsedMs || status != previousStatus) {
-      _emit("stateChanged", {"state": nextState, "previousState": previousState, "status": status});
+      _emit(TpsPlaybackEventNames.stateChanged, {"state": nextState, "previousState": previousState, "status": status});
     }
     if (!previousState.isComplete && resolvedStatus == TpsPlaybackStatus.completed) {
-      _emit("completed", {"state": nextState, "previousState": previousState, "status": status});
+      _emit(TpsPlaybackEventNames.completed, {"state": nextState, "previousState": previousState, "status": status});
     }
     _emitSnapshotChanged();
     return nextState;
@@ -1462,7 +1478,7 @@ class TpsStandalonePlayer {
   VoidCallback on(String eventName, void Function(Object?) listener) => session.on(eventName, listener);
   void off(String eventName, void Function(Object?) listener) => session.off(eventName, listener);
   VoidCallback observeSnapshot(void Function(TpsPlaybackSnapshot) listener, [bool emitCurrent = true]) => session.observeSnapshot(listener, emitCurrent);
-  VoidCallback onSnapshotChanged(void Function(TpsPlaybackSnapshot) listener) => session.on("snapshotChanged", (event) => listener(event as TpsPlaybackSnapshot));
+  VoidCallback onSnapshotChanged(void Function(TpsPlaybackSnapshot) listener) => session.on(TpsPlaybackEventNames.snapshotChanged, (event) => listener(event as TpsPlaybackSnapshot));
   PlayerState play() => session.play();
   PlayerState pause() => session.pause();
   PlayerState stop() => session.stop();
@@ -3561,7 +3577,7 @@ bool _isSpokenWord(_WordSeed word) => word.kind == "word" && word.cleanText.isNo
 int _clamp(int value, int minimum, int maximum) => math.min(math.max(value, minimum), maximum);
 int _clampWpm(int candidate, int fallback) => candidate.isFinite ? _clamp(candidate, TpsSpec.minimumWpm, TpsSpec.maximumWpm) : fallback;
 int _normalizeBaseWpm(int? value) => _clampWpm(value ?? TpsSpec.defaultBaseWpm, TpsSpec.defaultBaseWpm);
-int _normalizeSpeedStep(int? value) => value == null || value <= 0 ? 10 : value;
+int _normalizeSpeedStep(int? value) => value == null || value <= 0 ? TpsPlaybackDefaults.defaultSpeedStepWpm : value;
 int _normalizeSpeedOffset(int baseWpm, int offset) => _clamp(baseWpm + offset, TpsSpec.minimumWpm, TpsSpec.maximumWpm) - baseWpm;
 int _nowMs() => DateTime.now().millisecondsSinceEpoch;
 TpsPlaybackStatus _resolveStatusAfterSeek(TpsPlaybackStatus current, int totalDurationMs, int elapsedMs) {

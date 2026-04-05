@@ -458,6 +458,8 @@ test("covers compiled-script normalization and playback option guard branches", 
   assert.equal(Object.isFrozen(frozen.words), true);
   assert.equal(Object.isFrozen(frozen.words[0]), true);
 
+  assert.throws(() => parseCompiledScriptJson(""), /non-empty string/i);
+  assert.throws(() => parseCompiledScriptJson(" "), /non-empty string/i);
   assert.throws(() => parseCompiledScriptJson("[]"), /script object/i);
   assert.throws(() => normalizeCompiledScript({ metadata: [], totalDurationMs: 0, segments: [], words: [] }), /metadata must be an object/i);
   assert.throws(() => normalizeCompiledScript({ metadata: {}, totalDurationMs: 0, segments: {}, words: [] }), /segments array/i);
@@ -467,12 +469,27 @@ test("covers compiled-script normalization and playback option guard branches", 
   invalidWord.words[0].index = 99;
   assert.throws(() => normalizeCompiledScript(invalidWord), /sequential indexes/i);
 
+  const duplicateSegmentIdentifier = structuredClone(compiled);
+  duplicateSegmentIdentifier.segments = [
+    duplicateSegmentIdentifier.segments[0],
+    { ...duplicateSegmentIdentifier.segments[0], blocks: [], words: [] }
+  ];
+  assert.throws(() => normalizeCompiledScript(duplicateSegmentIdentifier), /segment identifiers must be unique/i);
+
+  const emptyWordIdentifier = structuredClone(compiled);
+  emptyWordIdentifier.words[0].id = " ";
+  assert.throws(() => normalizeCompiledScript(emptyWordIdentifier), /word identifiers cannot be empty/i);
+
   const invalidCanonicalReference = structuredClone(compiled);
   invalidCanonicalReference.segments[0].words = [
     { ...invalidCanonicalReference.segments[0].words[0], id: "missing-word" },
     ...invalidCanonicalReference.segments[0].words.slice(1)
   ];
   assert.throws(() => normalizeCompiledScript(invalidCanonicalReference), /canonical word/i);
+
+  const invalidSegmentReference = structuredClone(compiled);
+  invalidSegmentReference.words[0].segmentId = "missing-segment";
+  assert.throws(() => normalizeCompiledScript(invalidSegmentReference), /must reference segment/i);
 
   const defaultedTempoSession = new TpsPlaybackSession(compiled, { baseWpm: Number.NaN, initialSpeedOffsetWpm: Number.NaN });
   assert.equal(defaultedTempoSession.baseWpm, TpsSpec.defaultBaseWpm);

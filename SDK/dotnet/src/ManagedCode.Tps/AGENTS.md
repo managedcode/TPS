@@ -66,3 +66,10 @@ For this .NET project:
 - Keep the `ManagedCode.Tps` namespace prefix intact.
 - Do not place test helpers or test-only code in this project.
 - Prefer small, composable types over large utility buckets.
+
+## Exception Record
+
+- Size exception:
+  - scope: `TpsPlaybackSession.cs`, `Internal/TpsContentCompiler.cs`, `Internal/TpsParser.cs`, `Models/Contracts.cs`
+  - reason: these files still concentrate the parity-first .NET implementation of the runtime contract
+  - removal plan: split playback transition/publish code, parser header/front-matter code, content-scope handling, and transport contracts into smaller cohesive types

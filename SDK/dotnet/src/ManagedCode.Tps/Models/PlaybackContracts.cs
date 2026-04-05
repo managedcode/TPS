@@ -11,6 +11,27 @@ public enum TpsPlaybackStatus
     Completed
 }
 
+public static class TpsPlaybackDefaults
+{
+    public const int DefaultSpeedStepWpm = 10;
+    public const int DefaultTickIntervalMs = 16;
+    public const int MinimumSpeedStepWpm = 1;
+    public const int MinimumTickIntervalMs = 1;
+}
+
+public static class TpsPlaybackEventNames
+{
+    public const string StateChanged = "stateChanged";
+    public const string WordChanged = "wordChanged";
+    public const string PhraseChanged = "phraseChanged";
+    public const string BlockChanged = "blockChanged";
+    public const string SegmentChanged = "segmentChanged";
+    public const string StatusChanged = "statusChanged";
+    public const string Completed = "completed";
+    public const string SnapshotChanged = "snapshotChanged";
+    public const string ObserveSnapshot = "observeSnapshot";
+}
+
 public class TpsPlaybackSessionOptions
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -29,14 +50,14 @@ public class TpsPlaybackSessionOptions
     {
         get;
         init => field = value > 0 ? value : throw new ArgumentOutOfRangeException(nameof(value), "SpeedStepWpm must be greater than zero.");
-    } = 10;
+    } = TpsPlaybackDefaults.DefaultSpeedStepWpm;
 
     [JsonPropertyName("tickIntervalMs")]
     public int TickIntervalMs
     {
         get;
         init => field = value > 0 ? value : throw new ArgumentOutOfRangeException(nameof(value), "TickIntervalMs must be greater than zero.");
-    } = 16;
+    } = TpsPlaybackDefaults.DefaultTickIntervalMs;
 
     [JsonIgnore]
     public TimeProvider TimeProvider
