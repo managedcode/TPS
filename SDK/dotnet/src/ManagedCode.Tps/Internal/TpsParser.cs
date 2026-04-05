@@ -277,10 +277,17 @@ internal sealed partial class TpsParser
 
         if (!headerContent.StartsWith("[", StringComparison.Ordinal) || !headerContent.EndsWith("]", StringComparison.Ordinal))
         {
-            return new ParsedHeader(headerContent);
+            return new ParsedHeader(headerContent, line.StartOffset, line.StartOffset + line.Text.Length);
         }
 
-        return ParseBracketHeader(headerContent[1..^1], line.StartOffset + line.Text.IndexOf('[', StringComparison.Ordinal) + 1, lineStarts, diagnostics);
+        var parsed = ParseBracketHeader(headerContent[1..^1], line.StartOffset + line.Text.IndexOf('[', StringComparison.Ordinal) + 1, lineStarts, diagnostics);
+        return parsed is null
+            ? null
+            : parsed with
+            {
+                HeaderStart = line.StartOffset,
+                HeaderEnd = line.StartOffset + line.Text.Length
+            };
     }
 
     private static ParsedHeader? ParseBracketHeader(string content, int contentOffset, IReadOnlyList<int> lineStarts, List<TpsDiagnostic> diagnostics)
@@ -297,7 +304,7 @@ internal sealed partial class TpsParser
             return null;
         }
 
-        var header = new ParsedHeader(parts[0].Value);
+        var header = new ParsedHeader(parts[0].Value, contentOffset, contentOffset + content.Length);
         foreach (var part in parts.Skip(1))
         {
             var normalized = TpsSupport.NormalizeValue(part.Value);
@@ -415,11 +422,15 @@ internal sealed partial class TpsParser
                 AccentColor = palette.Accent,
                 Blocks = blocks
             },
-            blocks);
+            blocks)
+        {
+            HeaderStart = header.HeaderStart,
+            HeaderEnd = header.HeaderEnd
+        };
     }
 
     private static ParsedSegmentInternal CreateImplicitSegment(IReadOnlyDictionary<string, string> metadata, int index) =>
-        CreateSegment(new ParsedHeader(metadata.TryGetValue(TpsSpec.FrontMatterKeys.Title, out var title) ? title : TpsSpec.DefaultImplicitSegmentName)
+        CreateSegment(new ParsedHeader(metadata.TryGetValue(TpsSpec.FrontMatterKeys.Title, out var title) ? title : TpsSpec.DefaultImplicitSegmentName, 0, 0)
         {
             TargetWpm = TpsSupport.ResolveBaseWpm(metadata),
             Emotion = TpsSpec.DefaultEmotion
@@ -434,7 +445,11 @@ internal sealed partial class TpsParser
             Emotion = header.Emotion,
             Speaker = header.Speaker,
             Archetype = header.Archetype
-        });
+        })
+        {
+            HeaderStart = header.HeaderStart,
+            HeaderEnd = header.HeaderEnd
+        };
 
     private static ContentSection? CreateContentSection(IReadOnlyList<LineRecord> lines)
     {
@@ -582,6 +597,8 @@ internal enum HeaderLevel
 
 internal sealed record ParsedHeader(
     string Name,
+    int HeaderStart,
+    int HeaderEnd,
     int? TargetWpm = null,
     string? Emotion = null,
     string? Timing = null,
@@ -596,12 +613,20 @@ internal sealed class ParsedBlockInternal(TpsBlock block)
 {
     public TpsBlock Block { get; } = block;
 
+    public int HeaderStart { get; init; }
+
+    public int HeaderEnd { get; init; }
+
     public ContentSection? Content { get; set; }
 }
 
 internal sealed class ParsedSegmentInternal(TpsSegment segment, List<TpsBlock> blocks)
 {
     public TpsSegment Segment { get; } = segment;
+
+    public int HeaderStart { get; init; }
+
+    public int HeaderEnd { get; init; }
 
     public List<TpsBlock> Blocks { get; } = blocks;
 

@@ -25,6 +25,8 @@ The TypeScript runtime is the canonical implementation. The JavaScript runtime i
 
 Compiled TPS output is meant to be portable. The active runtimes treat the compiled state machine as the shared transport format for `compile -> json -> restore -> play` flows.
 
+The root [README.md](/Users/ksemenenko/Developer/TPS/README.md) is the canonical format specification. This SDK README documents the runtime contract that is implemented today.
+
 ## Workspace Layout
 
 - `ts/`: canonical TypeScript implementation
@@ -48,6 +50,33 @@ Compiled TPS output is meant to be portable. The active runtimes treat the compi
 | `SDK/swift` | Swift runtime package | changing Apple-platform runtime behavior or tests | `cd SDK/swift && ./coverage.sh` |
 | `SDK/java` | Java runtime package | changing Java behavior or tests | `cd SDK/java && ./coverage.sh` |
 
+## Source Input Conventions
+
+The format spec allows these file naming conventions:
+
+- `.tps`
+- `.tps.md`
+- `.md.tps`
+
+The runtimes themselves compile TPS source text, not a specific extension. If a host already has the script content in memory, it can compile it directly without depending on the original file name.
+
+## Current Runtime Contract
+
+Across the active runtimes, the shared contract today includes:
+
+- spec constants for metadata keys, keywords, emotions, archetypes, tags, and playback defaults
+- actionable TPS diagnostics for malformed structure, invalid ranges, unknown tags, and unknown archetypes
+- parsing into a document model with segment, block, phrase, and word scopes
+- compilation into a normalized JSON-friendly state machine
+- restore from compiled JSON or compiled object graphs
+- deterministic playback via `TpsPlayer`
+- timed playback via `TpsPlaybackSession`
+- compile-and-play embedding via `TpsStandalonePlayer`
+
+Archetype parsing, inheritance, and recommended-WPM defaults are part of the current parity contract.
+
+The advisory archetype-profile mismatch warnings and rhythm-analysis warnings described in the root spec are format-level guidance and are not yet enforced uniformly across every runtime.
+
 ## Compiled Model
 
 The compiled TPS state machine is organized as:
@@ -58,7 +87,7 @@ The compiled TPS state machine is organized as:
 4. phrases
 5. words
 
-Each compiled word carries timing and authoring-derived metadata such as emphasis, emotion, speed override, pronunciation, volume, delivery mode, and edit-point markers.
+Each compiled word carries timing and authoring-derived metadata such as emphasis, pause timing, highlight, breath, edit-point markers, emotion hints, articulation, energy, melody, volume, speed override or multiplier, pronunciation or phonetic guides, stress guides, speaker, and head-cue data.
 
 ## Playback Model
 
@@ -91,7 +120,7 @@ Each snapshot exposes:
 - tempo state: base WPM, global offset, effective base WPM, playback rate
 - control availability for enabling or disabling host buttons
 
-The root [README.md](/Users/ksemenenko/Developer/TPS/README.md) is the canonical human-readable format spec. Keep it aligned with `examples/*.tps`, `SDK/fixtures/invalid/*.tps`, and the shared example snapshots whenever TPS syntax or playback semantics change.
+Keep the root [README.md](/Users/ksemenenko/Developer/TPS/README.md) aligned with `examples/*.tps`, `SDK/fixtures/invalid/*.tps`, and the shared example snapshots whenever TPS syntax or playback semantics change.
 
 On .NET, prefer wiring playback through `TpsPlaybackSessionOptions.TimeProvider` when a host needs deterministic or externally controlled time.
 On .NET UI hosts, also wire `TpsPlaybackSessionOptions.EventSynchronizationContext` so snapshot and state events land on the dispatcher the host actually renders from.

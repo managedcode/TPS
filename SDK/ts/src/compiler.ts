@@ -1,3 +1,4 @@
+import { appendArchetypeDiagnostics, type ArchetypeDiagnosticTarget } from "./archetype-analysis.js";
 import { compileContent, type InheritedFormattingState, type PhraseSeed, type WordSeed } from "./content-compiler.js";
 import { normalizeCompiledScript } from "./compiled-script.js";
 import { hasErrors } from "./diagnostics.js";
@@ -8,6 +9,7 @@ import { resolveArchetypeWpm, resolveBaseWpm, resolveEmotion, resolveSpeedOffset
 interface BlockCandidate {
   block: CompiledBlock;
   content: ReturnType<typeof compileContent>;
+  diagnosticTarget: ArchetypeDiagnosticTarget;
 }
 
 interface SegmentCandidate {
@@ -42,7 +44,9 @@ function compileAnalysis(analysis: DocumentAnalysis): CompiledScript {
   const baseWpm = resolveBaseWpm(analysis.document.metadata);
   const speedOffsets = resolveSpeedOffsets(analysis.document.metadata);
   const candidates = analysis.parsedSegments.map((parsedSegment) => compileSegment(parsedSegment, baseWpm, speedOffsets, analysis));
-  return finalizeScript(analysis.document.metadata, candidates);
+  const script = finalizeScript(analysis.document.metadata, candidates);
+  appendArchetypeDiagnostics(candidates.flatMap((candidate) => candidate.blocks.map((block) => block.diagnosticTarget)), analysis.lineStarts, analysis.diagnostics);
+  return script;
 }
 
 function compileSegment(
@@ -81,8 +85,10 @@ function compileSegment(
   };
 }
 
-function buildBlocks(parsedSegment: ParsedSegmentInternal): Array<{ block: ParsedBlockInternal["block"]; isImplicit: boolean; content?: ContentSection }> {
-  const blocks: Array<{ block: ParsedBlockInternal["block"]; isImplicit: boolean; content?: ContentSection }> = [];
+function buildBlocks(
+  parsedSegment: ParsedSegmentInternal
+): Array<{ block: ParsedBlockInternal["block"]; isImplicit: boolean; content?: ContentSection; headerStart: number; headerEnd: number }> {
+  const blocks: Array<{ block: ParsedBlockInternal["block"]; isImplicit: boolean; content?: ContentSection; headerStart: number; headerEnd: number }> = [];
   if (parsedSegment.leadingContent?.text && parsedSegment.parsedBlocks.length > 0) {
     blocks.push({
       block: {
@@ -95,7 +101,9 @@ function buildBlocks(parsedSegment: ParsedSegmentInternal): Array<{ block: Parse
         archetype: parsedSegment.segment.archetype
       },
       isImplicit: true,
-      content: parsedSegment.leadingContent
+      content: parsedSegment.leadingContent,
+      headerStart: parsedSegment.headerStart,
+      headerEnd: parsedSegment.headerEnd
     });
   }
 
@@ -111,19 +119,27 @@ function buildBlocks(parsedSegment: ParsedSegmentInternal): Array<{ block: Parse
         archetype: parsedSegment.segment.archetype
       },
       isImplicit: true,
-      content: parsedSegment.directContent
+      content: parsedSegment.directContent,
+      headerStart: parsedSegment.headerStart,
+      headerEnd: parsedSegment.headerEnd
     });
   }
 
   for (const parsedBlock of parsedSegment.parsedBlocks) {
-    blocks.push({ block: parsedBlock.block, isImplicit: false, content: parsedBlock.content });
+    blocks.push({
+      block: parsedBlock.block,
+      isImplicit: false,
+      content: parsedBlock.content,
+      headerStart: parsedBlock.headerStart,
+      headerEnd: parsedBlock.headerEnd
+    });
   }
 
   return blocks;
 }
 
 function compileBlock(
-  entry: { block: ParsedBlockInternal["block"]; isImplicit: boolean; content?: ContentSection },
+  entry: { block: ParsedBlockInternal["block"]; isImplicit: boolean; content?: ContentSection; headerStart: number; headerEnd: number },
   inherited: InheritedFormattingState,
   analysis: DocumentAnalysis
 ): BlockCandidate {
@@ -152,7 +168,25 @@ function compileBlock(
       phrases: [],
       words: []
     },
-    content
+    content,
+    diagnosticTarget: {
+      block: {
+        ...entry.block,
+        targetWpm: blockInherited.targetWpm,
+        emotion: blockInherited.emotion,
+        speaker: blockInherited.speaker,
+        archetype: resolvedArchetype,
+        isImplicit: entry.isImplicit,
+        startWordIndex: 0,
+        endWordIndex: 0,
+        startMs: 0,
+        endMs: 0,
+        phrases: [],
+        words: []
+      },
+      rangeStart: entry.headerStart,
+      rangeEnd: entry.headerEnd
+    }
   };
 }
 
@@ -171,6 +205,7 @@ function finalizeScript(metadata: Record<string, string>, candidates: SegmentCan
     const segmentWords: CompiledWord[] = [];
     for (const blockCandidate of segmentCandidate.blocks) {
       const { block, words, phrases, elapsed, nextWordIndex } = finalizeBlock(blockCandidate.block, blockCandidate.content.words, blockCandidate.content.phrases, segment.id, elapsedMs, wordIndex);
+      blockCandidate.diagnosticTarget.block = block;
       block.words = words;
       block.phrases = phrases;
       segment.blocks.push(block);

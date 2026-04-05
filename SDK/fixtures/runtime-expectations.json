@@ -64,5 +64,19 @@
     "unknown-archetype.tps": [
       "unknown-archetype"
     ]
+  },
+  "advisoryDiagnostics": {
+    "archetype-warnings.tps": [
+      "archetype-articulation-mismatch",
+      "archetype-energy-mismatch",
+      "archetype-melody-mismatch",
+      "archetype-volume-mismatch",
+      "archetype-speed-mismatch",
+      "archetype-rhythm-phrase-length",
+      "archetype-rhythm-pause-frequency",
+      "archetype-rhythm-pause-duration",
+      "archetype-rhythm-emphasis-density",
+      "archetype-rhythm-speed-variation"
+    ]
   }
 }

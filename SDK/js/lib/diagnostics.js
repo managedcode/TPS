@@ -1,4 +1,5 @@
-import { TpsDiagnosticCodes } from "./constants.js";
+import { TpsWarningDiagnosticCodes } from "./constants.js";
+const warningCodes = new Set(TpsWarningDiagnosticCodes);
 export function normalizeLineEndings(value) {
     return (value ?? "").replaceAll("\r\n", "\n").replaceAll("\r", "\n");
 }
@@ -32,8 +33,8 @@ export function rangeAt(start, end, lineStarts) {
         end: positionAt(end, lineStarts)
     };
 }
-export function createDiagnostic(code, message, start, end, lineStarts, suggestion) {
-    const severity = code === TpsDiagnosticCodes.invalidHeaderParameter ? "warning" : "error";
+export function createDiagnostic(code, message, start, end, lineStarts, suggestion, severityOverride) {
+    const severity = severityOverride ?? (warningCodes.has(code) ? "warning" : "error");
     return {
         code,
         severity,
@@ -44,5 +45,8 @@ export function createDiagnostic(code, message, start, end, lineStarts, suggesti
 }
 export function hasErrors(diagnostics) {
     return diagnostics.some((diagnostic) => diagnostic.severity === "error");
+}
+export function createWarningDiagnostic(code, message, start, end, lineStarts, suggestion) {
+    return createDiagnostic(code, message, start, end, lineStarts, suggestion, "warning");
 }
 //# sourceMappingURL=diagnostics.js.map

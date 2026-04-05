@@ -37,7 +37,7 @@ test("publishes the TPS keyword catalog and spec constants", () => {
 test("compiles the runtime parity fixture into a deterministic state machine", () => {
   const result = compileTps(readFixture("valid", "runtime-parity.tps"));
   assert.equal(result.ok, true);
-  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.diagnostics.every((diagnostic) => diagnostic.severity === "warning"));
   assert.ok(result.script);
 
   const [segment] = result.script.segments;
@@ -80,6 +80,17 @@ test("validates invalid fixtures with actionable diagnostics", () => {
     assert.deepEqual(result.diagnostics.map((diagnostic) => diagnostic.code), expectedCodes);
     assert.ok(result.diagnostics.every((diagnostic) => diagnostic.range.start.line >= 1));
   }
+});
+
+test("emits advisory archetype profile and rhythm diagnostics from shared fixtures", () => {
+  const warned = compileTps(readFixture("valid", "archetype-warnings.tps"));
+  assert.equal(warned.ok, true);
+  assert.deepEqual(warned.diagnostics.map((diagnostic) => diagnostic.code), expectations.advisoryDiagnostics["archetype-warnings.tps"]);
+  assert.ok(warned.diagnostics.every((diagnostic) => diagnostic.severity === "warning"));
+
+  const clean = compileTps(readFixture("valid", "archetype-clean.tps"));
+  assert.equal(clean.ok, true);
+  assert.deepEqual(clean.diagnostics, []);
 });
 
 test("parses plain markdown headers, title overrides, implicit segments, and timing hints", () => {

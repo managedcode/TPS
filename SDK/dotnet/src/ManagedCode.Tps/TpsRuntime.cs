@@ -48,7 +48,9 @@ public static class TpsRuntime
         var candidates = analysis.ParsedSegments
             .Select(parsedSegment => CompileSegment(parsedSegment, baseWpm, speedOffsets, analysis))
             .ToList();
-        return FinalizeScript(analysis.Document.Metadata, candidates);
+        var script = FinalizeScript(analysis.Document.Metadata, candidates);
+        TpsArchetypeAnalyzer.AppendDiagnostics(candidates.SelectMany(candidate => candidate.Blocks.Select(block => block.DiagnosticTarget)), analysis.LineStarts, analysis.Diagnostics);
+        return script;
     }
 
     private static SegmentCandidate CompileSegment(
@@ -100,7 +102,9 @@ public static class TpsRuntime
                     Archetype = parsedSegment.Segment.Archetype
                 },
                 true,
-                parsedSegment.LeadingContent);
+                parsedSegment.LeadingContent,
+                parsedSegment.HeaderStart,
+                parsedSegment.HeaderEnd);
         }
 
         if (parsedSegment.ParsedBlocks.Count == 0)
@@ -117,12 +121,14 @@ public static class TpsRuntime
                     Archetype = parsedSegment.Segment.Archetype
                 },
                 true,
-                parsedSegment.DirectContent);
+                parsedSegment.DirectContent,
+                parsedSegment.HeaderStart,
+                parsedSegment.HeaderEnd);
         }
 
         foreach (var parsedBlock in parsedSegment.ParsedBlocks)
         {
-            yield return new BlockDefinition(parsedBlock.Block, false, parsedBlock.Content);
+            yield return new BlockDefinition(parsedBlock.Block, false, parsedBlock.Content, parsedBlock.HeaderStart, parsedBlock.HeaderEnd);
         }
     }
 
@@ -147,22 +153,25 @@ public static class TpsRuntime
         var phrases = new List<CompiledPhrase>();
         var words = new List<CompiledWord>();
 
+        var compiledBlock = new CompiledBlock
+        {
+            Id = definition.Block.Id,
+            Name = definition.Block.Name,
+            TargetWpm = blockInherited.TargetWpm,
+            Emotion = blockInherited.Emotion,
+            Speaker = blockInherited.Speaker,
+            Archetype = blockArchetype,
+            IsImplicit = definition.IsImplicit,
+            Phrases = phrases,
+            Words = words
+        };
+
         return new BlockCandidate(
-            new CompiledBlock
-            {
-                Id = definition.Block.Id,
-                Name = definition.Block.Name,
-                TargetWpm = blockInherited.TargetWpm,
-                Emotion = blockInherited.Emotion,
-                Speaker = blockInherited.Speaker,
-                Archetype = blockArchetype,
-                IsImplicit = definition.IsImplicit,
-                Phrases = phrases,
-                Words = words
-            },
+            compiledBlock,
             content,
             phrases,
-            words);
+            words,
+            new ArchetypeDiagnosticTarget(compiledBlock, definition.HeaderStart, definition.HeaderEnd));
     }
 
     private static CompiledScript FinalizeScript(IReadOnlyDictionary<string, string> metadata, IEnumerable<SegmentCandidate> candidates)
@@ -288,8 +297,9 @@ internal sealed record BlockCandidate(
     CompiledBlock Block,
     ContentCompilationResult Content,
     List<CompiledPhrase> Phrases,
-    List<CompiledWord> Words);
+    List<CompiledWord> Words,
+    ArchetypeDiagnosticTarget DiagnosticTarget);
 
-internal sealed record BlockDefinition(TpsBlock Block, bool IsImplicit, ContentSection? Content);
+internal sealed record BlockDefinition(TpsBlock Block, bool IsImplicit, ContentSection? Content, int HeaderStart, int HeaderEnd);
 
 internal sealed record FinalizedBlock(List<CompiledWord> Words, List<CompiledPhrase> Phrases, int ElapsedMs, int NextWordIndex);

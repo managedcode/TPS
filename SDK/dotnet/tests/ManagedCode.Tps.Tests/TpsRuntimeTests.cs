@@ -15,6 +15,9 @@ public sealed class TpsRuntimeTests
         Assert.Equal(10, TpsPlaybackDefaults.DefaultSpeedStepWpm);
         Assert.Equal(16, TpsPlaybackDefaults.DefaultTickIntervalMs);
         Assert.Equal("snapshotChanged", TpsPlaybackEventNames.SnapshotChanged);
+        Assert.Equal("legato", TpsSpec.ArchetypeProfiles[TpsSpec.ArchetypeNames.Friend].Articulation);
+        Assert.Equal(12, TpsSpec.ArchetypeRhythmMinimumWords);
+        Assert.Contains(TpsSpec.DiagnosticCodes.ArchetypeRhythmPauseFrequency, TpsSpec.WarningDiagnosticCodes);
         Assert.Contains(TpsSpec.Tags.Building, TpsSpec.DeliveryModes);
         Assert.Contains(TpsSpec.Tags.Loud, TpsSpec.VolumeLevels);
         Assert.Contains(TpsSpec.Tags.Normal, TpsSpec.RelativeSpeedTags);
@@ -166,7 +169,7 @@ public sealed class TpsRuntimeTests
     {
         var result = TpsRuntime.Compile(ReadFixture("valid", "runtime-parity.tps"));
         Assert.True(result.Ok);
-        Assert.Empty(result.Diagnostics);
+        Assert.All(result.Diagnostics, diagnostic => Assert.Equal(TpsSeverity.Warning, diagnostic.Severity));
 
         var segment = Assert.Single(result.Script.Segments);
         Assert.Equal("Call to Action", segment.Name);
@@ -192,6 +195,19 @@ public sealed class TpsRuntimeTests
         var editPoint = Assert.Single(result.Script.Words, word => word.Kind == "edit-point");
         Assert.Equal("high", editPoint.Metadata.EditPointPriority);
         Assert.Equal(result.Script.TotalDurationMs, result.Script.Words[^1].EndMs);
+    }
+
+    [Fact]
+    public void Compile_EmitsAdvisoryArchetypeDiagnosticsFromSharedFixtures()
+    {
+        var warned = TpsRuntime.Compile(ReadFixture("valid", "archetype-warnings.tps"));
+        Assert.True(warned.Ok);
+        Assert.Equal(LoadAdvisoryExpectations("archetype-warnings.tps"), warned.Diagnostics.Select(diagnostic => diagnostic.Code).ToArray());
+        Assert.All(warned.Diagnostics, diagnostic => Assert.Equal(TpsSeverity.Warning, diagnostic.Severity));
+
+        var clean = TpsRuntime.Compile(ReadFixture("valid", "archetype-clean.tps"));
+        Assert.True(clean.Ok);
+        Assert.Empty(clean.Diagnostics);
     }
 
     [Fact]
@@ -528,6 +544,12 @@ public sealed class TpsRuntimeTests
         {
             yield return (property.Name, property.Value.EnumerateArray().Select(item => item.GetString()!).ToArray());
         }
+    }
+
+    private static string[] LoadAdvisoryExpectations(string fileName)
+    {
+        using var document = JsonDocument.Parse(File.ReadAllText(Path.Combine(FixturesRoot, "runtime-expectations.json")));
+        return document.RootElement.GetProperty("advisoryDiagnostics").GetProperty(fileName).EnumerateArray().Select(item => item.GetString()!).ToArray();
     }
 
     private static CompiledScript MutateCompiledNode(JsonObject baseline, Action<JsonObject> mutate)

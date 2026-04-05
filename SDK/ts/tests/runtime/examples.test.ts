@@ -21,6 +21,7 @@ test("source TypeScript runtime matches shared example snapshots", () => {
     const source = readFileSync(path.join(rootDir, "examples", example), "utf8");
     const result = compileTps(source);
     assert.equal(result.ok, true, example);
+    assert.deepEqual(result.diagnostics, [], example);
     assert.deepEqual(
       buildExampleSnapshot(example, result.script, {
         playerFactory: (script) => new TpsPlayer(script),
@@ -161,4 +162,29 @@ test("source TypeScript runtime rejects malformed compiled JSON and invalid fixt
   const canonicalTransport = JSON.parse(readFixture("transport", "runtime-parity.compiled.json"));
   canonicalTransport.segments = [];
   assert.throws(() => parseCompiledScriptJson(JSON.stringify(canonicalTransport)), /at least one segment/i);
+});
+
+test("source TypeScript runtime emits advisory archetype diagnostics from shared fixtures", () => {
+  const warned = compileTps(readFixture("valid", "archetype-warnings.tps"));
+  assert.equal(warned.ok, true);
+  assert.deepEqual(
+    warned.diagnostics.map((diagnostic) => diagnostic.code),
+    [
+      "archetype-articulation-mismatch",
+      "archetype-energy-mismatch",
+      "archetype-melody-mismatch",
+      "archetype-volume-mismatch",
+      "archetype-speed-mismatch",
+      "archetype-rhythm-phrase-length",
+      "archetype-rhythm-pause-frequency",
+      "archetype-rhythm-pause-duration",
+      "archetype-rhythm-emphasis-density",
+      "archetype-rhythm-speed-variation"
+    ]
+  );
+  assert.ok(warned.diagnostics.every((diagnostic) => diagnostic.severity === "warning"));
+
+  const clean = compileTps(readFixture("valid", "archetype-clean.tps"));
+  assert.equal(clean.ok, true);
+  assert.deepEqual(clean.diagnostics, []);
 });

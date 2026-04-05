@@ -120,6 +120,111 @@ export const TpsArchetypeRecommendedWpm = Object.freeze({
   [TpsArchetypeNames.entertainer]: 150
 });
 
+export const TpsArchetypeArticulationExpectations = Object.freeze({
+  legato: "legato",
+  staccato: "staccato",
+  neutral: "neutral",
+  flexible: "flexible"
+});
+
+export const TpsArchetypeVolumeExpectations = Object.freeze({
+  defaultOnly: "default-only",
+  softOrDefault: "soft-or-default",
+  loudOnly: "loud-only",
+  flexible: "flexible"
+});
+
+export const TpsArchetypeProfiles = Object.freeze({
+  [TpsArchetypeNames.friend]: Object.freeze({
+    articulation: TpsArchetypeArticulationExpectations.legato,
+    energy: Object.freeze({ min: 4, max: 6 }),
+    melody: Object.freeze({ min: 6, max: 8 }),
+    volume: TpsArchetypeVolumeExpectations.softOrDefault,
+    speed: Object.freeze({ min: 125, max: 150 })
+  }),
+  [TpsArchetypeNames.motivator]: Object.freeze({
+    articulation: TpsArchetypeArticulationExpectations.legato,
+    energy: Object.freeze({ min: 7, max: 10 }),
+    melody: Object.freeze({ min: 7, max: 9 }),
+    volume: TpsArchetypeVolumeExpectations.loudOnly,
+    speed: Object.freeze({ min: 145, max: 170 })
+  }),
+  [TpsArchetypeNames.educator]: Object.freeze({
+    articulation: TpsArchetypeArticulationExpectations.neutral,
+    energy: Object.freeze({ min: 3, max: 5 }),
+    melody: Object.freeze({ min: 2, max: 4 }),
+    volume: TpsArchetypeVolumeExpectations.defaultOnly,
+    speed: Object.freeze({ min: 110, max: 135 })
+  }),
+  [TpsArchetypeNames.coach]: Object.freeze({
+    articulation: TpsArchetypeArticulationExpectations.staccato,
+    energy: Object.freeze({ min: 7, max: 9 }),
+    melody: Object.freeze({ min: 1, max: 3 }),
+    volume: TpsArchetypeVolumeExpectations.loudOnly,
+    speed: Object.freeze({ min: 135, max: 160 })
+  }),
+  [TpsArchetypeNames.storyteller]: Object.freeze({
+    articulation: TpsArchetypeArticulationExpectations.flexible,
+    energy: Object.freeze({ min: 4, max: 7 }),
+    melody: Object.freeze({ min: 8, max: 10 }),
+    volume: TpsArchetypeVolumeExpectations.flexible,
+    speed: Object.freeze({ min: 100, max: 150 })
+  }),
+  [TpsArchetypeNames.entertainer]: Object.freeze({
+    articulation: TpsArchetypeArticulationExpectations.flexible,
+    energy: Object.freeze({ min: 6, max: 8 }),
+    melody: Object.freeze({ min: 7, max: 9 }),
+    volume: TpsArchetypeVolumeExpectations.flexible,
+    speed: Object.freeze({ min: 140, max: 165 })
+  })
+});
+
+export const TpsArchetypeRhythmProfiles = Object.freeze({
+  minimumWords: 12,
+  [TpsArchetypeNames.friend]: Object.freeze({
+    phraseLength: Object.freeze({ min: 8, max: 15 }),
+    pauseFrequencyPer100Words: Object.freeze({ min: 4, max: 8 }),
+    averagePauseDurationMs: Object.freeze({ min: 300, max: 600 }),
+    emphasisDensityPercent: Object.freeze({ min: 3, max: 8 }),
+    speedVariationPer100Words: Object.freeze({ min: 0, max: 1 })
+  }),
+  [TpsArchetypeNames.motivator]: Object.freeze({
+    phraseLength: Object.freeze({ min: 8, max: 20 }),
+    pauseFrequencyPer100Words: Object.freeze({ min: 3, max: 6 }),
+    averagePauseDurationMs: Object.freeze({ min: 600, max: 2000 }),
+    emphasisDensityPercent: Object.freeze({ min: 10, max: 20 }),
+    speedVariationPer100Words: Object.freeze({ min: 0, max: 2 })
+  }),
+  [TpsArchetypeNames.educator]: Object.freeze({
+    phraseLength: Object.freeze({ min: 10, max: 25 }),
+    pauseFrequencyPer100Words: Object.freeze({ min: 6, max: 12 }),
+    averagePauseDurationMs: Object.freeze({ min: 400, max: 800 }),
+    emphasisDensityPercent: Object.freeze({ min: 3, max: 8 }),
+    speedVariationPer100Words: Object.freeze({ min: 0, max: 2 })
+  }),
+  [TpsArchetypeNames.coach]: Object.freeze({
+    phraseLength: Object.freeze({ min: 3, max: 8 }),
+    pauseFrequencyPer100Words: Object.freeze({ min: 8, max: 15 }),
+    averagePauseDurationMs: Object.freeze({ min: 200, max: 400 }),
+    emphasisDensityPercent: Object.freeze({ min: 15, max: 30 }),
+    speedVariationPer100Words: Object.freeze({ min: 0, max: 2 })
+  }),
+  [TpsArchetypeNames.storyteller]: Object.freeze({
+    phraseLength: Object.freeze({ min: 5, max: 20 }),
+    pauseFrequencyPer100Words: Object.freeze({ min: 4, max: 10 }),
+    averagePauseDurationMs: Object.freeze({ min: 500, max: 3000 }),
+    emphasisDensityPercent: Object.freeze({ min: 5, max: 12 }),
+    speedVariationPer100Words: Object.freeze({ min: 3, max: 6 })
+  }),
+  [TpsArchetypeNames.entertainer]: Object.freeze({
+    phraseLength: Object.freeze({ min: 5, max: 15 }),
+    pauseFrequencyPer100Words: Object.freeze({ min: 5, max: 10 }),
+    averagePauseDurationMs: Object.freeze({ min: 300, max: 2000 }),
+    emphasisDensityPercent: Object.freeze({ min: 5, max: 15 }),
+    speedVariationPer100Words: Object.freeze({ min: 2, max: 4 })
+  })
+});
+
 export const TpsEnergyLevels = Object.freeze({ min: 1, max: 10 });
 export const TpsMelodyLevels = Object.freeze({ min: 1, max: 10 });
 
@@ -191,9 +296,33 @@ export const TpsDiagnosticCodes = Object.freeze({
   invalidEnergyLevel: "invalid-energy-level",
   invalidMelodyLevel: "invalid-melody-level",
   unknownArchetype: "unknown-archetype",
+  archetypeArticulationMismatch: "archetype-articulation-mismatch",
+  archetypeEnergyMismatch: "archetype-energy-mismatch",
+  archetypeMelodyMismatch: "archetype-melody-mismatch",
+  archetypeVolumeMismatch: "archetype-volume-mismatch",
+  archetypeSpeedMismatch: "archetype-speed-mismatch",
+  archetypeRhythmPhraseLength: "archetype-rhythm-phrase-length",
+  archetypeRhythmPauseFrequency: "archetype-rhythm-pause-frequency",
+  archetypeRhythmPauseDuration: "archetype-rhythm-pause-duration",
+  archetypeRhythmEmphasisDensity: "archetype-rhythm-emphasis-density",
+  archetypeRhythmSpeedVariation: "archetype-rhythm-speed-variation",
   mismatchedClosingTag: "mismatched-closing-tag",
   unclosedTag: "unclosed-tag"
 });
+
+export const TpsWarningDiagnosticCodes = Object.freeze([
+  TpsDiagnosticCodes.invalidHeaderParameter,
+  TpsDiagnosticCodes.archetypeArticulationMismatch,
+  TpsDiagnosticCodes.archetypeEnergyMismatch,
+  TpsDiagnosticCodes.archetypeMelodyMismatch,
+  TpsDiagnosticCodes.archetypeVolumeMismatch,
+  TpsDiagnosticCodes.archetypeSpeedMismatch,
+  TpsDiagnosticCodes.archetypeRhythmPhraseLength,
+  TpsDiagnosticCodes.archetypeRhythmPauseFrequency,
+  TpsDiagnosticCodes.archetypeRhythmPauseDuration,
+  TpsDiagnosticCodes.archetypeRhythmEmphasisDensity,
+  TpsDiagnosticCodes.archetypeRhythmSpeedVariation
+] as const);
 
 export const TpsPlaybackDefaults = Object.freeze({
   defaultSpeedStepWpm: 10,
@@ -223,10 +352,13 @@ export const TpsKeywords = Object.freeze({
   deliveryModes: TpsDeliveryModes,
   articulationStyles: TpsArticulationStyles,
   archetypes: TpsArchetypes,
+  archetypeProfiles: TpsArchetypeProfiles,
+  archetypeRhythmProfiles: TpsArchetypeRhythmProfiles,
   relativeSpeedTags: TpsRelativeSpeedTags,
   editPointPriorities: TpsEditPointPriorities,
   controlMarkers: TpsControlMarkers,
-  playbackEventNames: TpsPlaybackEventNames
+  playbackEventNames: TpsPlaybackEventNames,
+  warningDiagnosticCodes: TpsWarningDiagnosticCodes
 });
 
 export const TpsSpec = Object.freeze({
@@ -258,6 +390,11 @@ export const TpsSpec = Object.freeze({
   articulationStyles: TpsArticulationStyles,
   archetypes: TpsArchetypes,
   archetypeRecommendedWpm: TpsArchetypeRecommendedWpm,
+  archetypeArticulationExpectations: TpsArchetypeArticulationExpectations,
+  archetypeVolumeExpectations: TpsArchetypeVolumeExpectations,
+  archetypeProfiles: TpsArchetypeProfiles,
+  archetypeRhythmProfiles: TpsArchetypeRhythmProfiles,
+  warningDiagnosticCodes: TpsWarningDiagnosticCodes,
   playbackDefaults: TpsPlaybackDefaults,
   playbackEventNames: TpsPlaybackEventNames,
   energyLevels: TpsEnergyLevels,

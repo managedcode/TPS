@@ -5,10 +5,14 @@ export interface ContentSection {
 }
 export interface ParsedBlockInternal {
     block: TpsSegment["blocks"][number];
+    headerStart: number;
+    headerEnd: number;
     content?: ContentSection;
 }
 export interface ParsedSegmentInternal {
     segment: TpsSegment;
+    headerStart: number;
+    headerEnd: number;
     leadingContent?: ContentSection;
     directContent?: ContentSection;
     parsedBlocks: ParsedBlockInternal[];

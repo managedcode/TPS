@@ -28,11 +28,15 @@ export interface ContentSection {
 
 export interface ParsedBlockInternal {
   block: TpsSegment["blocks"][number];
+  headerStart: number;
+  headerEnd: number;
   content?: ContentSection;
 }
 
 export interface ParsedSegmentInternal {
   segment: TpsSegment;
+  headerStart: number;
+  headerEnd: number;
   leadingContent?: ContentSection;
   directContent?: ContentSection;
   parsedBlocks: ParsedBlockInternal[];
@@ -48,6 +52,8 @@ export interface DocumentAnalysis {
 
 interface ParsedHeader {
   name: string;
+  headerStart: number;
+  headerEnd: number;
   targetWpm?: number;
   emotion?: string;
   timing?: string;
@@ -310,10 +316,21 @@ function tryParseHeader(
   }
 
   if (!headerContent.startsWith("[") || !headerContent.endsWith("]")) {
-    return { name: headerContent };
+    return {
+      name: headerContent,
+      headerStart: line.startOffset,
+      headerEnd: line.startOffset + line.text.length
+    };
   }
 
-  return parseBracketHeader(headerContent.slice(1, -1), line.startOffset + line.text.indexOf("[") + 1, lineStarts, diagnostics);
+  const parsed = parseBracketHeader(headerContent.slice(1, -1), line.startOffset + line.text.indexOf("[") + 1, lineStarts, diagnostics);
+  return parsed
+    ? {
+        ...parsed,
+        headerStart: line.startOffset,
+        headerEnd: line.startOffset + line.text.length
+      }
+    : undefined;
 }
 
 function parseBracketHeader(
@@ -328,7 +345,11 @@ function parseBracketHeader(
     return undefined;
   }
 
-  const parsed: ParsedHeader = { name: parts[0].value };
+  const parsed: ParsedHeader = {
+    name: parts[0].value,
+    headerStart: contentOffset,
+    headerEnd: contentOffset + headerContent.length
+  };
   for (const part of parts.slice(1)) {
     const normalized = normalizeValue(part.value);
     if (!normalized) {
@@ -436,13 +457,20 @@ function createSegment(header: ParsedHeader, metadata: Record<string, string>, i
     blocks: []
   };
 
-  return { segment, parsedBlocks: [] };
+  return {
+    segment,
+    headerStart: header.headerStart,
+    headerEnd: header.headerEnd,
+    parsedBlocks: []
+  };
 }
 
 function createImplicitSegment(metadata: Record<string, string>, index: number): ParsedSegmentInternal {
   return createSegment(
     {
       name: metadata[TpsFrontMatterKeys.title] ?? TpsSpec.defaultImplicitSegmentName,
+      headerStart: 0,
+      headerEnd: 0,
       targetWpm: resolveBaseWpm(metadata),
       emotion: TpsSpec.defaultEmotion
     },
@@ -453,6 +481,8 @@ function createImplicitSegment(metadata: Record<string, string>, index: number):
 
 function createBlock(header: ParsedHeader, blockIndex: number, segmentId: string): ParsedBlockInternal {
   return {
+    headerStart: header.headerStart,
+    headerEnd: header.headerEnd,
     block: {
       id: `${segmentId}-block-${blockIndex}`,
       name: header.name,

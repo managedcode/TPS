@@ -72,6 +72,16 @@ public static class TpsSpec
 
     public static class DiagnosticCodes
     {
+        public const string ArchetypeArticulationMismatch = "archetype-articulation-mismatch";
+        public const string ArchetypeEnergyMismatch = "archetype-energy-mismatch";
+        public const string ArchetypeMelodyMismatch = "archetype-melody-mismatch";
+        public const string ArchetypeRhythmEmphasisDensity = "archetype-rhythm-emphasis-density";
+        public const string ArchetypeRhythmPauseDuration = "archetype-rhythm-pause-duration";
+        public const string ArchetypeRhythmPauseFrequency = "archetype-rhythm-pause-frequency";
+        public const string ArchetypeRhythmPhraseLength = "archetype-rhythm-phrase-length";
+        public const string ArchetypeRhythmSpeedVariation = "archetype-rhythm-speed-variation";
+        public const string ArchetypeSpeedMismatch = "archetype-speed-mismatch";
+        public const string ArchetypeVolumeMismatch = "archetype-volume-mismatch";
         public const string InvalidEnergyLevel = "invalid-energy-level";
         public const string InvalidFrontMatter = "invalid-front-matter";
         public const string InvalidHeader = "invalid-header";
@@ -86,6 +96,22 @@ public static class TpsSpec
         public const string UnknownTag = "unknown-tag";
         public const string UnterminatedTag = "unterminated-tag";
     }
+
+    public static IReadOnlySet<string> WarningDiagnosticCodes { get; } =
+        new HashSet<string>(StringComparer.Ordinal)
+        {
+            DiagnosticCodes.InvalidHeaderParameter,
+            DiagnosticCodes.ArchetypeArticulationMismatch,
+            DiagnosticCodes.ArchetypeEnergyMismatch,
+            DiagnosticCodes.ArchetypeMelodyMismatch,
+            DiagnosticCodes.ArchetypeVolumeMismatch,
+            DiagnosticCodes.ArchetypeSpeedMismatch,
+            DiagnosticCodes.ArchetypeRhythmPhraseLength,
+            DiagnosticCodes.ArchetypeRhythmPauseFrequency,
+            DiagnosticCodes.ArchetypeRhythmPauseDuration,
+            DiagnosticCodes.ArchetypeRhythmEmphasisDensity,
+            DiagnosticCodes.ArchetypeRhythmSpeedVariation
+        };
 
     public static IReadOnlyList<string> Emotions { get; } =
     [
@@ -167,6 +193,46 @@ public static class TpsSpec
             [ArchetypeNames.Entertainer] = 150
         };
 
+    public static class ArchetypeArticulationExpectations
+    {
+        public const string Flexible = "flexible";
+        public const string Legato = "legato";
+        public const string Neutral = "neutral";
+        public const string Staccato = "staccato";
+    }
+
+    public static class ArchetypeVolumeExpectations
+    {
+        public const string DefaultOnly = "default-only";
+        public const string Flexible = "flexible";
+        public const string LoudOnly = "loud-only";
+        public const string SoftOrDefault = "soft-or-default";
+    }
+
+    public static IReadOnlyDictionary<string, TpsArchetypeProfile> ArchetypeProfiles { get; } =
+        new Dictionary<string, TpsArchetypeProfile>(StringComparer.OrdinalIgnoreCase)
+        {
+            [ArchetypeNames.Friend] = new(ArchetypeArticulationExpectations.Legato, new NumericRange(4, 6), new NumericRange(6, 8), ArchetypeVolumeExpectations.SoftOrDefault, new NumericRange(125, 150)),
+            [ArchetypeNames.Motivator] = new(ArchetypeArticulationExpectations.Legato, new NumericRange(7, 10), new NumericRange(7, 9), ArchetypeVolumeExpectations.LoudOnly, new NumericRange(145, 170)),
+            [ArchetypeNames.Educator] = new(ArchetypeArticulationExpectations.Neutral, new NumericRange(3, 5), new NumericRange(2, 4), ArchetypeVolumeExpectations.DefaultOnly, new NumericRange(110, 135)),
+            [ArchetypeNames.Coach] = new(ArchetypeArticulationExpectations.Staccato, new NumericRange(7, 9), new NumericRange(1, 3), ArchetypeVolumeExpectations.LoudOnly, new NumericRange(135, 160)),
+            [ArchetypeNames.Storyteller] = new(ArchetypeArticulationExpectations.Flexible, new NumericRange(4, 7), new NumericRange(8, 10), ArchetypeVolumeExpectations.Flexible, new NumericRange(100, 150)),
+            [ArchetypeNames.Entertainer] = new(ArchetypeArticulationExpectations.Flexible, new NumericRange(6, 8), new NumericRange(7, 9), ArchetypeVolumeExpectations.Flexible, new NumericRange(140, 165))
+        };
+
+    public const int ArchetypeRhythmMinimumWords = 12;
+
+    public static IReadOnlyDictionary<string, TpsArchetypeRhythmProfile> ArchetypeRhythmProfiles { get; } =
+        new Dictionary<string, TpsArchetypeRhythmProfile>(StringComparer.OrdinalIgnoreCase)
+        {
+            [ArchetypeNames.Friend] = new(new NumericRange(8, 15), new NumericRange(4, 8), new NumericRange(300, 600), new NumericRange(3, 8), new NumericRange(0, 1)),
+            [ArchetypeNames.Motivator] = new(new NumericRange(8, 20), new NumericRange(3, 6), new NumericRange(600, 2000), new NumericRange(10, 20), new NumericRange(0, 2)),
+            [ArchetypeNames.Educator] = new(new NumericRange(10, 25), new NumericRange(6, 12), new NumericRange(400, 800), new NumericRange(3, 8), new NumericRange(0, 2)),
+            [ArchetypeNames.Coach] = new(new NumericRange(3, 8), new NumericRange(8, 15), new NumericRange(200, 400), new NumericRange(15, 30), new NumericRange(0, 2)),
+            [ArchetypeNames.Storyteller] = new(new NumericRange(5, 20), new NumericRange(4, 10), new NumericRange(500, 3000), new NumericRange(5, 12), new NumericRange(3, 6)),
+            [ArchetypeNames.Entertainer] = new(new NumericRange(5, 15), new NumericRange(5, 10), new NumericRange(300, 2000), new NumericRange(5, 15), new NumericRange(2, 4))
+        };
+
     public const int EnergyLevelMin = 1;
     public const int EnergyLevelMax = 10;
     public const int MelodyLevelMin = 1;
@@ -217,3 +283,19 @@ public static class TpsSpec
 }
 
 public sealed record EmotionPalette(string Accent, string Text, string Background);
+
+public sealed record NumericRange(int Min, int Max);
+
+public sealed record TpsArchetypeProfile(
+    string Articulation,
+    NumericRange Energy,
+    NumericRange Melody,
+    string Volume,
+    NumericRange Speed);
+
+public sealed record TpsArchetypeRhythmProfile(
+    NumericRange PhraseLength,
+    NumericRange PauseFrequencyPer100Words,
+    NumericRange AveragePauseDurationMs,
+    NumericRange EmphasisDensityPercent,
+    NumericRange SpeedVariationPer100Words);

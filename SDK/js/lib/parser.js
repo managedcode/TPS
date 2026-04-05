@@ -195,9 +195,20 @@ function tryParseHeader(line, level, lineStarts, diagnostics) {
         return undefined;
     }
     if (!headerContent.startsWith("[") || !headerContent.endsWith("]")) {
-        return { name: headerContent };
+        return {
+            name: headerContent,
+            headerStart: line.startOffset,
+            headerEnd: line.startOffset + line.text.length
+        };
     }
-    return parseBracketHeader(headerContent.slice(1, -1), line.startOffset + line.text.indexOf("[") + 1, lineStarts, diagnostics);
+    const parsed = parseBracketHeader(headerContent.slice(1, -1), line.startOffset + line.text.indexOf("[") + 1, lineStarts, diagnostics);
+    return parsed
+        ? {
+            ...parsed,
+            headerStart: line.startOffset,
+            headerEnd: line.startOffset + line.text.length
+        }
+        : undefined;
 }
 function parseBracketHeader(headerContent, contentOffset, lineStarts, diagnostics) {
     const parts = splitHeaderPartsDetailed(headerContent);
@@ -205,7 +216,11 @@ function parseBracketHeader(headerContent, contentOffset, lineStarts, diagnostic
         diagnostics.push(createDiagnostic(TpsDiagnosticCodes.invalidHeader, "Header name is required.", contentOffset, contentOffset + headerContent.length, lineStarts));
         return undefined;
     }
-    const parsed = { name: parts[0].value };
+    const parsed = {
+        name: parts[0].value,
+        headerStart: contentOffset,
+        headerEnd: contentOffset + headerContent.length
+    };
     for (const part of parts.slice(1)) {
         const normalized = normalizeValue(part.value);
         if (!normalized) {
@@ -275,17 +290,26 @@ function createSegment(header, metadata, index) {
         accentColor: palette.accent,
         blocks: []
     };
-    return { segment, parsedBlocks: [] };
+    return {
+        segment,
+        headerStart: header.headerStart,
+        headerEnd: header.headerEnd,
+        parsedBlocks: []
+    };
 }
 function createImplicitSegment(metadata, index) {
     return createSegment({
         name: metadata[TpsFrontMatterKeys.title] ?? TpsSpec.defaultImplicitSegmentName,
+        headerStart: 0,
+        headerEnd: 0,
         targetWpm: resolveBaseWpm(metadata),
         emotion: TpsSpec.defaultEmotion
     }, metadata, index);
 }
 function createBlock(header, blockIndex, segmentId) {
     return {
+        headerStart: header.headerStart,
+        headerEnd: header.headerEnd,
         block: {
             id: `${segmentId}-block-${blockIndex}`,
             name: header.name,

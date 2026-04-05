@@ -59,11 +59,11 @@ internal static class TpsSupport
         int start,
         int end,
         IReadOnlyList<int> lineStarts,
-        string? suggestion = null)
+        string? suggestion = null,
+        TpsSeverity? severityOverride = null)
     {
-        var severity = string.Equals(code, TpsSpec.DiagnosticCodes.InvalidHeaderParameter, StringComparison.Ordinal)
-            ? TpsSeverity.Warning
-            : TpsSeverity.Error;
+        var severity = severityOverride
+            ?? (TpsSpec.WarningDiagnosticCodes.Contains(code) ? TpsSeverity.Warning : TpsSeverity.Error);
 
         return new TpsDiagnostic(
             code,
@@ -72,6 +72,15 @@ internal static class TpsSupport
             new TpsRange(PositionAt(start, lineStarts), PositionAt(end, lineStarts)),
             suggestion);
     }
+
+    public static TpsDiagnostic CreateWarningDiagnostic(
+        string code,
+        string message,
+        int start,
+        int end,
+        IReadOnlyList<int> lineStarts,
+        string? suggestion = null) =>
+        CreateDiagnostic(code, message, start, end, lineStarts, suggestion, TpsSeverity.Warning);
 
     public static bool HasErrors(IEnumerable<TpsDiagnostic> diagnostics) =>
         diagnostics.Any(diagnostic => diagnostic.Severity == TpsSeverity.Error);

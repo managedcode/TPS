@@ -1,3 +1,4 @@
+import { appendArchetypeDiagnostics } from "./archetype-analysis.js";
 import { compileContent } from "./content-compiler.js";
 import { normalizeCompiledScript } from "./compiled-script.js";
 import { hasErrors } from "./diagnostics.js";
@@ -27,7 +28,9 @@ function compileAnalysis(analysis) {
     const baseWpm = resolveBaseWpm(analysis.document.metadata);
     const speedOffsets = resolveSpeedOffsets(analysis.document.metadata);
     const candidates = analysis.parsedSegments.map((parsedSegment) => compileSegment(parsedSegment, baseWpm, speedOffsets, analysis));
-    return finalizeScript(analysis.document.metadata, candidates);
+    const script = finalizeScript(analysis.document.metadata, candidates);
+    appendArchetypeDiagnostics(candidates.flatMap((candidate) => candidate.blocks.map((block) => block.diagnosticTarget)), analysis.lineStarts, analysis.diagnostics);
+    return script;
 }
 function compileSegment(parsedSegment, baseWpm, speedOffsets, analysis) {
     const segmentEmotion = resolveEmotion(parsedSegment.segment.emotion);
@@ -72,7 +75,9 @@ function buildBlocks(parsedSegment) {
                 archetype: parsedSegment.segment.archetype
             },
             isImplicit: true,
-            content: parsedSegment.leadingContent
+            content: parsedSegment.leadingContent,
+            headerStart: parsedSegment.headerStart,
+            headerEnd: parsedSegment.headerEnd
         });
     }
     if (parsedSegment.parsedBlocks.length === 0) {
@@ -87,11 +92,19 @@ function buildBlocks(parsedSegment) {
                 archetype: parsedSegment.segment.archetype
             },
             isImplicit: true,
-            content: parsedSegment.directContent
+            content: parsedSegment.directContent,
+            headerStart: parsedSegment.headerStart,
+            headerEnd: parsedSegment.headerEnd
         });
     }
     for (const parsedBlock of parsedSegment.parsedBlocks) {
-        blocks.push({ block: parsedBlock.block, isImplicit: false, content: parsedBlock.content });
+        blocks.push({
+            block: parsedBlock.block,
+            isImplicit: false,
+            content: parsedBlock.content,
+            headerStart: parsedBlock.headerStart,
+            headerEnd: parsedBlock.headerEnd
+        });
     }
     return blocks;
 }
@@ -121,7 +134,25 @@ function compileBlock(entry, inherited, analysis) {
             phrases: [],
             words: []
         },
-        content
+        content,
+        diagnosticTarget: {
+            block: {
+                ...entry.block,
+                targetWpm: blockInherited.targetWpm,
+                emotion: blockInherited.emotion,
+                speaker: blockInherited.speaker,
+                archetype: resolvedArchetype,
+                isImplicit: entry.isImplicit,
+                startWordIndex: 0,
+                endWordIndex: 0,
+                startMs: 0,
+                endMs: 0,
+                phrases: [],
+                words: []
+            },
+            rangeStart: entry.headerStart,
+            rangeEnd: entry.headerEnd
+        }
     };
 }
 function finalizeScript(metadata, candidates) {
@@ -138,6 +169,7 @@ function finalizeScript(metadata, candidates) {
         const segmentWords = [];
         for (const blockCandidate of segmentCandidate.blocks) {
             const { block, words, phrases, elapsed, nextWordIndex } = finalizeBlock(blockCandidate.block, blockCandidate.content.words, blockCandidate.content.phrases, segment.id, elapsedMs, wordIndex);
+            blockCandidate.diagnosticTarget.block = block;
             block.words = words;
             block.phrases = phrases;
             segment.blocks.push(block);
