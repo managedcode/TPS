@@ -1116,6 +1116,7 @@ The [`examples/`](examples/) directory contains sample TPS files demonstrating t
 
 - Primary: `.tps` (TelePrompterScript)
 - Alternative: `.tps.md` (for markdown-aware editors)
+- Alternative: `.md.tps` 
 
 ## AI Skills
 
