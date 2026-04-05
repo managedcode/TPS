@@ -426,13 +426,17 @@ Three — notify the team.[/loud][/melody][/energy][/staccato]
 
 A **vocal archetype** defines the overall delivery persona for a segment or block.
 
-TPS uses the idea from [Vinh Giang](https://www.vinhgiang.com/)'s vocal communication framework: strong speakers switch delivery style based on **communicative intent**. In practice that means moving between modes such as connecting, inspiring, informing, or instructing. Giang describes four core archetypes: Friend, Motivator, Educator, and Coach. See his archetype explanations on [LinkedIn](https://www.linkedin.com/posts/vinhgiang_what-are-vocal-archetypes-activity-7095585018655223808-4rnD) and [Facebook](https://www.facebook.com/askvinh/videos/vocal-archetypes/404161770260317/).
+TPS draws this concept from two related speaking frameworks:
 
-TPS maps those personas onto measurable vocal controls using [Roger Love](https://rogerlove.com/)'s 5 Building Blocks of Voice framework: pitch, pace, tone, melody, and volume. See [How to Use Your Voice More Effectively](https://rogerlove.com/how-to-use-your-voice-more-effectively/) for the underlying vocal mechanics that TPS encodes through inline tags and playback metadata.
+1. [Vinh Giang](https://www.vinhgiang.com/) frames delivery as a switch between distinct **communicative intents**. In practice that means moving between modes such as connecting, inspiring, informing, or instructing. His core set includes four archetypes: Friend, Motivator, Educator, and Coach. See his explanations on [LinkedIn](https://www.linkedin.com/posts/vinhgiang_what-are-vocal-archetypes-activity-7095585018655223808-4rnD) and [Facebook](https://www.facebook.com/askvinh/videos/vocal-archetypes/404161770260317/).
+2. [Roger Love](https://rogerlove.com/) describes the measurable mechanics underneath vocal delivery: pitch, pace, tone, melody, and volume. TPS maps archetypes onto those controls so they can be expressed with inline tags and playback metadata. See [How to Use Your Voice More Effectively](https://rogerlove.com/how-to-use-your-voice-more-effectively/) for the underlying framework.
 
-TPS extends Giang's original set with two extra delivery personas used frequently in broadcast and voiceover coaching: Storyteller and Entertainer.
+TPS extends Giang's original set with two additional delivery personas used often in broadcast and voiceover coaching:
 
-The `Archetype:Name` parameter is added to segment or block headers using the same `|`-separated syntax. The parser identifies it by the `Archetype:` prefix.
+- Storyteller
+- Entertainer
+
+In TPS syntax, the archetype is declared with `Archetype:Name` inside a segment or block header using the same `|`-separated parameter format. The parser recognizes it by the `Archetype:` prefix.
 
 ##### Archetype Definitions
 
