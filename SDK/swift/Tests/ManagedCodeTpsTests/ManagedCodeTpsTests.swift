@@ -52,6 +52,22 @@ final class ManagedCodeTpsTests: XCTestCase {
         }
     }
 
+    func testAdvisoryArchetypeDiagnostics() throws {
+        let expectations = try readJsonFixture("runtime-expectations.json")
+        let advisoryDiagnostics = expectations["advisoryDiagnostics"] as! [String: Any]
+        for (fileName, rawExpected) in advisoryDiagnostics {
+            let result = TpsRuntime.compileTps(readFixture("valid/\(fileName)"))
+            let expectedCodes = rawExpected as! [String]
+            XCTAssertTrue(result.ok, fileName)
+            XCTAssertEqual(result.diagnostics.map(\.code), expectedCodes, fileName)
+            XCTAssertTrue(result.diagnostics.allSatisfy { $0.severity == "warning" }, fileName)
+        }
+
+        let clean = TpsRuntime.compileTps(readFixture("valid/archetype-clean.tps"))
+        XCTAssertTrue(clean.ok)
+        XCTAssertTrue(clean.diagnostics.isEmpty)
+    }
+
     func testParseAndValidateApisCoverHeaderVariantsAndFrontMatter() throws {
         let invalid = TpsRuntime.validateTps("## []")
         XCTAssertFalse(invalid.ok)

@@ -109,6 +109,48 @@ class TpsCompilationResult extends TpsValidationResult {
   final CompiledScript script;
 }
 
+class TpsNumericRange {
+  const TpsNumericRange({
+    required this.min,
+    required this.max,
+  });
+
+  final int min;
+  final int max;
+}
+
+class TpsArchetypeProfile {
+  const TpsArchetypeProfile({
+    required this.articulation,
+    required this.energy,
+    required this.melody,
+    required this.volume,
+    required this.speed,
+  });
+
+  final String articulation;
+  final TpsNumericRange energy;
+  final TpsNumericRange melody;
+  final String volume;
+  final TpsNumericRange speed;
+}
+
+class TpsArchetypeRhythmProfile {
+  const TpsArchetypeRhythmProfile({
+    required this.phraseLength,
+    required this.pauseFrequencyPer100Words,
+    required this.averagePauseDurationMs,
+    required this.emphasisDensityPercent,
+    required this.speedVariationPer100Words,
+  });
+
+  final TpsNumericRange phraseLength;
+  final TpsNumericRange pauseFrequencyPer100Words;
+  final TpsNumericRange averagePauseDurationMs;
+  final TpsNumericRange emphasisDensityPercent;
+  final TpsNumericRange speedVariationPer100Words;
+}
+
 class TpsDocument {
   const TpsDocument({
     required this.metadata,
@@ -803,6 +845,16 @@ abstract final class TpsTags {
 }
 
 abstract final class TpsDiagnosticCodes {
+  static const archetypeArticulationMismatch = "archetype-articulation-mismatch";
+  static const archetypeEnergyMismatch = "archetype-energy-mismatch";
+  static const archetypeMelodyMismatch = "archetype-melody-mismatch";
+  static const archetypeRhythmEmphasisDensity = "archetype-rhythm-emphasis-density";
+  static const archetypeRhythmPauseDuration = "archetype-rhythm-pause-duration";
+  static const archetypeRhythmPauseFrequency = "archetype-rhythm-pause-frequency";
+  static const archetypeRhythmPhraseLength = "archetype-rhythm-phrase-length";
+  static const archetypeRhythmSpeedVariation = "archetype-rhythm-speed-variation";
+  static const archetypeSpeedMismatch = "archetype-speed-mismatch";
+  static const archetypeVolumeMismatch = "archetype-volume-mismatch";
   static const invalidFrontMatter = "invalid-front-matter";
   static const invalidHeader = "invalid-header";
   static const invalidHeaderParameter = "invalid-header-parameter";
@@ -853,8 +905,22 @@ abstract final class TpsSpec {
   static const archetypeCoach = "coach";
   static const archetypeStoryteller = "storyteller";
   static const archetypeEntertainer = "entertainer";
+  static const archetypeRhythmMinimumWords = 12;
 
   static const archetypes = [archetypeFriend, archetypeMotivator, archetypeEducator, archetypeCoach, archetypeStoryteller, archetypeEntertainer];
+  static const warningDiagnosticCodes = {
+    TpsDiagnosticCodes.invalidHeaderParameter,
+    TpsDiagnosticCodes.archetypeArticulationMismatch,
+    TpsDiagnosticCodes.archetypeEnergyMismatch,
+    TpsDiagnosticCodes.archetypeMelodyMismatch,
+    TpsDiagnosticCodes.archetypeVolumeMismatch,
+    TpsDiagnosticCodes.archetypeSpeedMismatch,
+    TpsDiagnosticCodes.archetypeRhythmPhraseLength,
+    TpsDiagnosticCodes.archetypeRhythmPauseFrequency,
+    TpsDiagnosticCodes.archetypeRhythmPauseDuration,
+    TpsDiagnosticCodes.archetypeRhythmEmphasisDensity,
+    TpsDiagnosticCodes.archetypeRhythmSpeedVariation,
+  };
   static const archetypeRecommendedWpm = {
     archetypeFriend: 135,
     archetypeMotivator: 155,
@@ -862,6 +928,106 @@ abstract final class TpsSpec {
     archetypeCoach: 145,
     archetypeStoryteller: 125,
     archetypeEntertainer: 150,
+  };
+  static const archetypeArticulationExpectations = {
+    "legato": "legato",
+    "staccato": "staccato",
+    "neutral": "neutral",
+    "flexible": "flexible",
+  };
+  static const archetypeVolumeExpectations = {
+    "defaultOnly": "default-only",
+    "softOrDefault": "soft-or-default",
+    "loudOnly": "loud-only",
+    "flexible": "flexible",
+  };
+  static const archetypeProfiles = {
+    archetypeFriend: TpsArchetypeProfile(
+      articulation: "legato",
+      energy: TpsNumericRange(min: 4, max: 6),
+      melody: TpsNumericRange(min: 6, max: 8),
+      volume: "soft-or-default",
+      speed: TpsNumericRange(min: 125, max: 150),
+    ),
+    archetypeMotivator: TpsArchetypeProfile(
+      articulation: "legato",
+      energy: TpsNumericRange(min: 7, max: 10),
+      melody: TpsNumericRange(min: 7, max: 9),
+      volume: "loud-only",
+      speed: TpsNumericRange(min: 145, max: 170),
+    ),
+    archetypeEducator: TpsArchetypeProfile(
+      articulation: "neutral",
+      energy: TpsNumericRange(min: 3, max: 5),
+      melody: TpsNumericRange(min: 2, max: 4),
+      volume: "default-only",
+      speed: TpsNumericRange(min: 110, max: 135),
+    ),
+    archetypeCoach: TpsArchetypeProfile(
+      articulation: "staccato",
+      energy: TpsNumericRange(min: 7, max: 9),
+      melody: TpsNumericRange(min: 1, max: 3),
+      volume: "loud-only",
+      speed: TpsNumericRange(min: 135, max: 160),
+    ),
+    archetypeStoryteller: TpsArchetypeProfile(
+      articulation: "flexible",
+      energy: TpsNumericRange(min: 4, max: 7),
+      melody: TpsNumericRange(min: 8, max: 10),
+      volume: "flexible",
+      speed: TpsNumericRange(min: 100, max: 150),
+    ),
+    archetypeEntertainer: TpsArchetypeProfile(
+      articulation: "flexible",
+      energy: TpsNumericRange(min: 6, max: 8),
+      melody: TpsNumericRange(min: 7, max: 9),
+      volume: "flexible",
+      speed: TpsNumericRange(min: 140, max: 165),
+    ),
+  };
+  static const archetypeRhythmProfiles = {
+    archetypeFriend: TpsArchetypeRhythmProfile(
+      phraseLength: TpsNumericRange(min: 8, max: 15),
+      pauseFrequencyPer100Words: TpsNumericRange(min: 4, max: 8),
+      averagePauseDurationMs: TpsNumericRange(min: 300, max: 600),
+      emphasisDensityPercent: TpsNumericRange(min: 3, max: 8),
+      speedVariationPer100Words: TpsNumericRange(min: 0, max: 1),
+    ),
+    archetypeMotivator: TpsArchetypeRhythmProfile(
+      phraseLength: TpsNumericRange(min: 8, max: 20),
+      pauseFrequencyPer100Words: TpsNumericRange(min: 3, max: 6),
+      averagePauseDurationMs: TpsNumericRange(min: 600, max: 2000),
+      emphasisDensityPercent: TpsNumericRange(min: 10, max: 20),
+      speedVariationPer100Words: TpsNumericRange(min: 0, max: 2),
+    ),
+    archetypeEducator: TpsArchetypeRhythmProfile(
+      phraseLength: TpsNumericRange(min: 10, max: 25),
+      pauseFrequencyPer100Words: TpsNumericRange(min: 6, max: 12),
+      averagePauseDurationMs: TpsNumericRange(min: 400, max: 800),
+      emphasisDensityPercent: TpsNumericRange(min: 3, max: 8),
+      speedVariationPer100Words: TpsNumericRange(min: 0, max: 2),
+    ),
+    archetypeCoach: TpsArchetypeRhythmProfile(
+      phraseLength: TpsNumericRange(min: 3, max: 8),
+      pauseFrequencyPer100Words: TpsNumericRange(min: 8, max: 15),
+      averagePauseDurationMs: TpsNumericRange(min: 200, max: 400),
+      emphasisDensityPercent: TpsNumericRange(min: 15, max: 30),
+      speedVariationPer100Words: TpsNumericRange(min: 0, max: 2),
+    ),
+    archetypeStoryteller: TpsArchetypeRhythmProfile(
+      phraseLength: TpsNumericRange(min: 5, max: 20),
+      pauseFrequencyPer100Words: TpsNumericRange(min: 4, max: 10),
+      averagePauseDurationMs: TpsNumericRange(min: 500, max: 3000),
+      emphasisDensityPercent: TpsNumericRange(min: 5, max: 12),
+      speedVariationPer100Words: TpsNumericRange(min: 3, max: 6),
+    ),
+    archetypeEntertainer: TpsArchetypeRhythmProfile(
+      phraseLength: TpsNumericRange(min: 5, max: 15),
+      pauseFrequencyPer100Words: TpsNumericRange(min: 5, max: 10),
+      averagePauseDurationMs: TpsNumericRange(min: 300, max: 2000),
+      emphasisDensityPercent: TpsNumericRange(min: 5, max: 15),
+      speedVariationPer100Words: TpsNumericRange(min: 2, max: 4),
+    ),
   };
   static const energyLevelMin = 1;
   static const energyLevelMax = 10;
@@ -937,6 +1103,9 @@ abstract final class TpsKeywords {
   static const deliveryModes = TpsSpec.deliveryModes;
   static const articulationStyles = TpsSpec.articulationStyles;
   static const archetypes = TpsSpec.archetypes;
+  static const archetypeProfiles = TpsSpec.archetypeProfiles;
+  static const archetypeRhythmProfiles = TpsSpec.archetypeRhythmProfiles;
+  static const warningDiagnosticCodes = TpsSpec.warningDiagnosticCodes;
   static const relativeSpeedTags = TpsSpec.relativeSpeedTags;
   static const editPointPriorities = TpsSpec.editPointPriorities;
 }
@@ -1853,7 +2022,9 @@ CompiledScript _compileAnalysis(_DocumentAnalysis analysis) {
   final baseWpm = _resolveBaseWpm(analysis.document.metadata);
   final speedOffsets = _resolveSpeedOffsets(analysis.document.metadata);
   final candidates = analysis.parsedSegments.map((segment) => _compileSegment(segment, baseWpm, speedOffsets, analysis)).toList(growable: false);
-  return _finalizeScript(analysis.document.metadata, candidates);
+  final script = _finalizeScript(analysis.document.metadata, candidates);
+  _appendArchetypeDiagnostics(candidates.map((segment) => segment.blocks).expand((blocks) => blocks).map((block) => block.diagnosticTarget), analysis.lineStarts, analysis.diagnostics);
+  return script;
 }
 
 class _FrontMatterExtraction {
@@ -1875,10 +2046,22 @@ class _SegmentCandidate {
   final List<_BlockCandidate> blocks;
 }
 
+class _ArchetypeDiagnosticTarget {
+  _ArchetypeDiagnosticTarget({
+    required this.rangeStart,
+    required this.rangeEnd,
+  });
+
+  final int rangeStart;
+  final int rangeEnd;
+  CompiledBlock? block;
+}
+
 class _BlockCandidate {
-  _BlockCandidate(this.block, this.content);
+  _BlockCandidate(this.block, this.content, this.diagnosticTarget);
   final CompiledBlock block;
   final _ContentCompilationResult content;
+  final _ArchetypeDiagnosticTarget diagnosticTarget;
 }
 
 _FrontMatterExtraction _extractFrontMatter(String source, List<int> lineStarts, List<TpsDiagnostic> diagnostics) {
@@ -2258,8 +2441,8 @@ _SegmentCandidate _compileSegment(_ParsedSegmentInternal parsedSegment, int base
   );
 }
 
-List<({TpsBlock block, bool isImplicit, _ContentSection? content})> _buildBlocks(_ParsedSegmentInternal parsedSegment) {
-  final blocks = <({TpsBlock block, bool isImplicit, _ContentSection? content})>[];
+List<({TpsBlock block, bool isImplicit, _ContentSection? content, int rangeStart, int rangeEnd})> _buildBlocks(_ParsedSegmentInternal parsedSegment) {
+  final blocks = <({TpsBlock block, bool isImplicit, _ContentSection? content, int rangeStart, int rangeEnd})>[];
   if (parsedSegment.leadingContent?.text.isNotEmpty == true && parsedSegment.parsedBlocks.isNotEmpty) {
     blocks.add((
       block: TpsBlock(
@@ -2273,6 +2456,8 @@ List<({TpsBlock block, bool isImplicit, _ContentSection? content})> _buildBlocks
       ),
       isImplicit: true,
       content: parsedSegment.leadingContent,
+      rangeStart: parsedSegment.leadingContent!.startOffset,
+      rangeEnd: parsedSegment.leadingContent!.startOffset + parsedSegment.leadingContent!.text.length,
     ));
   }
   if (parsedSegment.parsedBlocks.isEmpty) {
@@ -2288,15 +2473,23 @@ List<({TpsBlock block, bool isImplicit, _ContentSection? content})> _buildBlocks
       ),
       isImplicit: true,
       content: parsedSegment.directContent,
+      rangeStart: parsedSegment.directContent?.startOffset ?? 0,
+      rangeEnd: (parsedSegment.directContent?.startOffset ?? 0) + (parsedSegment.directContent?.text.length ?? 0),
     ));
   }
   for (final parsedBlock in parsedSegment.parsedBlocks) {
-    blocks.add((block: parsedBlock.block, isImplicit: false, content: parsedBlock.content));
+    blocks.add((
+      block: parsedBlock.block,
+      isImplicit: false,
+      content: parsedBlock.content,
+      rangeStart: parsedBlock.content?.startOffset ?? 0,
+      rangeEnd: (parsedBlock.content?.startOffset ?? 0) + (parsedBlock.content?.text.length ?? 0),
+    ));
   }
   return blocks;
 }
 
-_BlockCandidate _compileBlock(({TpsBlock block, bool isImplicit, _ContentSection? content}) entry, _InheritedFormattingState inherited, _DocumentAnalysis analysis) {
+_BlockCandidate _compileBlock(({TpsBlock block, bool isImplicit, _ContentSection? content, int rangeStart, int rangeEnd}) entry, _InheritedFormattingState inherited, _DocumentAnalysis analysis) {
   final resolvedArchetype = entry.block.archetype ?? inherited.archetype;
   final blockWpm = entry.block.targetWpm ?? _resolveArchetypeWpm(resolvedArchetype) ?? inherited.targetWpm;
   final blockInherited = _InheritedFormattingState(
@@ -2324,6 +2517,7 @@ _BlockCandidate _compileBlock(({TpsBlock block, bool isImplicit, _ContentSection
       words: const [],
     ),
     content,
+    _ArchetypeDiagnosticTarget(rangeStart: entry.rangeStart, rangeEnd: entry.rangeEnd),
   );
 }
 
@@ -2338,6 +2532,7 @@ CompiledScript _finalizeScript(Map<String, String> metadata, List<_SegmentCandid
     final compiledBlocks = <CompiledBlock>[];
     for (final blockCandidate in candidate.blocks) {
       final finalized = _finalizeCompiledBlock(blockCandidate.block, blockCandidate.content.words, blockCandidate.content.phrases, candidate.segment.id, elapsedMs, wordIndex);
+      blockCandidate.diagnosticTarget.block = finalized.block;
       compiledBlocks.add(finalized.block);
       segmentWords.addAll(finalized.words);
       scriptWords.addAll(finalized.words);
@@ -3345,8 +3540,8 @@ TpsPosition _positionAt(int offset, List<int> lineStarts) {
   return TpsPosition(line: lineIndex + 1, column: offset - lineStart + 1, offset: offset);
 }
 
-TpsDiagnostic _createDiagnostic(String code, String message, int start, int end, List<int> lineStarts, [String? suggestion]) {
-  final severity = code == TpsDiagnosticCodes.invalidHeaderParameter ? "warning" : "error";
+TpsDiagnostic _createDiagnostic(String code, String message, int start, int end, List<int> lineStarts, [String? suggestion, String? severityOverride]) {
+  final severity = severityOverride ?? (TpsSpec.warningDiagnosticCodes.contains(code) ? "warning" : "error");
   return TpsDiagnostic(
     code: code,
     severity: severity,
@@ -3355,6 +3550,9 @@ TpsDiagnostic _createDiagnostic(String code, String message, int start, int end,
     range: TpsRange(start: _positionAt(start, lineStarts), end: _positionAt(end, lineStarts)),
   );
 }
+
+TpsDiagnostic _createWarningDiagnostic(String code, String message, int start, int end, List<int> lineStarts, [String? suggestion]) =>
+    _createDiagnostic(code, message, start, end, lineStarts, suggestion, "warning");
 
 bool _hasErrors(List<TpsDiagnostic> diagnostics) => diagnostics.any((diagnostic) => diagnostic.severity == "error");
 String? _normalizeValue(String? value) {
@@ -3368,6 +3566,316 @@ int? _resolveArchetypeWpm(String? archetype) {
     return null;
   }
   return TpsSpec.archetypeRecommendedWpm[archetype.toLowerCase()];
+}
+
+void _appendArchetypeDiagnostics(Iterable<_ArchetypeDiagnosticTarget> targets, List<int> lineStarts, List<TpsDiagnostic> diagnostics) {
+  for (final target in targets) {
+    final block = target.block;
+    final archetype = block?.archetype?.toLowerCase();
+    if (block == null || archetype == null) {
+      continue;
+    }
+    final profile = TpsSpec.archetypeProfiles[archetype];
+    final rhythm = TpsSpec.archetypeRhythmProfiles[archetype];
+    if (profile == null || rhythm == null) {
+      continue;
+    }
+    final spokenWords = block.words.where(_isSpokenCompiledWord).toList(growable: false);
+    if (spokenWords.isEmpty) {
+      continue;
+    }
+    _appendArchetypeProfileWarnings(target, block, archetype, profile, spokenWords, lineStarts, diagnostics);
+    _appendArchetypeRhythmWarnings(target, block, archetype, rhythm, spokenWords, lineStarts, diagnostics);
+  }
+}
+
+void _appendArchetypeProfileWarnings(
+  _ArchetypeDiagnosticTarget target,
+  CompiledBlock block,
+  String archetype,
+  TpsArchetypeProfile profile,
+  List<CompiledWord> spokenWords,
+  List<int> lineStarts,
+  List<TpsDiagnostic> diagnostics,
+) {
+  final articulationConflict = _firstWhereOrNull(spokenWords, (word) => _isArticulationMismatch(word.metadata.articulationStyle, profile.articulation));
+  if (articulationConflict != null) {
+    diagnostics.add(_createWarningDiagnostic(
+      TpsDiagnosticCodes.archetypeArticulationMismatch,
+      _buildArticulationMessage(archetype, block.name, articulationConflict.metadata.articulationStyle ?? "unknown", profile.articulation),
+      target.rangeStart,
+      target.rangeEnd,
+      lineStarts,
+      _buildArticulationSuggestion(profile.articulation),
+    ));
+  }
+
+  final energyConflict = _firstWhereOrNull(spokenWords, (word) => _isOutOfRange(word.metadata.energyLevel, profile.energy));
+  if (energyConflict != null && energyConflict.metadata.energyLevel != null) {
+    diagnostics.add(_createWarningDiagnostic(
+      TpsDiagnosticCodes.archetypeEnergyMismatch,
+      "Archetype '$archetype' expects energy between ${profile.energy.min} and ${profile.energy.max}, but block '${block.name}' uses ${energyConflict.metadata.energyLevel} on '${energyConflict.cleanText}'.",
+      target.rangeStart,
+      target.rangeEnd,
+      lineStarts,
+      "Keep [energy:N] between ${profile.energy.min} and ${profile.energy.max} for this archetype.",
+    ));
+  }
+
+  final melodyConflict = _firstWhereOrNull(spokenWords, (word) => _isOutOfRange(word.metadata.melodyLevel, profile.melody));
+  if (melodyConflict != null && melodyConflict.metadata.melodyLevel != null) {
+    diagnostics.add(_createWarningDiagnostic(
+      TpsDiagnosticCodes.archetypeMelodyMismatch,
+      "Archetype '$archetype' expects melody between ${profile.melody.min} and ${profile.melody.max}, but block '${block.name}' uses ${melodyConflict.metadata.melodyLevel} on '${melodyConflict.cleanText}'.",
+      target.rangeStart,
+      target.rangeEnd,
+      lineStarts,
+      "Keep [melody:N] between ${profile.melody.min} and ${profile.melody.max} for this archetype.",
+    ));
+  }
+
+  final volumeConflict = _firstWhereOrNull(spokenWords, (word) => _isVolumeMismatch(word.metadata.volumeLevel, profile.volume));
+  if (volumeConflict != null) {
+    diagnostics.add(_createWarningDiagnostic(
+      TpsDiagnosticCodes.archetypeVolumeMismatch,
+      _buildVolumeMessage(archetype, block.name, volumeConflict.metadata.volumeLevel ?? "default", profile.volume),
+      target.rangeStart,
+      target.rangeEnd,
+      lineStarts,
+      _buildVolumeSuggestion(profile.volume),
+    ));
+  }
+
+  final speedConflict = _firstWhereOrNull(spokenWords, (word) => _isSpeedMismatch(word, block.targetWpm, profile.speed));
+  if (speedConflict != null) {
+    diagnostics.add(_createWarningDiagnostic(
+      TpsDiagnosticCodes.archetypeSpeedMismatch,
+      "Archetype '$archetype' expects inline speed changes to stay between ${profile.speed.min} and ${profile.speed.max} WPM, but block '${block.name}' reaches ${_resolveEffectiveWordWpm(speedConflict, block.targetWpm)} WPM on '${speedConflict.cleanText}'.",
+      target.rangeStart,
+      target.rangeEnd,
+      lineStarts,
+      "Prefer inline speed tags that keep this scope between ${profile.speed.min} and ${profile.speed.max} WPM.",
+    ));
+  }
+}
+
+void _appendArchetypeRhythmWarnings(
+  _ArchetypeDiagnosticTarget target,
+  CompiledBlock block,
+  String archetype,
+  TpsArchetypeRhythmProfile rhythm,
+  List<CompiledWord> spokenWords,
+  List<int> lineStarts,
+  List<TpsDiagnostic> diagnostics,
+) {
+  if (spokenWords.length < TpsSpec.archetypeRhythmMinimumWords) {
+    return;
+  }
+  final phraseWordCounts = block.phrases.map((phrase) => phrase.words.where(_isSpokenCompiledWord).length).where((count) => count > 0).toList(growable: false);
+  if (phraseWordCounts.length < 2) {
+    return;
+  }
+  final metrics = _collectArchetypeScopeMetrics(block, spokenWords, phraseWordCounts);
+  _pushArchetypeRhythmWarning(
+    diagnostics,
+    TpsDiagnosticCodes.archetypeRhythmPhraseLength,
+    target,
+    lineStarts,
+    !_isWithinRange(metrics.averagePhraseLength, rhythm.phraseLength),
+    "Archetype '$archetype' expects average phrase length between ${rhythm.phraseLength.min} and ${rhythm.phraseLength.max} words, but block '${block.name}' averages ${_formatMetric(metrics.averagePhraseLength)}.",
+    "Break phrases so this scope averages between ${rhythm.phraseLength.min} and ${rhythm.phraseLength.max} words.",
+  );
+  _pushArchetypeRhythmWarning(
+    diagnostics,
+    TpsDiagnosticCodes.archetypeRhythmPauseFrequency,
+    target,
+    lineStarts,
+    !_isWithinRange(metrics.pauseFrequencyPer100Words, rhythm.pauseFrequencyPer100Words),
+    "Archetype '$archetype' expects ${rhythm.pauseFrequencyPer100Words.min} to ${rhythm.pauseFrequencyPer100Words.max} pauses per 100 words, but block '${block.name}' has ${_formatMetric(metrics.pauseFrequencyPer100Words)}.",
+    "Adjust pause markers so this scope lands between ${rhythm.pauseFrequencyPer100Words.min} and ${rhythm.pauseFrequencyPer100Words.max} pauses per 100 words.",
+  );
+  _pushArchetypeRhythmWarning(
+    diagnostics,
+    TpsDiagnosticCodes.archetypeRhythmPauseDuration,
+    target,
+    lineStarts,
+    metrics.averagePauseDurationMs != null && !_isWithinRange(metrics.averagePauseDurationMs!, rhythm.averagePauseDurationMs),
+    "Archetype '$archetype' expects average pause duration between ${rhythm.averagePauseDurationMs.min} and ${rhythm.averagePauseDurationMs.max} ms, but block '${block.name}' averages ${_formatMetric(metrics.averagePauseDurationMs)} ms.",
+    "Adjust explicit pauses so this scope averages between ${rhythm.averagePauseDurationMs.min} and ${rhythm.averagePauseDurationMs.max} ms.",
+  );
+  _pushArchetypeRhythmWarning(
+    diagnostics,
+    TpsDiagnosticCodes.archetypeRhythmEmphasisDensity,
+    target,
+    lineStarts,
+    !_isWithinRange(metrics.emphasisDensityPercent, rhythm.emphasisDensityPercent),
+    "Archetype '$archetype' expects emphasis density between ${rhythm.emphasisDensityPercent.min}% and ${rhythm.emphasisDensityPercent.max}%, but block '${block.name}' is ${_formatMetric(metrics.emphasisDensityPercent)}%.",
+    "Add or remove emphasis so this scope lands between ${rhythm.emphasisDensityPercent.min}% and ${rhythm.emphasisDensityPercent.max}%.",
+  );
+  _pushArchetypeRhythmWarning(
+    diagnostics,
+    TpsDiagnosticCodes.archetypeRhythmSpeedVariation,
+    target,
+    lineStarts,
+    !_isWithinRange(metrics.speedVariationPer100Words, rhythm.speedVariationPer100Words),
+    "Archetype '$archetype' expects ${rhythm.speedVariationPer100Words.min} to ${rhythm.speedVariationPer100Words.max} inline speed changes per 100 words, but block '${block.name}' has ${_formatMetric(metrics.speedVariationPer100Words)}.",
+    "Adjust inline speed tags so this scope lands between ${rhythm.speedVariationPer100Words.min} and ${rhythm.speedVariationPer100Words.max} changes per 100 words.",
+  );
+}
+
+class _ArchetypeScopeMetrics {
+  _ArchetypeScopeMetrics({
+    required this.averagePhraseLength,
+    required this.pauseFrequencyPer100Words,
+    required this.averagePauseDurationMs,
+    required this.emphasisDensityPercent,
+    required this.speedVariationPer100Words,
+  });
+
+  final double averagePhraseLength;
+  final double pauseFrequencyPer100Words;
+  final double? averagePauseDurationMs;
+  final double emphasisDensityPercent;
+  final double speedVariationPer100Words;
+}
+
+_ArchetypeScopeMetrics _collectArchetypeScopeMetrics(CompiledBlock block, List<CompiledWord> spokenWords, List<int> phraseWordCounts) {
+  final pauses = block.words.where((word) => word.kind == "pause").toList(growable: false);
+  final pauseFrequencyPer100Words = (pauses.length / spokenWords.length) * 100;
+  final averagePauseDurationMs = pauses.isEmpty ? null : pauses.map((word) => word.displayDurationMs).reduce((left, right) => left + right) / pauses.length;
+  final emphasisDensityPercent = (spokenWords.where((word) => word.metadata.isEmphasis).length / spokenWords.length) * 100;
+  final averagePhraseLength = phraseWordCounts.reduce((left, right) => left + right) / phraseWordCounts.length;
+  var speedVariationRuns = 0;
+  var inVariation = false;
+  for (final word in spokenWords) {
+    final varied = _hasInlineSpeedVariation(word, block.targetWpm);
+    if (varied && !inVariation) {
+      speedVariationRuns += 1;
+    }
+    inVariation = varied;
+  }
+  return _ArchetypeScopeMetrics(
+    averagePhraseLength: averagePhraseLength.toDouble(),
+    pauseFrequencyPer100Words: pauseFrequencyPer100Words,
+    averagePauseDurationMs: averagePauseDurationMs?.toDouble(),
+    emphasisDensityPercent: emphasisDensityPercent,
+    speedVariationPer100Words: (speedVariationRuns / spokenWords.length) * 100,
+  );
+}
+
+void _pushArchetypeRhythmWarning(
+  List<TpsDiagnostic> diagnostics,
+  String code,
+  _ArchetypeDiagnosticTarget target,
+  List<int> lineStarts,
+  bool condition,
+  String message,
+  String suggestion,
+) {
+  if (!condition) {
+    return;
+  }
+  diagnostics.add(_createWarningDiagnostic(code, message, target.rangeStart, target.rangeEnd, lineStarts, suggestion));
+}
+
+bool _isSpokenCompiledWord(CompiledWord word) => word.kind == "word" && word.cleanText.isNotEmpty;
+
+bool _isOutOfRange(int? value, TpsNumericRange range) => value != null && (value < range.min || value > range.max);
+
+bool _isWithinRange(double value, TpsNumericRange range) => value >= range.min && value <= range.max;
+
+bool _isArticulationMismatch(String? value, String expectation) {
+  if (value == null || expectation == TpsSpec.archetypeArticulationExpectations["flexible"]) {
+    return false;
+  }
+  if (expectation == TpsSpec.archetypeArticulationExpectations["neutral"]) {
+    return true;
+  }
+  return value != expectation;
+}
+
+bool _isVolumeMismatch(String? value, String expectation) {
+  if (expectation == TpsSpec.archetypeVolumeExpectations["flexible"] || value == null) {
+    return false;
+  }
+  if (expectation == TpsSpec.archetypeVolumeExpectations["loudOnly"]) {
+    return value != TpsTags.loud;
+  }
+  if (expectation == TpsSpec.archetypeVolumeExpectations["defaultOnly"]) {
+    return true;
+  }
+  return value != TpsTags.soft;
+}
+
+bool _hasInlineSpeedVariation(CompiledWord word, int inheritedWpm) => _resolveEffectiveWordWpm(word, inheritedWpm) != inheritedWpm;
+
+bool _isSpeedMismatch(CompiledWord word, int inheritedWpm, TpsNumericRange range) {
+  if (word.metadata.speedOverride == null && word.metadata.speedMultiplier == null) {
+    return false;
+  }
+  final effectiveWpm = _resolveEffectiveWordWpm(word, inheritedWpm);
+  return effectiveWpm < range.min || effectiveWpm > range.max;
+}
+
+int _resolveEffectiveWordWpm(CompiledWord word, int inheritedWpm) {
+  if (word.metadata.speedOverride != null) {
+    return word.metadata.speedOverride!;
+  }
+  if (word.metadata.speedMultiplier != null) {
+    return math.max(1, (inheritedWpm * word.metadata.speedMultiplier!).round());
+  }
+  return inheritedWpm;
+}
+
+String _buildArticulationMessage(String archetype, String blockName, String actual, String expectation) {
+  if (expectation == TpsSpec.archetypeArticulationExpectations["neutral"]) {
+    return "Archetype '$archetype' expects natural diction without articulation tags, but block '$blockName' uses '$actual'.";
+  }
+  return "Archetype '$archetype' expects '$expectation' articulation, but block '$blockName' uses '$actual'.";
+}
+
+String _buildArticulationSuggestion(String expectation) {
+  if (expectation == TpsSpec.archetypeArticulationExpectations["neutral"]) {
+    return "Remove [legato] or [staccato] tags from this archetype scope.";
+  }
+  return "Prefer [$expectation]...[/$expectation] when you want to reinforce this archetype.";
+}
+
+String _buildVolumeMessage(String archetype, String blockName, String actual, String expectation) {
+  if (expectation == TpsSpec.archetypeVolumeExpectations["defaultOnly"]) {
+    return "Archetype '$archetype' expects default volume, but block '$blockName' uses '$actual'.";
+  }
+  if (expectation == TpsSpec.archetypeVolumeExpectations["softOrDefault"]) {
+    return "Archetype '$archetype' expects soft or default volume, but block '$blockName' uses '$actual'.";
+  }
+  return "Archetype '$archetype' expects loud volume, but block '$blockName' uses '$actual'.";
+}
+
+String _buildVolumeSuggestion(String expectation) {
+  if (expectation == TpsSpec.archetypeVolumeExpectations["defaultOnly"]) {
+    return "Remove explicit volume tags from this archetype scope.";
+  }
+  if (expectation == TpsSpec.archetypeVolumeExpectations["softOrDefault"]) {
+    return "Use [soft] sparingly or leave volume untagged in this scope.";
+  }
+  return "Prefer [loud] when this archetype needs an explicit volume tag.";
+}
+
+String _formatMetric(num? value) {
+  if (value == null) {
+    return "0";
+  }
+  final formatted = value.toStringAsFixed(1);
+  return formatted.endsWith(".0") ? formatted.substring(0, formatted.length - 2) : formatted;
+}
+
+T? _firstWhereOrNull<T>(Iterable<T> values, bool Function(T value) predicate) {
+  for (final value in values) {
+    if (predicate(value)) {
+      return value;
+    }
+  }
+  return null;
 }
 String _resolveEmotion(String? candidate, [String fallback = TpsSpec.defaultEmotion]) {
   final normalized = _normalizeValue(candidate)?.toLowerCase();

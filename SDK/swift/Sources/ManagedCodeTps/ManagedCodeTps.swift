@@ -37,6 +37,27 @@ public struct TpsCompilationResult {
     public let script: CompiledScript
 }
 
+public struct TpsNumericRange: Equatable, Sendable {
+    public let min: Int
+    public let max: Int
+}
+
+public struct TpsArchetypeProfile: Equatable, Sendable {
+    public let articulation: String
+    public let energy: TpsNumericRange
+    public let melody: TpsNumericRange
+    public let volume: String
+    public let speed: TpsNumericRange
+}
+
+public struct TpsArchetypeRhythmProfile: Equatable, Sendable {
+    public let phraseLength: TpsNumericRange
+    public let pauseFrequencyPer100Words: TpsNumericRange
+    public let averagePauseDurationMs: TpsNumericRange
+    public let emphasisDensityPercent: TpsNumericRange
+    public let speedVariationPer100Words: TpsNumericRange
+}
+
 public struct TpsDocument {
     public let metadata: [String: String]
     public let segments: [TpsSegment]
@@ -319,6 +340,16 @@ public enum TpsTags {
 }
 
 public enum TpsDiagnosticCodes {
+    public static let archetypeArticulationMismatch = "archetype-articulation-mismatch"
+    public static let archetypeEnergyMismatch = "archetype-energy-mismatch"
+    public static let archetypeMelodyMismatch = "archetype-melody-mismatch"
+    public static let archetypeRhythmEmphasisDensity = "archetype-rhythm-emphasis-density"
+    public static let archetypeRhythmPauseDuration = "archetype-rhythm-pause-duration"
+    public static let archetypeRhythmPauseFrequency = "archetype-rhythm-pause-frequency"
+    public static let archetypeRhythmPhraseLength = "archetype-rhythm-phrase-length"
+    public static let archetypeRhythmSpeedVariation = "archetype-rhythm-speed-variation"
+    public static let archetypeSpeedMismatch = "archetype-speed-mismatch"
+    public static let archetypeVolumeMismatch = "archetype-volume-mismatch"
     public static let invalidFrontMatter = "invalid-front-matter"
     public static let invalidHeader = "invalid-header"
     public static let invalidHeaderParameter = "invalid-header-parameter"
@@ -359,9 +390,51 @@ public enum TpsSpec {
     public static let archetypeCoach = "coach"
     public static let archetypeStoryteller = "storyteller"
     public static let archetypeEntertainer = "entertainer"
+    public static let archetypeRhythmMinimumWords = 12
 
     public static let archetypes = [archetypeFriend, archetypeMotivator, archetypeEducator, archetypeCoach, archetypeStoryteller, archetypeEntertainer]
+    public static let warningDiagnosticCodes: Set<String> = [
+        TpsDiagnosticCodes.invalidHeaderParameter,
+        TpsDiagnosticCodes.archetypeArticulationMismatch,
+        TpsDiagnosticCodes.archetypeEnergyMismatch,
+        TpsDiagnosticCodes.archetypeMelodyMismatch,
+        TpsDiagnosticCodes.archetypeVolumeMismatch,
+        TpsDiagnosticCodes.archetypeSpeedMismatch,
+        TpsDiagnosticCodes.archetypeRhythmPhraseLength,
+        TpsDiagnosticCodes.archetypeRhythmPauseFrequency,
+        TpsDiagnosticCodes.archetypeRhythmPauseDuration,
+        TpsDiagnosticCodes.archetypeRhythmEmphasisDensity,
+        TpsDiagnosticCodes.archetypeRhythmSpeedVariation,
+    ]
     public static let archetypeRecommendedWpm: [String: Int] = [archetypeFriend: 135, archetypeMotivator: 155, archetypeEducator: 120, archetypeCoach: 145, archetypeStoryteller: 125, archetypeEntertainer: 150]
+    public static let archetypeArticulationExpectations = [
+        "legato": "legato",
+        "staccato": "staccato",
+        "neutral": "neutral",
+        "flexible": "flexible",
+    ]
+    public static let archetypeVolumeExpectations = [
+        "defaultOnly": "default-only",
+        "softOrDefault": "soft-or-default",
+        "loudOnly": "loud-only",
+        "flexible": "flexible",
+    ]
+    public static let archetypeProfiles: [String: TpsArchetypeProfile] = [
+        archetypeFriend: .init(articulation: "legato", energy: .init(min: 4, max: 6), melody: .init(min: 6, max: 8), volume: "soft-or-default", speed: .init(min: 125, max: 150)),
+        archetypeMotivator: .init(articulation: "legato", energy: .init(min: 7, max: 10), melody: .init(min: 7, max: 9), volume: "loud-only", speed: .init(min: 145, max: 170)),
+        archetypeEducator: .init(articulation: "neutral", energy: .init(min: 3, max: 5), melody: .init(min: 2, max: 4), volume: "default-only", speed: .init(min: 110, max: 135)),
+        archetypeCoach: .init(articulation: "staccato", energy: .init(min: 7, max: 9), melody: .init(min: 1, max: 3), volume: "loud-only", speed: .init(min: 135, max: 160)),
+        archetypeStoryteller: .init(articulation: "flexible", energy: .init(min: 4, max: 7), melody: .init(min: 8, max: 10), volume: "flexible", speed: .init(min: 100, max: 150)),
+        archetypeEntertainer: .init(articulation: "flexible", energy: .init(min: 6, max: 8), melody: .init(min: 7, max: 9), volume: "flexible", speed: .init(min: 140, max: 165)),
+    ]
+    public static let archetypeRhythmProfiles: [String: TpsArchetypeRhythmProfile] = [
+        archetypeFriend: .init(phraseLength: .init(min: 8, max: 15), pauseFrequencyPer100Words: .init(min: 4, max: 8), averagePauseDurationMs: .init(min: 300, max: 600), emphasisDensityPercent: .init(min: 3, max: 8), speedVariationPer100Words: .init(min: 0, max: 1)),
+        archetypeMotivator: .init(phraseLength: .init(min: 8, max: 20), pauseFrequencyPer100Words: .init(min: 3, max: 6), averagePauseDurationMs: .init(min: 600, max: 2000), emphasisDensityPercent: .init(min: 10, max: 20), speedVariationPer100Words: .init(min: 0, max: 2)),
+        archetypeEducator: .init(phraseLength: .init(min: 10, max: 25), pauseFrequencyPer100Words: .init(min: 6, max: 12), averagePauseDurationMs: .init(min: 400, max: 800), emphasisDensityPercent: .init(min: 3, max: 8), speedVariationPer100Words: .init(min: 0, max: 2)),
+        archetypeCoach: .init(phraseLength: .init(min: 3, max: 8), pauseFrequencyPer100Words: .init(min: 8, max: 15), averagePauseDurationMs: .init(min: 200, max: 400), emphasisDensityPercent: .init(min: 15, max: 30), speedVariationPer100Words: .init(min: 0, max: 2)),
+        archetypeStoryteller: .init(phraseLength: .init(min: 5, max: 20), pauseFrequencyPer100Words: .init(min: 4, max: 10), averagePauseDurationMs: .init(min: 500, max: 3000), emphasisDensityPercent: .init(min: 5, max: 12), speedVariationPer100Words: .init(min: 3, max: 6)),
+        archetypeEntertainer: .init(phraseLength: .init(min: 5, max: 15), pauseFrequencyPer100Words: .init(min: 5, max: 10), averagePauseDurationMs: .init(min: 300, max: 2000), emphasisDensityPercent: .init(min: 5, max: 15), speedVariationPer100Words: .init(min: 2, max: 4)),
+    ]
     public static let energyLevelMin = 1
     public static let energyLevelMax = 10
     public static let melodyLevelMin = 1
@@ -427,6 +500,9 @@ public enum TpsKeywords {
     public static let deliveryModes = TpsSpec.deliveryModes
     public static let articulationStyles = TpsSpec.articulationStyles
     public static let archetypes = TpsSpec.archetypes
+    public static let archetypeProfiles = TpsSpec.archetypeProfiles
+    public static let archetypeRhythmProfiles = TpsSpec.archetypeRhythmProfiles
+    public static let warningDiagnosticCodes = TpsSpec.warningDiagnosticCodes
     public static let relativeSpeedTags = TpsSpec.relativeSpeedTags
     public static let editPointPriorities = TpsSpec.editPointPriorities
 }
@@ -969,7 +1045,17 @@ private struct ContentSection { let text: String; let startOffset: Int }
 private struct DocumentAnalysis { let source: String; let lineStarts: [Int]; var diagnostics: [TpsDiagnostic]; let document: TpsDocument; let parsedSegments: [ParsedSegmentInternal] }
 private struct ParsedHeader { var name: String; var targetWpm: Int? = nil; var emotion: String? = nil; var timing: String? = nil; var speaker: String? = nil; var archetype: String? = nil }
 private struct SegmentCandidate { let segment: CompiledSegment; let blocks: [BlockCandidate] }
-private struct BlockCandidate { let block: CompiledBlock; let content: ContentCompilationResult }
+private final class ArchetypeDiagnosticTarget {
+    let rangeStart: Int
+    let rangeEnd: Int
+    var block: CompiledBlock?
+
+    init(rangeStart: Int, rangeEnd: Int) {
+        self.rangeStart = rangeStart
+        self.rangeEnd = rangeEnd
+    }
+}
+private struct BlockCandidate { let block: CompiledBlock; let content: ContentCompilationResult; let diagnosticTarget: ArchetypeDiagnosticTarget }
 private struct WordSeed { var kind: String; var cleanText: String; var characterCount: Int; var orpPosition: Int; var displayDurationMs: Int; let metadata: WordMetadata }
 private struct PhraseSeed { let words: [WordSeed]; let text: String }
 private struct InheritedFormattingState { let targetWpm: Int; let emotion: String; let speaker: String?; let archetype: String?; let speedOffsets: [String: Int] }
@@ -1053,7 +1139,9 @@ private func compileAnalysis(_ analysis: DocumentAnalysis, diagnostics: inout [T
     let baseWpm = resolveBaseWpm(analysis.document.metadata)
     let speedOffsets = resolveSpeedOffsets(analysis.document.metadata)
     let candidates = analysis.parsedSegments.map { compileSegment($0, baseWpm: baseWpm, speedOffsets: speedOffsets, analysis: analysis, diagnostics: &diagnostics) }
-    return finalizeScript(metadata: analysis.document.metadata, candidates: candidates)
+    let script = finalizeScript(metadata: analysis.document.metadata, candidates: candidates)
+    appendArchetypeDiagnostics(candidates.flatMap(\.blocks).map(\.diagnosticTarget), lineStarts: analysis.lineStarts, diagnostics: &diagnostics)
+    return script
 }
 
 private func extractFrontMatter(_ source: String, lineStarts: [Int], diagnostics: inout [TpsDiagnostic]) -> FrontMatterExtraction {
@@ -1286,27 +1374,32 @@ private func compileSegment(_ parsedSegment: ParsedSegmentInternal, baseWpm: Int
     return SegmentCandidate(segment: segment, blocks: blocks)
 }
 
-private func buildBlocks(_ parsedSegment: ParsedSegmentInternal) -> [(block: TpsBlock, isImplicit: Bool, content: ContentSection?)] {
-    var blocks: [(block: TpsBlock, isImplicit: Bool, content: ContentSection?)] = []
+private func buildBlocks(_ parsedSegment: ParsedSegmentInternal) -> [(block: TpsBlock, isImplicit: Bool, content: ContentSection?, rangeStart: Int, rangeEnd: Int)] {
+    var blocks: [(block: TpsBlock, isImplicit: Bool, content: ContentSection?, rangeStart: Int, rangeEnd: Int)] = []
     if let leadingText = parsedSegment.leadingContent?.text, !leadingText.isEmpty, !parsedSegment.parsedBlocks.isEmpty {
-        blocks.append((TpsBlock(id: "\(parsedSegment.segment.id)-implicit-lead", name: "\(parsedSegment.segment.name) Lead", content: leadingText, targetWpm: parsedSegment.segment.targetWpm, emotion: parsedSegment.segment.emotion, speaker: parsedSegment.segment.speaker, archetype: parsedSegment.segment.archetype), true, parsedSegment.leadingContent))
+        let leadingContent = parsedSegment.leadingContent!
+        blocks.append((TpsBlock(id: "\(parsedSegment.segment.id)-implicit-lead", name: "\(parsedSegment.segment.name) Lead", content: leadingText, targetWpm: parsedSegment.segment.targetWpm, emotion: parsedSegment.segment.emotion, speaker: parsedSegment.segment.speaker, archetype: parsedSegment.segment.archetype), true, leadingContent, leadingContent.startOffset, leadingContent.startOffset + leadingContent.text.count))
     }
     if parsedSegment.parsedBlocks.isEmpty {
-        blocks.append((TpsBlock(id: "\(parsedSegment.segment.id)-implicit-body", name: parsedSegment.segment.name, content: parsedSegment.directContent?.text ?? "", targetWpm: parsedSegment.segment.targetWpm, emotion: parsedSegment.segment.emotion, speaker: parsedSegment.segment.speaker, archetype: parsedSegment.segment.archetype), true, parsedSegment.directContent))
+        let start = parsedSegment.directContent?.startOffset ?? 0
+        let end = start + (parsedSegment.directContent?.text.count ?? 0)
+        blocks.append((TpsBlock(id: "\(parsedSegment.segment.id)-implicit-body", name: parsedSegment.segment.name, content: parsedSegment.directContent?.text ?? "", targetWpm: parsedSegment.segment.targetWpm, emotion: parsedSegment.segment.emotion, speaker: parsedSegment.segment.speaker, archetype: parsedSegment.segment.archetype), true, parsedSegment.directContent, start, end))
     }
     for parsedBlock in parsedSegment.parsedBlocks {
-        blocks.append((parsedBlock.block, false, parsedBlock.content))
+        let start = parsedBlock.content?.startOffset ?? 0
+        let end = start + (parsedBlock.content?.text.count ?? 0)
+        blocks.append((parsedBlock.block, false, parsedBlock.content, start, end))
     }
     return blocks
 }
 
-private func compileBlock(_ entry: (block: TpsBlock, isImplicit: Bool, content: ContentSection?), inherited: InheritedFormattingState, analysis: DocumentAnalysis, diagnostics: inout [TpsDiagnostic]) -> BlockCandidate {
+private func compileBlock(_ entry: (block: TpsBlock, isImplicit: Bool, content: ContentSection?, rangeStart: Int, rangeEnd: Int), inherited: InheritedFormattingState, analysis: DocumentAnalysis, diagnostics: inout [TpsDiagnostic]) -> BlockCandidate {
     let resolvedArchetype = entry.block.archetype ?? inherited.archetype
     let blockWpm = entry.block.targetWpm ?? resolveArchetypeWpm(resolvedArchetype) ?? inherited.targetWpm
     let blockInherited = InheritedFormattingState(targetWpm: blockWpm, emotion: resolveEmotion(entry.block.emotion, fallback: inherited.emotion), speaker: entry.block.speaker ?? inherited.speaker, archetype: resolvedArchetype, speedOffsets: inherited.speedOffsets)
     let content = compileContent(entry.content?.text ?? "", startOffset: entry.content?.startOffset ?? 0, inherited: blockInherited, lineStarts: analysis.lineStarts, diagnostics: &diagnostics)
     let block = CompiledBlock(id: entry.block.id, name: entry.block.name, targetWpm: blockInherited.targetWpm, emotion: blockInherited.emotion, speaker: blockInherited.speaker, archetype: resolvedArchetype, isImplicit: entry.isImplicit, startWordIndex: 0, endWordIndex: 0, startMs: 0, endMs: 0, phrases: [], words: [])
-    return BlockCandidate(block: block, content: content)
+    return BlockCandidate(block: block, content: content, diagnosticTarget: ArchetypeDiagnosticTarget(rangeStart: entry.rangeStart, rangeEnd: entry.rangeEnd))
 }
 
 private func finalizeScript(metadata: [String: String], candidates: [SegmentCandidate]) -> CompiledScript {
@@ -1319,6 +1412,7 @@ private func finalizeScript(metadata: [String: String], candidates: [SegmentCand
         var compiledBlocks: [CompiledBlock] = []
         for blockCandidate in candidate.blocks {
             let finalized = finalizeCompiledBlock(blockCandidate.block, seeds: blockCandidate.content.words, phraseSeeds: blockCandidate.content.phrases, segmentId: candidate.segment.id, elapsedMs: elapsedMs, wordIndex: wordIndex)
+            blockCandidate.diagnosticTarget.block = finalized.block
             compiledBlocks.append(finalized.block)
             segmentWords.append(contentsOf: finalized.words)
             scriptWords.append(contentsOf: finalized.words)
@@ -1693,14 +1787,122 @@ private func positionAt(_ offset: Int, lineStarts: [Int]) -> TpsPosition {
     return TpsPosition(line: lineIndex + 1, column: offset - lineStart + 1, offset: offset)
 }
 private func createDiagnostic(_ code: String, message: String, start: Int, end: Int, lineStarts: [Int], suggestion: String? = nil) -> TpsDiagnostic {
-    let severity = code == TpsDiagnosticCodes.invalidHeaderParameter ? "warning" : "error"
+    let severity = TpsSpec.warningDiagnosticCodes.contains(code) ? "warning" : "error"
     return TpsDiagnostic(code: code, severity: severity, message: message, suggestion: suggestion, range: TpsRange(start: positionAt(start, lineStarts: lineStarts), end: positionAt(end, lineStarts: lineStarts)))
+}
+private func createWarningDiagnostic(_ code: String, message: String, start: Int, end: Int, lineStarts: [Int], suggestion: String? = nil) -> TpsDiagnostic {
+    TpsDiagnostic(code: code, severity: "warning", message: message, suggestion: suggestion, range: TpsRange(start: positionAt(start, lineStarts: lineStarts), end: positionAt(end, lineStarts: lineStarts)))
 }
 private func hasErrors(_ diagnostics: [TpsDiagnostic]) -> Bool { diagnostics.contains { $0.severity == "error" } }
 private func normalizeValue(_ value: String?) -> String? { let trimmed = value?.trimmingCharacters(in: .whitespacesAndNewlines); return trimmed?.isEmpty == false ? trimmed : nil }
 private func isKnownEmotion(_ value: String) -> Bool { TpsSpec.emotions.contains(value.lowercased()) }
 private func isKnownArchetype(_ value: String?) -> Bool { guard let value else { return false }; return TpsSpec.archetypes.contains(value.lowercased()) }
 private func resolveArchetypeWpm(_ archetype: String?) -> Int? { guard let archetype else { return nil }; return TpsSpec.archetypeRecommendedWpm[archetype.lowercased()] }
+private struct ArchetypeScopeMetrics { let averagePhraseLength: Double; let pauseFrequencyPer100Words: Double; let averagePauseDurationMs: Double?; let emphasisDensityPercent: Double; let speedVariationPer100Words: Double }
+private func appendArchetypeDiagnostics(_ targets: [ArchetypeDiagnosticTarget], lineStarts: [Int], diagnostics: inout [TpsDiagnostic]) {
+    for target in targets {
+        guard let block = target.block, let archetype = block.archetype?.lowercased(), let profile = TpsSpec.archetypeProfiles[archetype], let rhythm = TpsSpec.archetypeRhythmProfiles[archetype] else { continue }
+        let spokenWords = block.words.filter { $0.kind == "word" && !$0.cleanText.isEmpty }
+        guard !spokenWords.isEmpty else { continue }
+        appendArchetypeProfileWarnings(target: target, block: block, archetype: archetype, profile: profile, spokenWords: spokenWords, lineStarts: lineStarts, diagnostics: &diagnostics)
+        appendArchetypeRhythmWarnings(target: target, block: block, archetype: archetype, rhythm: rhythm, spokenWords: spokenWords, lineStarts: lineStarts, diagnostics: &diagnostics)
+    }
+}
+private func appendArchetypeProfileWarnings(target: ArchetypeDiagnosticTarget, block: CompiledBlock, archetype: String, profile: TpsArchetypeProfile, spokenWords: [CompiledWord], lineStarts: [Int], diagnostics: inout [TpsDiagnostic]) {
+    if let articulationConflict = spokenWords.first(where: { isArticulationMismatch($0.metadata.articulationStyle, expectation: profile.articulation) }) {
+        diagnostics.append(createWarningDiagnostic(TpsDiagnosticCodes.archetypeArticulationMismatch, message: buildArticulationMessage(archetype: archetype, blockName: block.name, actual: articulationConflict.metadata.articulationStyle ?? "unknown", expectation: profile.articulation), start: target.rangeStart, end: target.rangeEnd, lineStarts: lineStarts, suggestion: buildArticulationSuggestion(expectation: profile.articulation)))
+    }
+    if let energyConflict = spokenWords.first(where: { isOutOfRange($0.metadata.energyLevel, range: profile.energy) }), let energyLevel = energyConflict.metadata.energyLevel {
+        diagnostics.append(createWarningDiagnostic(TpsDiagnosticCodes.archetypeEnergyMismatch, message: "Archetype '\(archetype)' expects energy between \(profile.energy.min) and \(profile.energy.max), but block '\(block.name)' uses \(energyLevel) on '\(energyConflict.cleanText)'.", start: target.rangeStart, end: target.rangeEnd, lineStarts: lineStarts, suggestion: "Keep [energy:N] between \(profile.energy.min) and \(profile.energy.max) for this archetype."))
+    }
+    if let melodyConflict = spokenWords.first(where: { isOutOfRange($0.metadata.melodyLevel, range: profile.melody) }), let melodyLevel = melodyConflict.metadata.melodyLevel {
+        diagnostics.append(createWarningDiagnostic(TpsDiagnosticCodes.archetypeMelodyMismatch, message: "Archetype '\(archetype)' expects melody between \(profile.melody.min) and \(profile.melody.max), but block '\(block.name)' uses \(melodyLevel) on '\(melodyConflict.cleanText)'.", start: target.rangeStart, end: target.rangeEnd, lineStarts: lineStarts, suggestion: "Keep [melody:N] between \(profile.melody.min) and \(profile.melody.max) for this archetype."))
+    }
+    if let volumeConflict = spokenWords.first(where: { isVolumeMismatch($0.metadata.volumeLevel, expectation: profile.volume) }) {
+        diagnostics.append(createWarningDiagnostic(TpsDiagnosticCodes.archetypeVolumeMismatch, message: buildVolumeMessage(archetype: archetype, blockName: block.name, actual: volumeConflict.metadata.volumeLevel ?? "default", expectation: profile.volume), start: target.rangeStart, end: target.rangeEnd, lineStarts: lineStarts, suggestion: buildVolumeSuggestion(expectation: profile.volume)))
+    }
+    if let speedConflict = spokenWords.first(where: { isSpeedMismatch($0, inheritedWpm: block.targetWpm, range: profile.speed) }) {
+        diagnostics.append(createWarningDiagnostic(TpsDiagnosticCodes.archetypeSpeedMismatch, message: "Archetype '\(archetype)' expects inline speed changes to stay between \(profile.speed.min) and \(profile.speed.max) WPM, but block '\(block.name)' reaches \(resolveEffectiveWordWpm(speedConflict, inheritedWpm: block.targetWpm)) WPM on '\(speedConflict.cleanText)'.", start: target.rangeStart, end: target.rangeEnd, lineStarts: lineStarts, suggestion: "Prefer inline speed tags that keep this scope between \(profile.speed.min) and \(profile.speed.max) WPM."))
+    }
+}
+private func appendArchetypeRhythmWarnings(target: ArchetypeDiagnosticTarget, block: CompiledBlock, archetype: String, rhythm: TpsArchetypeRhythmProfile, spokenWords: [CompiledWord], lineStarts: [Int], diagnostics: inout [TpsDiagnostic]) {
+    guard spokenWords.count >= TpsSpec.archetypeRhythmMinimumWords else { return }
+    let phraseWordCounts = block.phrases.map { $0.words.filter { $0.kind == "word" && !$0.cleanText.isEmpty }.count }.filter { $0 > 0 }
+    guard phraseWordCounts.count >= 2 else { return }
+    let metrics = collectArchetypeScopeMetrics(block: block, spokenWords: spokenWords, phraseWordCounts: phraseWordCounts)
+    pushArchetypeRhythmWarning(&diagnostics, code: TpsDiagnosticCodes.archetypeRhythmPhraseLength, target: target, lineStarts: lineStarts, condition: !isWithinRange(metrics.averagePhraseLength, range: rhythm.phraseLength), message: "Archetype '\(archetype)' expects average phrase length between \(rhythm.phraseLength.min) and \(rhythm.phraseLength.max) words, but block '\(block.name)' averages \(formatMetric(metrics.averagePhraseLength)).", suggestion: "Break phrases so this scope averages between \(rhythm.phraseLength.min) and \(rhythm.phraseLength.max) words.")
+    pushArchetypeRhythmWarning(&diagnostics, code: TpsDiagnosticCodes.archetypeRhythmPauseFrequency, target: target, lineStarts: lineStarts, condition: !isWithinRange(metrics.pauseFrequencyPer100Words, range: rhythm.pauseFrequencyPer100Words), message: "Archetype '\(archetype)' expects \(rhythm.pauseFrequencyPer100Words.min) to \(rhythm.pauseFrequencyPer100Words.max) pauses per 100 words, but block '\(block.name)' has \(formatMetric(metrics.pauseFrequencyPer100Words)).", suggestion: "Adjust pause markers so this scope lands between \(rhythm.pauseFrequencyPer100Words.min) and \(rhythm.pauseFrequencyPer100Words.max) pauses per 100 words.")
+    pushArchetypeRhythmWarning(&diagnostics, code: TpsDiagnosticCodes.archetypeRhythmPauseDuration, target: target, lineStarts: lineStarts, condition: metrics.averagePauseDurationMs.map { !isWithinRange($0, range: rhythm.averagePauseDurationMs) } ?? false, message: "Archetype '\(archetype)' expects average pause duration between \(rhythm.averagePauseDurationMs.min) and \(rhythm.averagePauseDurationMs.max) ms, but block '\(block.name)' averages \(formatMetric(metrics.averagePauseDurationMs)) ms.", suggestion: "Adjust explicit pauses so this scope averages between \(rhythm.averagePauseDurationMs.min) and \(rhythm.averagePauseDurationMs.max) ms.")
+    pushArchetypeRhythmWarning(&diagnostics, code: TpsDiagnosticCodes.archetypeRhythmEmphasisDensity, target: target, lineStarts: lineStarts, condition: !isWithinRange(metrics.emphasisDensityPercent, range: rhythm.emphasisDensityPercent), message: "Archetype '\(archetype)' expects emphasis density between \(rhythm.emphasisDensityPercent.min)% and \(rhythm.emphasisDensityPercent.max)%, but block '\(block.name)' is \(formatMetric(metrics.emphasisDensityPercent))%.", suggestion: "Add or remove emphasis so this scope lands between \(rhythm.emphasisDensityPercent.min)% and \(rhythm.emphasisDensityPercent.max)%.")
+    pushArchetypeRhythmWarning(&diagnostics, code: TpsDiagnosticCodes.archetypeRhythmSpeedVariation, target: target, lineStarts: lineStarts, condition: !isWithinRange(metrics.speedVariationPer100Words, range: rhythm.speedVariationPer100Words), message: "Archetype '\(archetype)' expects \(rhythm.speedVariationPer100Words.min) to \(rhythm.speedVariationPer100Words.max) inline speed changes per 100 words, but block '\(block.name)' has \(formatMetric(metrics.speedVariationPer100Words)).", suggestion: "Adjust inline speed tags so this scope lands between \(rhythm.speedVariationPer100Words.min) and \(rhythm.speedVariationPer100Words.max) changes per 100 words.")
+}
+private func collectArchetypeScopeMetrics(block: CompiledBlock, spokenWords: [CompiledWord], phraseWordCounts: [Int]) -> ArchetypeScopeMetrics {
+    let pauses = block.words.filter { $0.kind == "pause" }
+    let averagePauseDurationMs = pauses.isEmpty ? nil : Double(pauses.map(\.displayDurationMs).reduce(0, +)) / Double(pauses.count)
+    let emphasisDensityPercent = Double(spokenWords.filter { $0.metadata.isEmphasis }.count) / Double(spokenWords.count) * 100
+    let averagePhraseLength = Double(phraseWordCounts.reduce(0, +)) / Double(phraseWordCounts.count)
+    var speedVariationRuns = 0
+    var inVariation = false
+    for word in spokenWords {
+        let varied = hasInlineSpeedVariation(word, inheritedWpm: block.targetWpm)
+        if varied && !inVariation { speedVariationRuns += 1 }
+        inVariation = varied
+    }
+    return ArchetypeScopeMetrics(averagePhraseLength: averagePhraseLength, pauseFrequencyPer100Words: Double(pauses.count) / Double(spokenWords.count) * 100, averagePauseDurationMs: averagePauseDurationMs, emphasisDensityPercent: emphasisDensityPercent, speedVariationPer100Words: Double(speedVariationRuns) / Double(spokenWords.count) * 100)
+}
+private func pushArchetypeRhythmWarning(_ diagnostics: inout [TpsDiagnostic], code: String, target: ArchetypeDiagnosticTarget, lineStarts: [Int], condition: Bool, message: String, suggestion: String) {
+    guard condition else { return }
+    diagnostics.append(createWarningDiagnostic(code, message: message, start: target.rangeStart, end: target.rangeEnd, lineStarts: lineStarts, suggestion: suggestion))
+}
+private func isOutOfRange(_ value: Int?, range: TpsNumericRange) -> Bool { guard let value else { return false }; return value < range.min || value > range.max }
+private func isWithinRange(_ value: Double, range: TpsNumericRange) -> Bool { value >= Double(range.min) && value <= Double(range.max) }
+private func isArticulationMismatch(_ value: String?, expectation: String) -> Bool {
+    if value == nil || expectation == TpsSpec.archetypeArticulationExpectations["flexible"] { return false }
+    if expectation == TpsSpec.archetypeArticulationExpectations["neutral"] { return true }
+    return value != expectation
+}
+private func isVolumeMismatch(_ value: String?, expectation: String) -> Bool {
+    if expectation == TpsSpec.archetypeVolumeExpectations["flexible"] || value == nil { return false }
+    if expectation == TpsSpec.archetypeVolumeExpectations["loudOnly"] { return value != TpsTags.loud }
+    if expectation == TpsSpec.archetypeVolumeExpectations["defaultOnly"] { return true }
+    return value != TpsTags.soft
+}
+private func hasInlineSpeedVariation(_ word: CompiledWord, inheritedWpm: Int) -> Bool { resolveEffectiveWordWpm(word, inheritedWpm: inheritedWpm) != inheritedWpm }
+private func isSpeedMismatch(_ word: CompiledWord, inheritedWpm: Int, range: TpsNumericRange) -> Bool {
+    guard word.metadata.speedOverride != nil || word.metadata.speedMultiplier != nil else { return false }
+    let effectiveWpm = resolveEffectiveWordWpm(word, inheritedWpm: inheritedWpm)
+    return effectiveWpm < range.min || effectiveWpm > range.max
+}
+private func resolveEffectiveWordWpm(_ word: CompiledWord, inheritedWpm: Int) -> Int {
+    if let speedOverride = word.metadata.speedOverride { return speedOverride }
+    if let speedMultiplier = word.metadata.speedMultiplier { return max(1, Int(round(Double(inheritedWpm) * speedMultiplier))) }
+    return inheritedWpm
+}
+private func buildArticulationMessage(archetype: String, blockName: String, actual: String, expectation: String) -> String {
+    if expectation == TpsSpec.archetypeArticulationExpectations["neutral"] {
+        return "Archetype '\(archetype)' expects natural diction without articulation tags, but block '\(blockName)' uses '\(actual)'."
+    }
+    return "Archetype '\(archetype)' expects '\(expectation)' articulation, but block '\(blockName)' uses '\(actual)'."
+}
+private func buildArticulationSuggestion(expectation: String) -> String {
+    if expectation == TpsSpec.archetypeArticulationExpectations["neutral"] { return "Remove [legato] or [staccato] tags from this archetype scope." }
+    return "Prefer [\(expectation)]...[/\(expectation)] when you want to reinforce this archetype."
+}
+private func buildVolumeMessage(archetype: String, blockName: String, actual: String, expectation: String) -> String {
+    if expectation == TpsSpec.archetypeVolumeExpectations["defaultOnly"] { return "Archetype '\(archetype)' expects default volume, but block '\(blockName)' uses '\(actual)'." }
+    if expectation == TpsSpec.archetypeVolumeExpectations["softOrDefault"] { return "Archetype '\(archetype)' expects soft or default volume, but block '\(blockName)' uses '\(actual)'." }
+    return "Archetype '\(archetype)' expects loud volume, but block '\(blockName)' uses '\(actual)'."
+}
+private func buildVolumeSuggestion(expectation: String) -> String {
+    if expectation == TpsSpec.archetypeVolumeExpectations["defaultOnly"] { return "Remove explicit volume tags from this archetype scope." }
+    if expectation == TpsSpec.archetypeVolumeExpectations["softOrDefault"] { return "Use [soft] sparingly or leave volume untagged in this scope." }
+    return "Prefer [loud] when this archetype needs an explicit volume tag."
+}
+private func formatMetric(_ value: Double?) -> String {
+    guard let value else { return "0" }
+    let formatted = String(format: "%.1f", value)
+    return formatted.hasSuffix(".0") ? String(formatted.dropLast(2)) : formatted
+}
 private func resolveEmotion(_ candidate: String?, fallback: String = TpsSpec.defaultEmotion) -> String { guard let normalized = normalizeValue(candidate)?.lowercased(), isKnownEmotion(normalized) else { return fallback }; return normalized }
 private func resolvePalette(_ emotion: String?) -> [String: String] { TpsSpec.emotionPalettes[resolveEmotion(emotion)] ?? TpsSpec.emotionPalettes[TpsSpec.defaultEmotion]! }
 private func resolveBaseWpm(_ metadata: [String: String]) -> Int { clampWpm(Int(metadata[TpsFrontMatterKeys.baseWpm] ?? "") ?? TpsSpec.defaultBaseWpm, fallback: TpsSpec.defaultBaseWpm) }

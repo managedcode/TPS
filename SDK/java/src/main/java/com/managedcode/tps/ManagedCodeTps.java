@@ -75,6 +75,16 @@ public final class ManagedCodeTps {
     }
 
     public static final class TpsDiagnosticCodes {
+        public static final String ARCHETYPE_ARTICULATION_MISMATCH = "archetype-articulation-mismatch";
+        public static final String ARCHETYPE_ENERGY_MISMATCH = "archetype-energy-mismatch";
+        public static final String ARCHETYPE_MELODY_MISMATCH = "archetype-melody-mismatch";
+        public static final String ARCHETYPE_RHYTHM_EMPHASIS_DENSITY = "archetype-rhythm-emphasis-density";
+        public static final String ARCHETYPE_RHYTHM_PAUSE_DURATION = "archetype-rhythm-pause-duration";
+        public static final String ARCHETYPE_RHYTHM_PAUSE_FREQUENCY = "archetype-rhythm-pause-frequency";
+        public static final String ARCHETYPE_RHYTHM_PHRASE_LENGTH = "archetype-rhythm-phrase-length";
+        public static final String ARCHETYPE_RHYTHM_SPEED_VARIATION = "archetype-rhythm-speed-variation";
+        public static final String ARCHETYPE_SPEED_MISMATCH = "archetype-speed-mismatch";
+        public static final String ARCHETYPE_VOLUME_MISMATCH = "archetype-volume-mismatch";
         public static final String INVALID_FRONT_MATTER = "invalid-front-matter";
         public static final String INVALID_HEADER = "invalid-header";
         public static final String INVALID_HEADER_PARAMETER = "invalid-header-parameter";
@@ -117,8 +127,22 @@ public final class ManagedCodeTps {
         public static final String ARCHETYPE_COACH = "coach";
         public static final String ARCHETYPE_STORYTELLER = "storyteller";
         public static final String ARCHETYPE_ENTERTAINER = "entertainer";
+        public static final int ARCHETYPE_RHYTHM_MINIMUM_WORDS = 12;
 
         public static final List<String> ARCHETYPES = List.of(ARCHETYPE_FRIEND, ARCHETYPE_MOTIVATOR, ARCHETYPE_EDUCATOR, ARCHETYPE_COACH, ARCHETYPE_STORYTELLER, ARCHETYPE_ENTERTAINER);
+        public static final Set<String> WARNING_DIAGNOSTIC_CODES = Set.of(
+            TpsDiagnosticCodes.INVALID_HEADER_PARAMETER,
+            TpsDiagnosticCodes.ARCHETYPE_ARTICULATION_MISMATCH,
+            TpsDiagnosticCodes.ARCHETYPE_ENERGY_MISMATCH,
+            TpsDiagnosticCodes.ARCHETYPE_MELODY_MISMATCH,
+            TpsDiagnosticCodes.ARCHETYPE_VOLUME_MISMATCH,
+            TpsDiagnosticCodes.ARCHETYPE_SPEED_MISMATCH,
+            TpsDiagnosticCodes.ARCHETYPE_RHYTHM_PHRASE_LENGTH,
+            TpsDiagnosticCodes.ARCHETYPE_RHYTHM_PAUSE_FREQUENCY,
+            TpsDiagnosticCodes.ARCHETYPE_RHYTHM_PAUSE_DURATION,
+            TpsDiagnosticCodes.ARCHETYPE_RHYTHM_EMPHASIS_DENSITY,
+            TpsDiagnosticCodes.ARCHETYPE_RHYTHM_SPEED_VARIATION
+        );
         public static final Map<String, Integer> ARCHETYPE_RECOMMENDED_WPM = Map.of(
             ARCHETYPE_FRIEND, 135,
             ARCHETYPE_MOTIVATOR, 155,
@@ -126,6 +150,34 @@ public final class ManagedCodeTps {
             ARCHETYPE_COACH, 145,
             ARCHETYPE_STORYTELLER, 125,
             ARCHETYPE_ENTERTAINER, 150
+        );
+        public static final Map<String, String> ARCHETYPE_ARTICULATION_EXPECTATIONS = Map.of(
+            "legato", "legato",
+            "staccato", "staccato",
+            "neutral", "neutral",
+            "flexible", "flexible"
+        );
+        public static final Map<String, String> ARCHETYPE_VOLUME_EXPECTATIONS = Map.of(
+            "defaultOnly", "default-only",
+            "softOrDefault", "soft-or-default",
+            "loudOnly", "loud-only",
+            "flexible", "flexible"
+        );
+        public static final Map<String, TpsArchetypeProfile> ARCHETYPE_PROFILES = Map.of(
+            ARCHETYPE_FRIEND, new TpsArchetypeProfile("legato", new TpsNumericRange(4, 6), new TpsNumericRange(6, 8), "soft-or-default", new TpsNumericRange(125, 150)),
+            ARCHETYPE_MOTIVATOR, new TpsArchetypeProfile("legato", new TpsNumericRange(7, 10), new TpsNumericRange(7, 9), "loud-only", new TpsNumericRange(145, 170)),
+            ARCHETYPE_EDUCATOR, new TpsArchetypeProfile("neutral", new TpsNumericRange(3, 5), new TpsNumericRange(2, 4), "default-only", new TpsNumericRange(110, 135)),
+            ARCHETYPE_COACH, new TpsArchetypeProfile("staccato", new TpsNumericRange(7, 9), new TpsNumericRange(1, 3), "loud-only", new TpsNumericRange(135, 160)),
+            ARCHETYPE_STORYTELLER, new TpsArchetypeProfile("flexible", new TpsNumericRange(4, 7), new TpsNumericRange(8, 10), "flexible", new TpsNumericRange(100, 150)),
+            ARCHETYPE_ENTERTAINER, new TpsArchetypeProfile("flexible", new TpsNumericRange(6, 8), new TpsNumericRange(7, 9), "flexible", new TpsNumericRange(140, 165))
+        );
+        public static final Map<String, TpsArchetypeRhythmProfile> ARCHETYPE_RHYTHM_PROFILES = Map.of(
+            ARCHETYPE_FRIEND, new TpsArchetypeRhythmProfile(new TpsNumericRange(8, 15), new TpsNumericRange(4, 8), new TpsNumericRange(300, 600), new TpsNumericRange(3, 8), new TpsNumericRange(0, 1)),
+            ARCHETYPE_MOTIVATOR, new TpsArchetypeRhythmProfile(new TpsNumericRange(8, 20), new TpsNumericRange(3, 6), new TpsNumericRange(600, 2000), new TpsNumericRange(10, 20), new TpsNumericRange(0, 2)),
+            ARCHETYPE_EDUCATOR, new TpsArchetypeRhythmProfile(new TpsNumericRange(10, 25), new TpsNumericRange(6, 12), new TpsNumericRange(400, 800), new TpsNumericRange(3, 8), new TpsNumericRange(0, 2)),
+            ARCHETYPE_COACH, new TpsArchetypeRhythmProfile(new TpsNumericRange(3, 8), new TpsNumericRange(8, 15), new TpsNumericRange(200, 400), new TpsNumericRange(15, 30), new TpsNumericRange(0, 2)),
+            ARCHETYPE_STORYTELLER, new TpsArchetypeRhythmProfile(new TpsNumericRange(5, 20), new TpsNumericRange(4, 10), new TpsNumericRange(500, 3000), new TpsNumericRange(5, 12), new TpsNumericRange(3, 6)),
+            ARCHETYPE_ENTERTAINER, new TpsArchetypeRhythmProfile(new TpsNumericRange(5, 15), new TpsNumericRange(5, 10), new TpsNumericRange(300, 2000), new TpsNumericRange(5, 15), new TpsNumericRange(2, 4))
         );
         public static final int ENERGY_LEVEL_MIN = 1;
         public static final int ENERGY_LEVEL_MAX = 10;
@@ -195,6 +247,9 @@ public final class ManagedCodeTps {
         public static final List<String> RELATIVE_SPEED_TAGS = TpsSpec.RELATIVE_SPEED_TAGS;
         public static final List<String> EDIT_POINT_PRIORITIES = TpsSpec.EDIT_POINT_PRIORITIES;
         public static final List<String> ARCHETYPES = TpsSpec.ARCHETYPES;
+        public static final Map<String, TpsArchetypeProfile> ARCHETYPE_PROFILES = TpsSpec.ARCHETYPE_PROFILES;
+        public static final Map<String, TpsArchetypeRhythmProfile> ARCHETYPE_RHYTHM_PROFILES = TpsSpec.ARCHETYPE_RHYTHM_PROFILES;
+        public static final Set<String> WARNING_DIAGNOSTIC_CODES = TpsSpec.WARNING_DIAGNOSTIC_CODES;
 
         private TpsKeywords() {
         }
@@ -242,6 +297,27 @@ public final class ManagedCodeTps {
         public TpsCompilationResult {
             diagnostics = List.copyOf(diagnostics);
         }
+    }
+
+    public record TpsNumericRange(int min, int max) {
+    }
+
+    public record TpsArchetypeProfile(
+        String articulation,
+        TpsNumericRange energy,
+        TpsNumericRange melody,
+        String volume,
+        TpsNumericRange speed
+    ) {
+    }
+
+    public record TpsArchetypeRhythmProfile(
+        TpsNumericRange phraseLength,
+        TpsNumericRange pauseFrequencyPer100Words,
+        TpsNumericRange averagePauseDurationMs,
+        TpsNumericRange emphasisDensityPercent,
+        TpsNumericRange speedVariationPer100Words
+    ) {
     }
 
     public record TpsDocument(Map<String, String> metadata, List<TpsSegment> segments) {
@@ -1222,7 +1298,18 @@ public final class ManagedCodeTps {
     private record SegmentCandidate(CompiledSegment segment, List<BlockCandidate> blocks) {
     }
 
-    private record BlockCandidate(CompiledBlock block, ContentCompilationResult content) {
+    private static final class ArchetypeDiagnosticTarget {
+        private final int rangeStart;
+        private final int rangeEnd;
+        private CompiledBlock block;
+
+        private ArchetypeDiagnosticTarget(int rangeStart, int rangeEnd) {
+            this.rangeStart = rangeStart;
+            this.rangeEnd = rangeEnd;
+        }
+    }
+
+    private record BlockCandidate(CompiledBlock block, ContentCompilationResult content, ArchetypeDiagnosticTarget diagnosticTarget) {
     }
 
     private record WordSeed(String kind, String cleanText, int characterCount, int orpPosition, int displayDurationMs, WordMetadata metadata) {
@@ -1376,7 +1463,9 @@ public final class ManagedCodeTps {
         for (ParsedSegmentInternal parsedSegment : analysis.parsedSegments) {
             candidates.add(compileSegment(parsedSegment, baseWpm, speedOffsets, analysis, diagnostics));
         }
-        return finalizeScript(analysis.document.metadata(), candidates);
+        CompiledScript script = finalizeScript(analysis.document.metadata(), candidates);
+        appendArchetypeDiagnostics(candidates.stream().flatMap(candidate -> candidate.blocks().stream()).map(BlockCandidate::diagnosticTarget).toList(), analysis.lineStarts, diagnostics);
+        return script;
     }
 
     private static FrontMatterExtraction extractFrontMatter(String source, List<Integer> lineStarts, List<TpsDiagnostic> diagnostics) {
@@ -1669,19 +1758,23 @@ public final class ManagedCodeTps {
         return new SegmentCandidate(segment, blocks);
     }
 
-    private record BlockEntry(TpsBlock block, boolean isImplicit, ContentSection content) {
+    private record BlockEntry(TpsBlock block, boolean isImplicit, ContentSection content, int rangeStart, int rangeEnd) {
     }
 
     private static List<BlockEntry> buildBlocks(ParsedSegmentInternal parsedSegment) {
         List<BlockEntry> blocks = new ArrayList<>();
         if (parsedSegment.leadingContent != null && !parsedSegment.leadingContent.text.isEmpty() && !parsedSegment.parsedBlocks.isEmpty()) {
-            blocks.add(new BlockEntry(new TpsBlock(parsedSegment.segment.id() + "-implicit-lead", parsedSegment.segment.name() + " Lead", parsedSegment.leadingContent.text, parsedSegment.segment.targetWpm(), parsedSegment.segment.emotion(), parsedSegment.segment.speaker(), parsedSegment.segment.archetype()), true, parsedSegment.leadingContent));
+            blocks.add(new BlockEntry(new TpsBlock(parsedSegment.segment.id() + "-implicit-lead", parsedSegment.segment.name() + " Lead", parsedSegment.leadingContent.text, parsedSegment.segment.targetWpm(), parsedSegment.segment.emotion(), parsedSegment.segment.speaker(), parsedSegment.segment.archetype()), true, parsedSegment.leadingContent, parsedSegment.leadingContent.startOffset, parsedSegment.leadingContent.startOffset + parsedSegment.leadingContent.text.length()));
         }
         if (parsedSegment.parsedBlocks.isEmpty()) {
-            blocks.add(new BlockEntry(new TpsBlock(parsedSegment.segment.id() + "-implicit-body", parsedSegment.segment.name(), parsedSegment.directContent == null ? "" : parsedSegment.directContent.text, parsedSegment.segment.targetWpm(), parsedSegment.segment.emotion(), parsedSegment.segment.speaker(), parsedSegment.segment.archetype()), true, parsedSegment.directContent));
+            int start = parsedSegment.directContent == null ? 0 : parsedSegment.directContent.startOffset;
+            int end = start + (parsedSegment.directContent == null ? 0 : parsedSegment.directContent.text.length());
+            blocks.add(new BlockEntry(new TpsBlock(parsedSegment.segment.id() + "-implicit-body", parsedSegment.segment.name(), parsedSegment.directContent == null ? "" : parsedSegment.directContent.text, parsedSegment.segment.targetWpm(), parsedSegment.segment.emotion(), parsedSegment.segment.speaker(), parsedSegment.segment.archetype()), true, parsedSegment.directContent, start, end));
         }
         for (ParsedBlockInternal parsedBlock : parsedSegment.parsedBlocks) {
-            blocks.add(new BlockEntry(parsedBlock.block, false, parsedBlock.content));
+            int start = parsedBlock.content == null ? 0 : parsedBlock.content.startOffset;
+            int end = start + (parsedBlock.content == null ? 0 : parsedBlock.content.text.length());
+            blocks.add(new BlockEntry(parsedBlock.block, false, parsedBlock.content, start, end));
         }
         return List.copyOf(blocks);
     }
@@ -1693,7 +1786,7 @@ public final class ManagedCodeTps {
         InheritedFormattingState blockInherited = new InheritedFormattingState(blockWpm, resolveEmotion(entry.block.emotion(), inherited.emotion()), entry.block.speaker() == null ? inherited.speaker() : entry.block.speaker(), resolvedArchetype, inherited.speedOffsets());
         ContentCompilationResult content = compileContent(entry.content == null ? "" : entry.content.text, entry.content == null ? 0 : entry.content.startOffset, blockInherited, analysis.lineStarts, diagnostics);
         CompiledBlock block = new CompiledBlock(entry.block.id(), entry.block.name(), blockInherited.targetWpm(), blockInherited.emotion(), blockInherited.speaker(), resolvedArchetype, entry.isImplicit, 0, 0, 0, 0, List.of(), List.of());
-        return new BlockCandidate(block, content);
+        return new BlockCandidate(block, content, new ArchetypeDiagnosticTarget(entry.rangeStart, entry.rangeEnd));
     }
 
     private static CompiledScript finalizeScript(Map<String, String> metadata, List<SegmentCandidate> candidates) {
@@ -1706,6 +1799,7 @@ public final class ManagedCodeTps {
             List<CompiledBlock> compiledBlocks = new ArrayList<>();
             for (BlockCandidate blockCandidate : candidate.blocks()) {
                 BlockFinalizeResult finalized = finalizeCompiledBlock(blockCandidate.block(), blockCandidate.content().words(), blockCandidate.content().phrases(), candidate.segment().id(), elapsedMs, wordIndex);
+                blockCandidate.diagnosticTarget().block = finalized.block();
                 compiledBlocks.add(finalized.block());
                 segmentWords.addAll(finalized.words());
                 scriptWords.addAll(finalized.words());
@@ -2423,7 +2517,8 @@ public final class ManagedCodeTps {
 
     private static String normalizeLineEndings(String value) { return value.replace("\r\n", "\n").replace("\r", "\n"); }
     private static List<Integer> createLineStarts(String text) { List<Integer> lineStarts = new ArrayList<>(List.of(0)); for (int index = 0; index < text.length(); index += 1) if (text.charAt(index) == '\n') lineStarts.add(index + 1); return List.copyOf(lineStarts); }
-    private static TpsDiagnostic createDiagnostic(String code, String message, int start, int end, List<Integer> lineStarts, String suggestion) { return new TpsDiagnostic(code, TpsDiagnosticCodes.INVALID_HEADER_PARAMETER.equals(code) ? "warning" : "error", message, suggestion, new TpsRange(positionFromOffset(start, lineStarts), positionFromOffset(end, lineStarts))); }
+    private static TpsDiagnostic createDiagnostic(String code, String message, int start, int end, List<Integer> lineStarts, String suggestion) { return new TpsDiagnostic(code, TpsSpec.WARNING_DIAGNOSTIC_CODES.contains(code) ? "warning" : "error", message, suggestion, new TpsRange(positionFromOffset(start, lineStarts), positionFromOffset(end, lineStarts))); }
+    private static TpsDiagnostic createWarningDiagnostic(String code, String message, int start, int end, List<Integer> lineStarts, String suggestion) { return new TpsDiagnostic(code, "warning", message, suggestion, new TpsRange(positionFromOffset(start, lineStarts), positionFromOffset(end, lineStarts))); }
     private static boolean hasErrors(List<TpsDiagnostic> diagnostics) { return diagnostics.stream().anyMatch(diagnostic -> "error".equals(diagnostic.severity())); }
     private static String normalizeValue(String value) { if (value == null) return null; String trimmed = value.trim(); return trimmed.isEmpty() ? null : trimmed; }
     private static String resolveEmotion(String candidate, String fallback) { String normalized = normalizeValue(candidate); return normalized != null && isKnownEmotion(normalized.toLowerCase(Locale.ROOT)) ? normalized.toLowerCase(Locale.ROOT) : fallback; }
@@ -2438,6 +2533,135 @@ public final class ManagedCodeTps {
     private static boolean isKnownEmotion(String value) { return TpsSpec.EMOTIONS.contains(value.toLowerCase(Locale.ROOT)); }
     private static boolean isKnownArchetype(String value) { return value != null && TpsSpec.ARCHETYPES.stream().anyMatch(a -> a.equalsIgnoreCase(value)); }
     private static Integer resolveArchetypeWpm(String archetype) { if (archetype == null) return null; return TpsSpec.ARCHETYPE_RECOMMENDED_WPM.get(archetype.toLowerCase(Locale.ROOT)); }
+    private record ArchetypeScopeMetrics(double averagePhraseLength, double pauseFrequencyPer100Words, Double averagePauseDurationMs, double emphasisDensityPercent, double speedVariationPer100Words) {
+    }
+    private static void appendArchetypeDiagnostics(List<ArchetypeDiagnosticTarget> targets, List<Integer> lineStarts, List<TpsDiagnostic> diagnostics) {
+        for (ArchetypeDiagnosticTarget target : targets) {
+            if (target.block == null || target.block.archetype() == null) {
+                continue;
+            }
+            String archetype = target.block.archetype().toLowerCase(Locale.ROOT);
+            TpsArchetypeProfile profile = TpsSpec.ARCHETYPE_PROFILES.get(archetype);
+            TpsArchetypeRhythmProfile rhythm = TpsSpec.ARCHETYPE_RHYTHM_PROFILES.get(archetype);
+            if (profile == null || rhythm == null) {
+                continue;
+            }
+            List<CompiledWord> spokenWords = target.block.words().stream().filter(word -> "word".equals(word.kind()) && !word.cleanText().isEmpty()).toList();
+            if (spokenWords.isEmpty()) {
+                continue;
+            }
+            appendArchetypeProfileWarnings(target, archetype, profile, spokenWords, lineStarts, diagnostics);
+            appendArchetypeRhythmWarnings(target, archetype, rhythm, spokenWords, lineStarts, diagnostics);
+        }
+    }
+    private static void appendArchetypeProfileWarnings(ArchetypeDiagnosticTarget target, String archetype, TpsArchetypeProfile profile, List<CompiledWord> spokenWords, List<Integer> lineStarts, List<TpsDiagnostic> diagnostics) {
+        CompiledBlock block = target.block;
+        CompiledWord articulationConflict = spokenWords.stream().filter(word -> isArticulationMismatch(word.metadata().articulationStyle(), profile.articulation())).findFirst().orElse(null);
+        if (articulationConflict != null) {
+            diagnostics.add(createWarningDiagnostic(TpsDiagnosticCodes.ARCHETYPE_ARTICULATION_MISMATCH, buildArticulationMessage(archetype, block.name(), Objects.requireNonNullElse(articulationConflict.metadata().articulationStyle(), "unknown"), profile.articulation()), target.rangeStart, target.rangeEnd, lineStarts, buildArticulationSuggestion(profile.articulation())));
+        }
+        CompiledWord energyConflict = spokenWords.stream().filter(word -> isOutOfRange(word.metadata().energyLevel(), profile.energy())).findFirst().orElse(null);
+        if (energyConflict != null && energyConflict.metadata().energyLevel() != null) {
+            diagnostics.add(createWarningDiagnostic(TpsDiagnosticCodes.ARCHETYPE_ENERGY_MISMATCH, "Archetype '" + archetype + "' expects energy between " + profile.energy().min() + " and " + profile.energy().max() + ", but block '" + block.name() + "' uses " + energyConflict.metadata().energyLevel() + " on '" + energyConflict.cleanText() + "'.", target.rangeStart, target.rangeEnd, lineStarts, "Keep [energy:N] between " + profile.energy().min() + " and " + profile.energy().max() + " for this archetype."));
+        }
+        CompiledWord melodyConflict = spokenWords.stream().filter(word -> isOutOfRange(word.metadata().melodyLevel(), profile.melody())).findFirst().orElse(null);
+        if (melodyConflict != null && melodyConflict.metadata().melodyLevel() != null) {
+            diagnostics.add(createWarningDiagnostic(TpsDiagnosticCodes.ARCHETYPE_MELODY_MISMATCH, "Archetype '" + archetype + "' expects melody between " + profile.melody().min() + " and " + profile.melody().max() + ", but block '" + block.name() + "' uses " + melodyConflict.metadata().melodyLevel() + " on '" + melodyConflict.cleanText() + "'.", target.rangeStart, target.rangeEnd, lineStarts, "Keep [melody:N] between " + profile.melody().min() + " and " + profile.melody().max() + " for this archetype."));
+        }
+        CompiledWord volumeConflict = spokenWords.stream().filter(word -> isVolumeMismatch(word.metadata().volumeLevel(), profile.volume())).findFirst().orElse(null);
+        if (volumeConflict != null) {
+            diagnostics.add(createWarningDiagnostic(TpsDiagnosticCodes.ARCHETYPE_VOLUME_MISMATCH, buildVolumeMessage(archetype, block.name(), Objects.requireNonNullElse(volumeConflict.metadata().volumeLevel(), "default"), profile.volume()), target.rangeStart, target.rangeEnd, lineStarts, buildVolumeSuggestion(profile.volume())));
+        }
+        CompiledWord speedConflict = spokenWords.stream().filter(word -> isSpeedMismatch(word, block.targetWpm(), profile.speed())).findFirst().orElse(null);
+        if (speedConflict != null) {
+            diagnostics.add(createWarningDiagnostic(TpsDiagnosticCodes.ARCHETYPE_SPEED_MISMATCH, "Archetype '" + archetype + "' expects inline speed changes to stay between " + profile.speed().min() + " and " + profile.speed().max() + " WPM, but block '" + block.name() + "' reaches " + resolveEffectiveWordWpm(speedConflict, block.targetWpm()) + " WPM on '" + speedConflict.cleanText() + "'.", target.rangeStart, target.rangeEnd, lineStarts, "Prefer inline speed tags that keep this scope between " + profile.speed().min() + " and " + profile.speed().max() + " WPM."));
+        }
+    }
+    private static void appendArchetypeRhythmWarnings(ArchetypeDiagnosticTarget target, String archetype, TpsArchetypeRhythmProfile rhythm, List<CompiledWord> spokenWords, List<Integer> lineStarts, List<TpsDiagnostic> diagnostics) {
+        CompiledBlock block = target.block;
+        if (spokenWords.size() < TpsSpec.ARCHETYPE_RHYTHM_MINIMUM_WORDS) {
+            return;
+        }
+        List<Integer> phraseWordCounts = block.phrases().stream().map(phrase -> (int) phrase.words().stream().filter(word -> "word".equals(word.kind()) && !word.cleanText().isEmpty()).count()).filter(count -> count > 0).toList();
+        if (phraseWordCounts.size() < 2) {
+            return;
+        }
+        ArchetypeScopeMetrics metrics = collectArchetypeScopeMetrics(block, spokenWords, phraseWordCounts);
+        pushArchetypeRhythmWarning(diagnostics, TpsDiagnosticCodes.ARCHETYPE_RHYTHM_PHRASE_LENGTH, target, lineStarts, !isWithinRange(metrics.averagePhraseLength(), rhythm.phraseLength()), "Archetype '" + archetype + "' expects average phrase length between " + rhythm.phraseLength().min() + " and " + rhythm.phraseLength().max() + " words, but block '" + block.name() + "' averages " + formatMetric(metrics.averagePhraseLength()) + ".", "Break phrases so this scope averages between " + rhythm.phraseLength().min() + " and " + rhythm.phraseLength().max() + " words.");
+        pushArchetypeRhythmWarning(diagnostics, TpsDiagnosticCodes.ARCHETYPE_RHYTHM_PAUSE_FREQUENCY, target, lineStarts, !isWithinRange(metrics.pauseFrequencyPer100Words(), rhythm.pauseFrequencyPer100Words()), "Archetype '" + archetype + "' expects " + rhythm.pauseFrequencyPer100Words().min() + " to " + rhythm.pauseFrequencyPer100Words().max() + " pauses per 100 words, but block '" + block.name() + "' has " + formatMetric(metrics.pauseFrequencyPer100Words()) + ".", "Adjust pause markers so this scope lands between " + rhythm.pauseFrequencyPer100Words().min() + " and " + rhythm.pauseFrequencyPer100Words().max() + " pauses per 100 words.");
+        pushArchetypeRhythmWarning(diagnostics, TpsDiagnosticCodes.ARCHETYPE_RHYTHM_PAUSE_DURATION, target, lineStarts, metrics.averagePauseDurationMs() != null && !isWithinRange(metrics.averagePauseDurationMs(), rhythm.averagePauseDurationMs()), "Archetype '" + archetype + "' expects average pause duration between " + rhythm.averagePauseDurationMs().min() + " and " + rhythm.averagePauseDurationMs().max() + " ms, but block '" + block.name() + "' averages " + formatMetric(metrics.averagePauseDurationMs()) + " ms.", "Adjust explicit pauses so this scope averages between " + rhythm.averagePauseDurationMs().min() + " and " + rhythm.averagePauseDurationMs().max() + " ms.");
+        pushArchetypeRhythmWarning(diagnostics, TpsDiagnosticCodes.ARCHETYPE_RHYTHM_EMPHASIS_DENSITY, target, lineStarts, !isWithinRange(metrics.emphasisDensityPercent(), rhythm.emphasisDensityPercent()), "Archetype '" + archetype + "' expects emphasis density between " + rhythm.emphasisDensityPercent().min() + "% and " + rhythm.emphasisDensityPercent().max() + "%, but block '" + block.name() + "' is " + formatMetric(metrics.emphasisDensityPercent()) + "%.", "Add or remove emphasis so this scope lands between " + rhythm.emphasisDensityPercent().min() + "% and " + rhythm.emphasisDensityPercent().max() + "%.");
+        pushArchetypeRhythmWarning(diagnostics, TpsDiagnosticCodes.ARCHETYPE_RHYTHM_SPEED_VARIATION, target, lineStarts, !isWithinRange(metrics.speedVariationPer100Words(), rhythm.speedVariationPer100Words()), "Archetype '" + archetype + "' expects " + rhythm.speedVariationPer100Words().min() + " to " + rhythm.speedVariationPer100Words().max() + " inline speed changes per 100 words, but block '" + block.name() + "' has " + formatMetric(metrics.speedVariationPer100Words()) + ".", "Adjust inline speed tags so this scope lands between " + rhythm.speedVariationPer100Words().min() + " and " + rhythm.speedVariationPer100Words().max() + " changes per 100 words.");
+    }
+    private static ArchetypeScopeMetrics collectArchetypeScopeMetrics(CompiledBlock block, List<CompiledWord> spokenWords, List<Integer> phraseWordCounts) {
+        List<CompiledWord> pauses = block.words().stream().filter(word -> "pause".equals(word.kind())).toList();
+        Double averagePauseDurationMs = pauses.isEmpty() ? null : pauses.stream().mapToInt(CompiledWord::displayDurationMs).average().orElse(0D);
+        double emphasisDensityPercent = (double) spokenWords.stream().filter(word -> word.metadata().isEmphasis()).count() / spokenWords.size() * 100D;
+        double averagePhraseLength = phraseWordCounts.stream().mapToInt(Integer::intValue).average().orElse(0D);
+        int speedVariationRuns = 0;
+        boolean inVariation = false;
+        for (CompiledWord word : spokenWords) {
+            boolean varied = hasInlineSpeedVariation(word, block.targetWpm());
+            if (varied && !inVariation) {
+                speedVariationRuns += 1;
+            }
+            inVariation = varied;
+        }
+        return new ArchetypeScopeMetrics(averagePhraseLength, (double) pauses.size() / spokenWords.size() * 100D, averagePauseDurationMs, emphasisDensityPercent, (double) speedVariationRuns / spokenWords.size() * 100D);
+    }
+    private static void pushArchetypeRhythmWarning(List<TpsDiagnostic> diagnostics, String code, ArchetypeDiagnosticTarget target, List<Integer> lineStarts, boolean condition, String message, String suggestion) {
+        if (!condition) {
+            return;
+        }
+        diagnostics.add(createWarningDiagnostic(code, message, target.rangeStart, target.rangeEnd, lineStarts, suggestion));
+    }
+    private static boolean isOutOfRange(Integer value, TpsNumericRange range) { return value != null && (value < range.min() || value > range.max()); }
+    private static boolean isWithinRange(double value, TpsNumericRange range) { return value >= range.min() && value <= range.max(); }
+    private static boolean isArticulationMismatch(String value, String expectation) {
+        if (value == null || Objects.equals(expectation, TpsSpec.ARCHETYPE_ARTICULATION_EXPECTATIONS.get("flexible"))) return false;
+        if (Objects.equals(expectation, TpsSpec.ARCHETYPE_ARTICULATION_EXPECTATIONS.get("neutral"))) return true;
+        return !Objects.equals(value, expectation);
+    }
+    private static boolean isVolumeMismatch(String value, String expectation) {
+        if (Objects.equals(expectation, TpsSpec.ARCHETYPE_VOLUME_EXPECTATIONS.get("flexible")) || value == null) return false;
+        if (Objects.equals(expectation, TpsSpec.ARCHETYPE_VOLUME_EXPECTATIONS.get("loudOnly"))) return !Objects.equals(value, TpsTags.LOUD);
+        if (Objects.equals(expectation, TpsSpec.ARCHETYPE_VOLUME_EXPECTATIONS.get("defaultOnly"))) return true;
+        return !Objects.equals(value, TpsTags.SOFT);
+    }
+    private static boolean hasInlineSpeedVariation(CompiledWord word, int inheritedWpm) { return resolveEffectiveWordWpm(word, inheritedWpm) != inheritedWpm; }
+    private static boolean isSpeedMismatch(CompiledWord word, int inheritedWpm, TpsNumericRange range) {
+        if (word.metadata().speedOverride() == null && word.metadata().speedMultiplier() == null) return false;
+        int effectiveWpm = resolveEffectiveWordWpm(word, inheritedWpm);
+        return effectiveWpm < range.min() || effectiveWpm > range.max();
+    }
+    private static int resolveEffectiveWordWpm(CompiledWord word, int inheritedWpm) {
+        if (word.metadata().speedOverride() != null) return word.metadata().speedOverride();
+        if (word.metadata().speedMultiplier() != null) return Math.max(1, (int) Math.round(inheritedWpm * word.metadata().speedMultiplier()));
+        return inheritedWpm;
+    }
+    private static String buildArticulationMessage(String archetype, String blockName, String actual, String expectation) {
+        if (Objects.equals(expectation, TpsSpec.ARCHETYPE_ARTICULATION_EXPECTATIONS.get("neutral"))) return "Archetype '" + archetype + "' expects natural diction without articulation tags, but block '" + blockName + "' uses '" + actual + "'.";
+        return "Archetype '" + archetype + "' expects '" + expectation + "' articulation, but block '" + blockName + "' uses '" + actual + "'.";
+    }
+    private static String buildArticulationSuggestion(String expectation) {
+        if (Objects.equals(expectation, TpsSpec.ARCHETYPE_ARTICULATION_EXPECTATIONS.get("neutral"))) return "Remove [legato] or [staccato] tags from this archetype scope.";
+        return "Prefer [" + expectation + "]... [/" + expectation + "] when you want to reinforce this archetype.";
+    }
+    private static String buildVolumeMessage(String archetype, String blockName, String actual, String expectation) {
+        if (Objects.equals(expectation, TpsSpec.ARCHETYPE_VOLUME_EXPECTATIONS.get("defaultOnly"))) return "Archetype '" + archetype + "' expects default volume, but block '" + blockName + "' uses '" + actual + "'.";
+        if (Objects.equals(expectation, TpsSpec.ARCHETYPE_VOLUME_EXPECTATIONS.get("softOrDefault"))) return "Archetype '" + archetype + "' expects soft or default volume, but block '" + blockName + "' uses '" + actual + "'.";
+        return "Archetype '" + archetype + "' expects loud volume, but block '" + blockName + "' uses '" + actual + "'.";
+    }
+    private static String buildVolumeSuggestion(String expectation) {
+        if (Objects.equals(expectation, TpsSpec.ARCHETYPE_VOLUME_EXPECTATIONS.get("defaultOnly"))) return "Remove explicit volume tags from this archetype scope.";
+        if (Objects.equals(expectation, TpsSpec.ARCHETYPE_VOLUME_EXPECTATIONS.get("softOrDefault"))) return "Use [soft] sparingly or leave volume untagged in this scope.";
+        return "Prefer [loud] when this archetype needs an explicit volume tag.";
+    }
+    private static String formatMetric(Double value) {
+        if (value == null) return "0";
+        String formatted = String.format(Locale.ROOT, "%.1f", value);
+        return formatted.endsWith(".0") ? formatted.substring(0, formatted.length() - 2) : formatted;
+    }
     private static boolean isWhitespace(String value) { return value != null && !value.isEmpty() && Character.isWhitespace(value.charAt(0)); }
     private static boolean isSentenceEndingPunctuation(String text) { String trimmed = text.trim(); return !trimmed.isEmpty() && List.of(".", "!", "?").contains(trimmed.substring(trimmed.length() - 1)); }
     private static Integer tryResolvePauseMilliseconds(String argument) { String trimmed = normalizeValue(argument); if (trimmed == null) return null; String normalized = trimmed.toLowerCase(Locale.ROOT); if (normalized.endsWith("ms")) return Integer.parseInt(normalized.substring(0, normalized.length() - 2)); if (!normalized.endsWith("s")) return null; return (int) Math.round(Double.parseDouble(normalized.substring(0, normalized.length() - 1)) * 1000D); }

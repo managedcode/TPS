@@ -46,6 +46,7 @@ public final class ManagedCodeTpsTests {
         testCanonicalTransportFixture();
         testExampleSnapshots();
         testInvalidFixtures();
+        testAdvisoryArchetypeDiagnostics();
         testParseAndValidateApisCoverHeaderVariants();
         testAuthoringEdgeCasesAndPlayerGuardRails();
         testCompiledJsonGuardsAndPlaybackLifecycle();
@@ -104,6 +105,22 @@ public final class ManagedCodeTpsTests {
             assertEquals(expectedCodes, result.diagnostics().stream().map(ManagedCodeTps.TpsDiagnostic::code).toList(), "invalid fixture diagnostics: " + entry.getKey());
             assertTrue(result.diagnostics().stream().allMatch(diagnostic -> diagnostic.range().start().line() >= 1), "invalid fixture line numbers: " + entry.getKey());
         }
+    }
+
+    private static void testAdvisoryArchetypeDiagnostics() throws IOException {
+        Map<String, Object> expectations = castMap(new JsonReader(readFixture("runtime-expectations.json")).read());
+        Map<String, Object> advisoryDiagnostics = castMap(expectations.get("advisoryDiagnostics"));
+        for (Map.Entry<String, Object> entry : advisoryDiagnostics.entrySet()) {
+            ManagedCodeTps.TpsCompilationResult result = ManagedCodeTps.TpsRuntime.compileTps(readFixture("valid/" + entry.getKey()));
+            List<String> expectedCodes = castList(entry.getValue()).stream().map(Object::toString).toList();
+            assertTrue(result.ok(), "advisory fixture should compile: " + entry.getKey());
+            assertEquals(expectedCodes, result.diagnostics().stream().map(ManagedCodeTps.TpsDiagnostic::code).toList(), "advisory fixture diagnostics: " + entry.getKey());
+            assertTrue(result.diagnostics().stream().allMatch(diagnostic -> "warning".equals(diagnostic.severity())), "advisory severities: " + entry.getKey());
+        }
+
+        ManagedCodeTps.TpsCompilationResult clean = ManagedCodeTps.TpsRuntime.compileTps(readFixture("valid/archetype-clean.tps"));
+        assertTrue(clean.ok(), "clean advisory fixture should compile");
+        assertEquals(List.of(), clean.diagnostics(), "clean advisory fixture should not warn");
     }
 
     private static void testParseAndValidateApisCoverHeaderVariants() {

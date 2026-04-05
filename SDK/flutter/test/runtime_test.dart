@@ -56,6 +56,22 @@ void main() {
     }
   });
 
+  test("emits advisory archetype profile and rhythm diagnostics from shared fixtures", () {
+    final expectations = jsonDecode(readFixture(["runtime-expectations.json"])) as Map<String, Object?>;
+    final advisoryDiagnostics = Map<String, Object?>.from(expectations["advisoryDiagnostics"] as Map);
+    for (final entry in advisoryDiagnostics.entries) {
+      final result = compileTps(readFixture(["valid", entry.key]));
+      final expectedCodes = List<String>.from(entry.value as List);
+      expect(result.ok, isTrue, reason: entry.key);
+      expect(result.diagnostics.map((diagnostic) => diagnostic.code).toList(growable: false), equals(expectedCodes), reason: entry.key);
+      expect(result.diagnostics.every((diagnostic) => diagnostic.severity == "warning"), isTrue, reason: entry.key);
+    }
+
+    final clean = compileTps(readFixture(["valid", "archetype-clean.tps"]));
+    expect(clean.ok, isTrue);
+    expect(clean.diagnostics, isEmpty);
+  });
+
   test("serializes diagnostics, compiled scripts, player states, and playback snapshots", () {
     final invalid = validateTps("## []");
     expect(invalid.ok, isFalse);
