@@ -146,6 +146,9 @@ public sealed class TpsInternalTests
                 null,
                 null,
                 null,
+                null,
+                null,
+                null,
                 false,
                 true,
                 180,
@@ -153,5 +156,384 @@ public sealed class TpsInternalTests
                 1.5d),
             ' ');
         Assert.Null(accumulator.BuildWordMetadata(140).SpeedOverride);
+    }
+
+    [Fact]
+    public void Articulation_LegatoSetsArticulationStyle()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\n[legato]hello[/legato]");
+        var word = result.Script.Words.First(w => w.Kind == "word");
+        Assert.Equal("legato", word.Metadata.ArticulationStyle);
+    }
+
+    [Fact]
+    public void Articulation_StaccatoSetsArticulationStyle()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\n[staccato]hello[/staccato]");
+        var word = result.Script.Words.First(w => w.Kind == "word");
+        Assert.Equal("staccato", word.Metadata.ArticulationStyle);
+    }
+
+    [Fact]
+    public void Articulation_NoTagLeavesNull()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\nhello");
+        var word = result.Script.Words.First(w => w.Kind == "word");
+        Assert.Null(word.Metadata.ArticulationStyle);
+    }
+
+    [Fact]
+    public void Articulation_NestedInnermostWins()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\n[legato][staccato]inner[/staccato] outer[/legato]");
+        var words = result.Script.Words.Where(w => w.Kind == "word").ToList();
+        Assert.Equal("staccato", words.First(w => w.CleanText == "inner").Metadata.ArticulationStyle);
+        Assert.Equal("legato", words.First(w => w.CleanText == "outer").Metadata.ArticulationStyle);
+    }
+
+    [Fact]
+    public void Articulation_StacksWithVolume()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\n[staccato][loud]cmd[/loud][/staccato]");
+        var word = result.Script.Words.First(w => w.Kind == "word");
+        Assert.Equal("staccato", word.Metadata.ArticulationStyle);
+        Assert.Equal("loud", word.Metadata.VolumeLevel);
+    }
+
+    [Fact]
+    public void Articulation_CaseInsensitive()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\n[LEGATO]hello[/LEGATO]");
+        var word = result.Script.Words.First(w => w.Kind == "word");
+        Assert.Equal("legato", word.Metadata.ArticulationStyle);
+    }
+
+    [Fact]
+    public void Articulation_UnclosedProducesDiagnostic()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\n[legato]hello");
+        Assert.Contains(result.Diagnostics, d => d.Code == TpsSpec.DiagnosticCodes.UnclosedTag);
+    }
+
+    [Fact]
+    public void Energy_MinimumLevel()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\n[energy:1]hello[/energy]");
+        var word = result.Script.Words.First(w => w.Kind == "word");
+        Assert.Equal(1, word.Metadata.EnergyLevel);
+    }
+
+    [Fact]
+    public void Energy_MaximumLevel()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\n[energy:10]hello[/energy]");
+        var word = result.Script.Words.First(w => w.Kind == "word");
+        Assert.Equal(10, word.Metadata.EnergyLevel);
+    }
+
+    [Fact]
+    public void Energy_AppliedToAllWords()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\n[energy:7]three words here[/energy]");
+        var words = result.Script.Words.Where(w => w.Kind == "word").ToList();
+        Assert.Equal(3, words.Count);
+        Assert.All(words, w => Assert.Equal(7, w.Metadata.EnergyLevel));
+    }
+
+    [Fact]
+    public void Energy_NestedInnermostWins()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\n[energy:5][energy:9]inner[/energy] outer[/energy]");
+        var words = result.Script.Words.Where(w => w.Kind == "word").ToList();
+        Assert.Equal(9, words.First(w => w.CleanText == "inner").Metadata.EnergyLevel);
+        Assert.Equal(5, words.First(w => w.CleanText == "outer").Metadata.EnergyLevel);
+    }
+
+    [Fact]
+    public void Energy_NoTagLeavesNull()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\nhello");
+        var word = result.Script.Words.First(w => w.Kind == "word");
+        Assert.Null(word.Metadata.EnergyLevel);
+    }
+
+    [Fact]
+    public void Energy_InvalidAboveMax()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\n[energy:11]hello[/energy]");
+        Assert.Contains(result.Diagnostics, d => d.Code == TpsSpec.DiagnosticCodes.InvalidEnergyLevel);
+    }
+
+    [Fact]
+    public void Energy_InvalidZero()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\n[energy:0]hello[/energy]");
+        Assert.Contains(result.Diagnostics, d => d.Code == TpsSpec.DiagnosticCodes.InvalidEnergyLevel);
+    }
+
+    [Fact]
+    public void Energy_InvalidNegative()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\n[energy:-1]hello[/energy]");
+        Assert.Contains(result.Diagnostics, d => d.Code == TpsSpec.DiagnosticCodes.InvalidEnergyLevel);
+    }
+
+    [Fact]
+    public void Energy_InvalidNonNumeric()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\n[energy:abc]hello[/energy]");
+        Assert.Contains(result.Diagnostics, d => d.Code == TpsSpec.DiagnosticCodes.InvalidEnergyLevel);
+    }
+
+    [Fact]
+    public void Energy_InvalidNoArgument()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\n[energy]hello[/energy]");
+        Assert.Contains(result.Diagnostics, d => d.Code == TpsSpec.DiagnosticCodes.InvalidEnergyLevel);
+    }
+
+    [Fact]
+    public void Energy_DecimalProducesDiagnostic()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\n[energy:5.5]hello[/energy]");
+        Assert.Contains(result.Diagnostics, d => d.Code == TpsSpec.DiagnosticCodes.InvalidEnergyLevel);
+    }
+
+    [Fact]
+    public void Melody_MinimumLevel()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\n[melody:1]hello[/melody]");
+        var word = result.Script.Words.First(w => w.Kind == "word");
+        Assert.Equal(1, word.Metadata.MelodyLevel);
+    }
+
+    [Fact]
+    public void Melody_MaximumLevel()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\n[melody:10]hello[/melody]");
+        var word = result.Script.Words.First(w => w.Kind == "word");
+        Assert.Equal(10, word.Metadata.MelodyLevel);
+    }
+
+    [Fact]
+    public void Melody_NestedInnermostWins()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\n[melody:3][melody:8]inner[/melody] outer[/melody]");
+        var words = result.Script.Words.Where(w => w.Kind == "word").ToList();
+        Assert.Equal(8, words.First(w => w.CleanText == "inner").Metadata.MelodyLevel);
+        Assert.Equal(3, words.First(w => w.CleanText == "outer").Metadata.MelodyLevel);
+    }
+
+    [Fact]
+    public void Melody_InvalidAboveMax()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\n[melody:11]hello[/melody]");
+        Assert.Contains(result.Diagnostics, d => d.Code == TpsSpec.DiagnosticCodes.InvalidMelodyLevel);
+    }
+
+    [Fact]
+    public void Melody_InvalidZero()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\n[melody:0]hello[/melody]");
+        Assert.Contains(result.Diagnostics, d => d.Code == TpsSpec.DiagnosticCodes.InvalidMelodyLevel);
+    }
+
+    [Fact]
+    public void Melody_InvalidNonNumeric()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\n[melody:abc]hello[/melody]");
+        Assert.Contains(result.Diagnostics, d => d.Code == TpsSpec.DiagnosticCodes.InvalidMelodyLevel);
+    }
+
+    [Fact]
+    public void Melody_InvalidNoArgument()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\n[melody]hello[/melody]");
+        Assert.Contains(result.Diagnostics, d => d.Code == TpsSpec.DiagnosticCodes.InvalidMelodyLevel);
+    }
+
+    [Fact]
+    public void Melody_NoTagLeavesNull()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body]\nhello");
+        var word = result.Script.Words.First(w => w.Kind == "word");
+        Assert.Null(word.Metadata.MelodyLevel);
+    }
+
+    [Fact]
+    public void Archetype_SegmentCoach()
+    {
+        var result = TpsRuntime.Compile("## [Name|Archetype:Coach]\nhello");
+        Assert.Equal("coach", result.Script.Segments[0].Archetype);
+    }
+
+    [Fact]
+    public void Archetype_BlockFriend()
+    {
+        var result = TpsRuntime.Compile("## [Seg]\n### [Body|Archetype:Friend]\nhello");
+        Assert.Equal("friend", result.Script.Segments[0].Blocks[0].Archetype);
+    }
+
+    [Fact]
+    public void Archetype_BlockInheritsFromSegment()
+    {
+        var result = TpsRuntime.Compile("## [Seg|Archetype:Coach]\n### [Body]\nhello");
+        Assert.Equal("coach", result.Script.Segments[0].Archetype);
+        Assert.Equal("coach", result.Script.Segments[0].Blocks[0].Archetype);
+    }
+
+    [Fact]
+    public void Archetype_BlockOverridesSegment()
+    {
+        var result = TpsRuntime.Compile("## [Seg|Archetype:Coach]\n### [Body|Archetype:Friend]\nhello");
+        Assert.Equal("coach", result.Script.Segments[0].Archetype);
+        Assert.Equal("friend", result.Script.Segments[0].Blocks[0].Archetype);
+    }
+
+    [Theory]
+    [InlineData("Friend", "friend", 135)]
+    [InlineData("Motivator", "motivator", 155)]
+    [InlineData("Educator", "educator", 120)]
+    [InlineData("Coach", "coach", 145)]
+    [InlineData("Storyteller", "storyteller", 125)]
+    [InlineData("Entertainer", "entertainer", 150)]
+    public void Archetype_SetsRecommendedWpm(string input, string expected, int expectedWpm)
+    {
+        var result = TpsRuntime.Compile($"## [Name|Archetype:{input}]\nhello");
+        Assert.Equal(expected, result.Script.Segments[0].Archetype);
+        Assert.Equal(expectedWpm, result.Script.Segments[0].TargetWpm);
+    }
+
+    [Fact]
+    public void Archetype_ExplicitWpmOverrides()
+    {
+        var result = TpsRuntime.Compile("## [Name|160|Archetype:Coach]\nhello");
+        Assert.Equal("coach", result.Script.Segments[0].Archetype);
+        Assert.Equal(160, result.Script.Segments[0].TargetWpm);
+    }
+
+    [Fact]
+    public void Archetype_CaseInsensitive()
+    {
+        var result = TpsRuntime.Compile("## [Name|Archetype:COACH]\nhello");
+        Assert.Equal("coach", result.Script.Segments[0].Archetype);
+    }
+
+    [Fact]
+    public void Archetype_UnknownProducesDiagnostic()
+    {
+        var result = TpsRuntime.Compile("## [Name|Archetype:Unknown]\nhello");
+        Assert.Contains(result.Diagnostics, d => d.Code == TpsSpec.DiagnosticCodes.UnknownArchetype);
+    }
+
+    [Fact]
+    public void Archetype_EmptyProducesDiagnostic()
+    {
+        var result = TpsRuntime.Compile("## [Name|Archetype:]\nhello");
+        Assert.Contains(result.Diagnostics, d => d.Code == TpsSpec.DiagnosticCodes.UnknownArchetype);
+    }
+
+    [Fact]
+    public void Archetype_NoArchetypeLeavesNull()
+    {
+        var result = TpsRuntime.Compile("## [Name]\nhello");
+        Assert.Null(result.Script.Segments[0].Archetype);
+    }
+
+    [Fact]
+    public void Archetype_WithOtherParamsInAnyOrder()
+    {
+        var result = TpsRuntime.Compile("## [Name|warm|Archetype:Motivator|Speaker:Alice]\nhello");
+        Assert.Equal("motivator", result.Script.Segments[0].Archetype);
+        Assert.Equal("Alice", result.Script.Segments[0].Speaker);
+        Assert.Equal("warm", result.Script.Segments[0].Emotion);
+    }
+
+    [Fact]
+    public void Archetype_ImplicitBlocksInherit()
+    {
+        var result = TpsRuntime.Compile("## [Seg|Archetype:Educator]\nhello world");
+        Assert.Equal("educator", result.Script.Segments[0].Archetype);
+        Assert.Equal("educator", result.Script.Segments[0].Blocks[0].Archetype);
+        Assert.Equal(120, result.Script.Segments[0].Blocks[0].TargetWpm);
+    }
+
+    [Fact]
+    public void Combined_FullEndToEnd()
+    {
+        var result = TpsRuntime.Compile("## [Rally|Motivational|Archetype:Motivator]\n### [Body]\n[legato][energy:9][melody:8]Rise up.[/melody][/energy][/legato]");
+        Assert.Equal("motivator", result.Script.Segments[0].Archetype);
+        Assert.Equal(155, result.Script.Segments[0].TargetWpm);
+
+        var words = result.Script.Words.Where(w => w.Kind == "word").ToList();
+        Assert.True(words.Count >= 1);
+        var firstWord = words[0];
+        Assert.Equal("legato", firstWord.Metadata.ArticulationStyle);
+        Assert.Equal(9, firstWord.Metadata.EnergyLevel);
+        Assert.Equal(8, firstWord.Metadata.MelodyLevel);
+    }
+
+    [Fact]
+    public void Constants_ArchetypesContainsAll()
+    {
+        Assert.Equal(6, TpsSpec.Archetypes.Count);
+        Assert.Contains("friend", TpsSpec.Archetypes);
+        Assert.Contains("motivator", TpsSpec.Archetypes);
+        Assert.Contains("educator", TpsSpec.Archetypes);
+        Assert.Contains("coach", TpsSpec.Archetypes);
+        Assert.Contains("storyteller", TpsSpec.Archetypes);
+        Assert.Contains("entertainer", TpsSpec.Archetypes);
+    }
+
+    [Fact]
+    public void Constants_ArticulationStylesContainsLegatoAndStaccato()
+    {
+        Assert.Equal(2, TpsSpec.ArticulationStyles.Count);
+        Assert.Contains(TpsSpec.Tags.Legato, TpsSpec.ArticulationStyles);
+        Assert.Contains(TpsSpec.Tags.Staccato, TpsSpec.ArticulationStyles);
+    }
+
+    [Fact]
+    public void Constants_ArchetypeRecommendedWpmValues()
+    {
+        Assert.Equal(135, TpsSpec.ArchetypeRecommendedWpm["friend"]);
+        Assert.Equal(155, TpsSpec.ArchetypeRecommendedWpm["motivator"]);
+        Assert.Equal(120, TpsSpec.ArchetypeRecommendedWpm["educator"]);
+        Assert.Equal(145, TpsSpec.ArchetypeRecommendedWpm["coach"]);
+        Assert.Equal(125, TpsSpec.ArchetypeRecommendedWpm["storyteller"]);
+        Assert.Equal(150, TpsSpec.ArchetypeRecommendedWpm["entertainer"]);
+    }
+
+    [Fact]
+    public void Constants_EnergyAndMelodyBounds()
+    {
+        Assert.Equal(1, TpsSpec.EnergyLevelMin);
+        Assert.Equal(10, TpsSpec.EnergyLevelMax);
+        Assert.Equal(1, TpsSpec.MelodyLevelMin);
+        Assert.Equal(10, TpsSpec.MelodyLevelMax);
+    }
+
+    [Fact]
+    public void Constants_TagsExist()
+    {
+        Assert.Equal("energy", TpsSpec.Tags.Energy);
+        Assert.Equal("legato", TpsSpec.Tags.Legato);
+        Assert.Equal("melody", TpsSpec.Tags.Melody);
+        Assert.Equal("staccato", TpsSpec.Tags.Staccato);
+    }
+
+    [Fact]
+    public void Constants_ArchetypePrefix()
+    {
+        Assert.Equal("Archetype:", TpsSpec.ArchetypePrefix);
+    }
+
+    [Fact]
+    public void Constants_DiagnosticCodesExist()
+    {
+        Assert.Equal("invalid-energy-level", TpsSpec.DiagnosticCodes.InvalidEnergyLevel);
+        Assert.Equal("invalid-melody-level", TpsSpec.DiagnosticCodes.InvalidMelodyLevel);
+        Assert.Equal("unknown-archetype", TpsSpec.DiagnosticCodes.UnknownArchetype);
+        Assert.Equal("unclosed-tag", TpsSpec.DiagnosticCodes.UnclosedTag);
     }
 }

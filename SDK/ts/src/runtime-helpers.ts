@@ -1,4 +1,5 @@
 import {
+  TpsArchetypes,
   TpsDiagnosticCodes,
   TpsEmotions,
   TpsFrontMatterKeys,
@@ -11,7 +12,9 @@ const trailingPunctuation = [".", "!", "?", ",", ";", ":", "\"", "'", ")", "]", 
 const timeFormats = [/^\d{1,2}:\d{2}$/u];
 const legacyKeys = new Set<string>(Object.values(TpsLegacyKeys) as string[]);
 const emotionSet = new Set<string>(TpsEmotions);
+const archetypeSet = new Set<string>(TpsArchetypes);
 const emotionPalettes = TpsSpec.emotionPalettes as Record<string, { accent: string; text: string; background: string }>;
+const archetypeWpmMap = TpsSpec.archetypeRecommendedWpm as Record<string, number>;
 const knownTags = new Set<string>(Object.values(TpsTags) as string[]);
 
 export function normalizeValue(value: string | undefined | null): string | undefined {
@@ -133,6 +136,18 @@ export function resolveEffectiveWpm(
   }
 
   return Math.max(1, inheritedWpm);
+}
+
+export function isKnownArchetype(value: string | undefined): boolean {
+  return value ? archetypeSet.has(value.toLowerCase()) : false;
+}
+
+export function resolveArchetypeWpm(archetype: string | undefined): number | undefined {
+  if (!archetype) {
+    return undefined;
+  }
+
+  return archetypeWpmMap[archetype.toLowerCase()];
 }
 
 export function isKnownInlineTag(tag: string): boolean {

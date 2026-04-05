@@ -28,9 +28,12 @@ export const TpsTags = Object.freeze({
     building: "building",
     editPoint: "edit_point",
     emphasis: "emphasis",
+    energy: "energy",
     fast: "fast",
     highlight: "highlight",
+    legato: "legato",
     loud: "loud",
+    melody: "melody",
     normal: "normal",
     pause: "pause",
     phonetic: "phonetic",
@@ -39,6 +42,7 @@ export const TpsTags = Object.freeze({
     sarcasm: "sarcasm",
     slow: "slow",
     soft: "soft",
+    staccato: "staccato",
     stress: "stress",
     whisper: "whisper",
     xfast: "xfast",
@@ -49,6 +53,7 @@ export const TpsHeaderTokens = Object.freeze({
     segment: "## ",
     block: "### ",
     speakerPrefix: "Speaker:",
+    archetypePrefix: "Archetype:",
     wpmSuffix: "WPM"
 });
 export const TpsEmotions = Object.freeze([
@@ -76,6 +81,36 @@ export const TpsDeliveryModes = Object.freeze([
     TpsTags.rhetorical,
     TpsTags.building
 ]);
+export const TpsArticulationStyles = Object.freeze([
+    TpsTags.legato,
+    TpsTags.staccato
+]);
+export const TpsArchetypeNames = Object.freeze({
+    friend: "friend",
+    motivator: "motivator",
+    educator: "educator",
+    coach: "coach",
+    storyteller: "storyteller",
+    entertainer: "entertainer"
+});
+export const TpsArchetypes = Object.freeze([
+    TpsArchetypeNames.friend,
+    TpsArchetypeNames.motivator,
+    TpsArchetypeNames.educator,
+    TpsArchetypeNames.coach,
+    TpsArchetypeNames.storyteller,
+    TpsArchetypeNames.entertainer
+]);
+export const TpsArchetypeRecommendedWpm = Object.freeze({
+    [TpsArchetypeNames.friend]: 135,
+    [TpsArchetypeNames.motivator]: 155,
+    [TpsArchetypeNames.educator]: 120,
+    [TpsArchetypeNames.coach]: 145,
+    [TpsArchetypeNames.storyteller]: 125,
+    [TpsArchetypeNames.entertainer]: 150
+});
+export const TpsEnergyLevels = Object.freeze({ min: 1, max: 10 });
+export const TpsMelodyLevels = Object.freeze({ min: 1, max: 10 });
 export const TpsRelativeSpeedTags = Object.freeze([
     TpsTags.xslow,
     TpsTags.slow,
@@ -135,6 +170,9 @@ export const TpsDiagnosticCodes = Object.freeze({
     invalidPause: "invalid-pause",
     invalidTagArgument: "invalid-tag-argument",
     invalidWpm: "invalid-wpm",
+    invalidEnergyLevel: "invalid-energy-level",
+    invalidMelodyLevel: "invalid-melody-level",
+    unknownArchetype: "unknown-archetype",
     mismatchedClosingTag: "mismatched-closing-tag",
     unclosedTag: "unclosed-tag"
 });
@@ -146,6 +184,8 @@ export const TpsKeywords = Object.freeze({
     emotions: TpsEmotions,
     volumeLevels: TpsVolumeLevels,
     deliveryModes: TpsDeliveryModes,
+    articulationStyles: TpsArticulationStyles,
+    archetypes: TpsArchetypes,
     relativeSpeedTags: TpsRelativeSpeedTags,
     editPointPriorities: TpsEditPointPriorities,
     controlMarkers: TpsControlMarkers
@@ -175,6 +215,11 @@ export const TpsSpec = Object.freeze({
     emotionPalettes: TpsEmotionPalettes,
     emotionHeadCues: TpsEmotionHeadCues,
     diagnosticCodes: TpsDiagnosticCodes,
-    keywords: TpsKeywords
+    keywords: TpsKeywords,
+    articulationStyles: TpsArticulationStyles,
+    archetypes: TpsArchetypes,
+    archetypeRecommendedWpm: TpsArchetypeRecommendedWpm,
+    energyLevels: TpsEnergyLevels,
+    melodyLevels: TpsMelodyLevels
 });
 //# sourceMappingURL=constants.js.map

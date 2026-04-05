@@ -95,6 +95,10 @@ public sealed class TpsSegment
     public string? Speaker { get; init; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("archetype")]
+    public string? Archetype { get; init; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("timing")]
     public string? Timing { get; init; }
 
@@ -139,6 +143,10 @@ public sealed class TpsBlock
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("speaker")]
     public string? Speaker { get; init; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("archetype")]
+    public string? Archetype { get; init; }
 }
 
 public sealed record WordMetadata
@@ -184,6 +192,18 @@ public sealed record WordMetadata
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("deliveryMode")]
     public string? DeliveryMode { get; init; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("articulationStyle")]
+    public string? ArticulationStyle { get; init; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("energyLevel")]
+    public int? EnergyLevel { get; init; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("melodyLevel")]
+    public int? MelodyLevel { get; init; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("phoneticGuide")]
@@ -306,6 +326,10 @@ public sealed class CompiledBlock : ICompiledTimeRange
     [JsonPropertyName("speaker")]
     public string? Speaker { get; init; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("archetype")]
+    public string? Archetype { get; init; }
+
     [JsonPropertyName("isImplicit")]
     public required bool IsImplicit { get; init; }
 
@@ -373,6 +397,10 @@ public sealed class CompiledSegment : ICompiledTimeRange
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("speaker")]
     public string? Speaker { get; init; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("archetype")]
+    public string? Archetype { get; init; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("timing")]

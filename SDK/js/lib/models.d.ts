@@ -37,6 +37,7 @@ export interface TpsSegment {
     targetWpm?: number | undefined;
     emotion?: string | undefined;
     speaker?: string | undefined;
+    archetype?: string | undefined;
     timing?: string | undefined;
     backgroundColor?: string | undefined;
     textColor?: string | undefined;
@@ -51,6 +52,7 @@ export interface TpsBlock {
     targetWpm?: number | undefined;
     emotion?: string | undefined;
     speaker?: string | undefined;
+    archetype?: string | undefined;
 }
 export interface WordMetadata {
     isEmphasis: boolean;
@@ -71,6 +73,9 @@ export interface WordMetadata {
     stressGuide?: string | undefined;
     speedOverride?: number | undefined;
     speedMultiplier?: number | undefined;
+    articulationStyle?: string | undefined;
+    energyLevel?: number | undefined;
+    melodyLevel?: number | undefined;
     speaker?: string | undefined;
     headCue?: string | undefined;
 }
@@ -105,6 +110,7 @@ export interface CompiledBlock {
     targetWpm: number;
     emotion: string;
     speaker?: string | undefined;
+    archetype?: string | undefined;
     isImplicit: boolean;
     startWordIndex: number;
     endWordIndex: number;
@@ -119,6 +125,7 @@ export interface CompiledSegment {
     targetWpm: number;
     emotion: string;
     speaker?: string | undefined;
+    archetype?: string | undefined;
     timing?: string | undefined;
     backgroundColor: string;
     textColor: string;

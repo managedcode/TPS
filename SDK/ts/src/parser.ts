@@ -5,10 +5,12 @@ import type { TpsDiagnostic, TpsDocument, TpsParseResult, TpsSegment, TpsValidat
 import {
   buildInvalidWpmMessage,
   isInvalidWpm,
+  isKnownArchetype,
   isKnownEmotion,
   isLegacyMetadataKey,
   isTimingToken,
   normalizeValue,
+  resolveArchetypeWpm,
   resolveBaseWpm,
   resolveEmotion,
   resolvePalette
@@ -50,6 +52,7 @@ interface ParsedHeader {
   emotion?: string;
   timing?: string;
   speaker?: string;
+  archetype?: string;
 }
 
 export function parseDocument(source: string): DocumentAnalysis {
@@ -339,6 +342,26 @@ function parseBracketHeader(
       continue;
     }
 
+    if (normalized.toLowerCase().startsWith(TpsSpec.headerTokens.archetypePrefix.toLowerCase())) {
+      const archetypeValue = normalizeValue(normalized.slice(TpsSpec.headerTokens.archetypePrefix.length));
+      if (archetypeValue && isKnownArchetype(archetypeValue)) {
+        parsed.archetype = archetypeValue.toLowerCase();
+      } else {
+        diagnostics.push(
+          createDiagnostic(
+            TpsDiagnosticCodes.unknownArchetype,
+            `Archetype '${archetypeValue ?? ""}' is not a known vocal archetype.`,
+            tokenRangeStart,
+            tokenRangeEnd,
+            lineStarts,
+            "Use one of: Friend, Motivator, Educator, Coach, Storyteller, Entertainer."
+          )
+        );
+      }
+
+      continue;
+    }
+
     if (isTimingToken(normalized)) {
       parsed.timing = normalized;
       continue;
@@ -397,13 +420,15 @@ function applyHeaderWpm(
 function createSegment(header: ParsedHeader, metadata: Record<string, string>, index: number): ParsedSegmentInternal {
   const emotion = resolveEmotion(header.emotion);
   const palette = resolvePalette(emotion);
+  const archetypeWpm = resolveArchetypeWpm(header.archetype);
   const segment: TpsSegment = {
     id: `segment-${index}`,
     name: header.name,
     content: "",
-    targetWpm: header.targetWpm ?? resolveBaseWpm(metadata),
+    targetWpm: header.targetWpm ?? archetypeWpm ?? resolveBaseWpm(metadata),
     emotion,
     speaker: header.speaker,
+    archetype: header.archetype,
     timing: header.timing,
     backgroundColor: palette.background,
     textColor: palette.text,
@@ -434,7 +459,8 @@ function createBlock(header: ParsedHeader, blockIndex: number, segmentId: string
       content: "",
       targetWpm: header.targetWpm,
       emotion: header.emotion,
-      speaker: header.speaker
+      speaker: header.speaker,
+      archetype: header.archetype
     }
   };
 }

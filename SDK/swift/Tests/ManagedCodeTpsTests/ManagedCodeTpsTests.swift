@@ -245,6 +245,351 @@ final class ManagedCodeTpsTests: XCTestCase {
         session.dispose()
     }
 
+    // MARK: - Articulation Tests
+
+    func testArticulationLegatoSetsStyle() {
+        let result = TpsRuntime.compileTps("## [Signal]\n### [Body]\n[legato]smooth words[/legato]")
+        XCTAssertTrue(result.ok)
+        let words = spokenWords(result.script)
+        XCTAssertEqual(words.first(where: { $0.cleanText == "smooth" })?.metadata.articulationStyle, "legato")
+        XCTAssertEqual(words.first(where: { $0.cleanText == "words" })?.metadata.articulationStyle, "legato")
+    }
+
+    func testArticulationStaccatoSetsStyle() {
+        let result = TpsRuntime.compileTps("## [Signal]\n### [Body]\n[staccato]crisp words[/staccato]")
+        XCTAssertTrue(result.ok)
+        let words = spokenWords(result.script)
+        XCTAssertEqual(words.first(where: { $0.cleanText == "crisp" })?.metadata.articulationStyle, "staccato")
+        XCTAssertEqual(words.first(where: { $0.cleanText == "words" })?.metadata.articulationStyle, "staccato")
+    }
+
+    func testArticulationNoTagIsNil() {
+        let result = TpsRuntime.compileTps("## [Signal]\n### [Body]\nPlain words here.")
+        XCTAssertTrue(result.ok)
+        let words = spokenWords(result.script)
+        for word in words {
+            XCTAssertNil(word.metadata.articulationStyle, "Word '\(word.cleanText)' should have nil articulationStyle")
+        }
+    }
+
+    func testArticulationNestingInnermostWins() {
+        let result = TpsRuntime.compileTps("## [Signal]\n### [Body]\n[legato]outer [staccato]inner[/staccato] outer[/legato]")
+        XCTAssertTrue(result.ok)
+        let words = spokenWords(result.script)
+        XCTAssertEqual(words.first(where: { $0.cleanText == "outer" })?.metadata.articulationStyle, "legato")
+        XCTAssertEqual(words.first(where: { $0.cleanText == "inner" })?.metadata.articulationStyle, "staccato")
+    }
+
+    func testArticulationStacksWithOtherTags() {
+        let result = TpsRuntime.compileTps("## [Signal]\n### [Body]\n[legato][emphasis]word[/emphasis][/legato]")
+        XCTAssertTrue(result.ok)
+        let words = spokenWords(result.script)
+        let word = words.first(where: { $0.cleanText == "word" })
+        XCTAssertEqual(word?.metadata.articulationStyle, "legato")
+        XCTAssertEqual(word?.metadata.emphasisLevel, 1)
+    }
+
+    func testArticulationCaseInsensitive() {
+        let result = TpsRuntime.compileTps("## [Signal]\n### [Body]\n[Legato]word[/Legato]")
+        XCTAssertTrue(result.ok)
+        let words = spokenWords(result.script)
+        XCTAssertEqual(words.first(where: { $0.cleanText == "word" })?.metadata.articulationStyle, "legato")
+    }
+
+    // MARK: - Energy Tests
+
+    func testEnergyBasicLevel() {
+        let result = TpsRuntime.compileTps("## [Signal]\n### [Body]\n[energy:5]word[/energy]")
+        XCTAssertTrue(result.ok)
+        let words = spokenWords(result.script)
+        XCTAssertEqual(words.first(where: { $0.cleanText == "word" })?.metadata.energyLevel, 5)
+    }
+
+    func testEnergyBoundaryMin() {
+        let result = TpsRuntime.compileTps("## [Signal]\n### [Body]\n[energy:1]word[/energy]")
+        XCTAssertTrue(result.ok)
+        XCTAssertEqual(spokenWords(result.script).first(where: { $0.cleanText == "word" })?.metadata.energyLevel, 1)
+    }
+
+    func testEnergyBoundaryMax() {
+        let result = TpsRuntime.compileTps("## [Signal]\n### [Body]\n[energy:10]word[/energy]")
+        XCTAssertTrue(result.ok)
+        XCTAssertEqual(spokenWords(result.script).first(where: { $0.cleanText == "word" })?.metadata.energyLevel, 10)
+    }
+
+    func testEnergyNoTagIsNil() {
+        let result = TpsRuntime.compileTps("## [Signal]\n### [Body]\nPlain word.")
+        XCTAssertTrue(result.ok)
+        for word in spokenWords(result.script) {
+            XCTAssertNil(word.metadata.energyLevel, "Word '\(word.cleanText)' should have nil energyLevel")
+        }
+    }
+
+    func testEnergyNestingInnermostWins() {
+        let result = TpsRuntime.compileTps("## [Signal]\n### [Body]\n[energy:3]outer [energy:8]inner[/energy] outer[/energy]")
+        XCTAssertTrue(result.ok)
+        let words = spokenWords(result.script)
+        XCTAssertEqual(words.first(where: { $0.cleanText == "inner" })?.metadata.energyLevel, 8)
+    }
+
+    func testEnergyInvalidZero() {
+        let result = TpsRuntime.compileTps("## [Signal]\n### [Body]\n[energy:0]word[/energy]")
+        XCTAssertTrue(result.diagnostics.contains { $0.code == "invalid-energy-level" })
+    }
+
+    func testEnergyInvalidEleven() {
+        let result = TpsRuntime.compileTps("## [Signal]\n### [Body]\n[energy:11]word[/energy]")
+        XCTAssertTrue(result.diagnostics.contains { $0.code == "invalid-energy-level" })
+    }
+
+    func testEnergyInvalidNonNumeric() {
+        let result = TpsRuntime.compileTps("## [Signal]\n### [Body]\n[energy:abc]word[/energy]")
+        XCTAssertTrue(result.diagnostics.contains { $0.code == "invalid-energy-level" })
+    }
+
+    func testEnergyInvalidMissingArgument() {
+        let result = TpsRuntime.compileTps("## [Signal]\n### [Body]\n[energy]word[/energy]")
+        XCTAssertTrue(result.diagnostics.contains { $0.code == "invalid-energy-level" })
+    }
+
+    // MARK: - Melody Tests
+
+    func testMelodyBasicLevel() {
+        let result = TpsRuntime.compileTps("## [Signal]\n### [Body]\n[melody:7]word[/melody]")
+        XCTAssertTrue(result.ok)
+        XCTAssertEqual(spokenWords(result.script).first(where: { $0.cleanText == "word" })?.metadata.melodyLevel, 7)
+    }
+
+    func testMelodyBoundaryMin() {
+        let result = TpsRuntime.compileTps("## [Signal]\n### [Body]\n[melody:1]word[/melody]")
+        XCTAssertTrue(result.ok)
+        XCTAssertEqual(spokenWords(result.script).first(where: { $0.cleanText == "word" })?.metadata.melodyLevel, 1)
+    }
+
+    func testMelodyBoundaryMax() {
+        let result = TpsRuntime.compileTps("## [Signal]\n### [Body]\n[melody:10]word[/melody]")
+        XCTAssertTrue(result.ok)
+        XCTAssertEqual(spokenWords(result.script).first(where: { $0.cleanText == "word" })?.metadata.melodyLevel, 10)
+    }
+
+    func testMelodyNoTagIsNil() {
+        let result = TpsRuntime.compileTps("## [Signal]\n### [Body]\nPlain word.")
+        XCTAssertTrue(result.ok)
+        for word in spokenWords(result.script) {
+            XCTAssertNil(word.metadata.melodyLevel, "Word '\(word.cleanText)' should have nil melodyLevel")
+        }
+    }
+
+    func testMelodyNestingInnermostWins() {
+        let result = TpsRuntime.compileTps("## [Signal]\n### [Body]\n[melody:2]outer [melody:9]inner[/melody] outer[/melody]")
+        XCTAssertTrue(result.ok)
+        let words = spokenWords(result.script)
+        XCTAssertEqual(words.first(where: { $0.cleanText == "inner" })?.metadata.melodyLevel, 9)
+    }
+
+    func testMelodyInvalidZero() {
+        let result = TpsRuntime.compileTps("## [Signal]\n### [Body]\n[melody:0]word[/melody]")
+        XCTAssertTrue(result.diagnostics.contains { $0.code == "invalid-melody-level" })
+    }
+
+    func testMelodyInvalidEleven() {
+        let result = TpsRuntime.compileTps("## [Signal]\n### [Body]\n[melody:11]word[/melody]")
+        XCTAssertTrue(result.diagnostics.contains { $0.code == "invalid-melody-level" })
+    }
+
+    func testMelodyInvalidNonNumeric() {
+        let result = TpsRuntime.compileTps("## [Signal]\n### [Body]\n[melody:abc]word[/melody]")
+        XCTAssertTrue(result.diagnostics.contains { $0.code == "invalid-melody-level" })
+    }
+
+    func testMelodyInvalidMissingArgument() {
+        let result = TpsRuntime.compileTps("## [Signal]\n### [Body]\n[melody]word[/melody]")
+        XCTAssertTrue(result.diagnostics.contains { $0.code == "invalid-melody-level" })
+    }
+
+    // MARK: - Archetype Tests
+
+    func testArchetypeFriendSetsWpm() {
+        let result = TpsRuntime.compileTps("## [Signal|Archetype:Friend]\n### [Body]\nHello.")
+        XCTAssertTrue(result.ok)
+        XCTAssertEqual(result.script.segments.first?.targetWpm, 135)
+        XCTAssertEqual(result.script.segments.first?.archetype, "friend")
+    }
+
+    func testArchetypeMotivatorSetsWpm() {
+        let result = TpsRuntime.compileTps("## [Signal|Archetype:Motivator]\n### [Body]\nHello.")
+        XCTAssertTrue(result.ok)
+        XCTAssertEqual(result.script.segments.first?.targetWpm, 155)
+        XCTAssertEqual(result.script.segments.first?.archetype, "motivator")
+    }
+
+    func testArchetypeEducatorSetsWpm() {
+        let result = TpsRuntime.compileTps("## [Signal|Archetype:Educator]\n### [Body]\nHello.")
+        XCTAssertTrue(result.ok)
+        XCTAssertEqual(result.script.segments.first?.targetWpm, 120)
+        XCTAssertEqual(result.script.segments.first?.archetype, "educator")
+    }
+
+    func testArchetypeCoachSetsWpm() {
+        let result = TpsRuntime.compileTps("## [Signal|Archetype:Coach]\n### [Body]\nHello.")
+        XCTAssertTrue(result.ok)
+        XCTAssertEqual(result.script.segments.first?.targetWpm, 145)
+        XCTAssertEqual(result.script.segments.first?.archetype, "coach")
+    }
+
+    func testArchetypeStorytellerSetsWpm() {
+        let result = TpsRuntime.compileTps("## [Signal|Archetype:Storyteller]\n### [Body]\nHello.")
+        XCTAssertTrue(result.ok)
+        XCTAssertEqual(result.script.segments.first?.targetWpm, 125)
+        XCTAssertEqual(result.script.segments.first?.archetype, "storyteller")
+    }
+
+    func testArchetypeEntertainerSetsWpm() {
+        let result = TpsRuntime.compileTps("## [Signal|Archetype:Entertainer]\n### [Body]\nHello.")
+        XCTAssertTrue(result.ok)
+        XCTAssertEqual(result.script.segments.first?.targetWpm, 150)
+        XCTAssertEqual(result.script.segments.first?.archetype, "entertainer")
+    }
+
+    func testArchetypeInheritanceToBlocks() {
+        let result = TpsRuntime.compileTps("## [Signal|Archetype:Educator]\n### [Body]\nHello.")
+        XCTAssertTrue(result.ok)
+        XCTAssertEqual(result.script.segments.first?.blocks.first?.archetype, "educator")
+        XCTAssertEqual(result.script.segments.first?.blocks.first?.targetWpm, 120)
+    }
+
+    func testArchetypeBlockOverridesSegment() {
+        let result = TpsRuntime.compileTps("## [Signal|Archetype:Educator]\n### [Body|160WPM]\nHello.")
+        XCTAssertTrue(result.ok)
+        XCTAssertEqual(result.script.segments.first?.archetype, "educator")
+        XCTAssertEqual(result.script.segments.first?.blocks.first?.targetWpm, 160)
+    }
+
+    func testArchetypeCaseInsensitive() {
+        let result = TpsRuntime.compileTps("## [Signal|Archetype:FRIEND]\n### [Body]\nHello.")
+        XCTAssertTrue(result.ok)
+        XCTAssertEqual(result.script.segments.first?.archetype, "friend")
+        XCTAssertEqual(result.script.segments.first?.targetWpm, 135)
+    }
+
+    func testArchetypeUnknownProducesDiagnostic() {
+        let result = TpsRuntime.compileTps("## [Signal|Archetype:Robot]\n### [Body]\nHello.")
+        XCTAssertTrue(result.diagnostics.contains { $0.code == "unknown-archetype" })
+    }
+
+    func testArchetypeOnParsedSegment() {
+        let parsed = TpsRuntime.parseTps("## [Signal|Archetype:Coach]\n### [Body]\nHello.")
+        XCTAssertTrue(parsed.ok)
+        XCTAssertEqual(parsed.document.segments.first?.archetype, "coach")
+    }
+
+    // MARK: - Combined / End-to-End Tests
+
+    func testCombinedArticulationEnergyMelody() {
+        let result = TpsRuntime.compileTps("""
+        ## [Signal|Archetype:Motivator]
+        ### [Body]
+        [legato][energy:7][melody:4]flowing energetic melodic[/melody][/energy][/legato]
+        """)
+        XCTAssertTrue(result.ok)
+        let words = spokenWords(result.script)
+        let word = words.first(where: { $0.cleanText == "flowing" })
+        XCTAssertEqual(word?.metadata.articulationStyle, "legato")
+        XCTAssertEqual(word?.metadata.energyLevel, 7)
+        XCTAssertEqual(word?.metadata.melodyLevel, 4)
+        XCTAssertEqual(result.script.segments.first?.targetWpm, 155)
+        XCTAssertEqual(result.script.segments.first?.archetype, "motivator")
+    }
+
+    func testCombinedAllFeaturesEndToEnd() {
+        let result = TpsRuntime.compileTps("""
+        ---
+        title: "Combined Test"
+        base_wpm: 140
+        ---
+
+        ## [Intro|warm|Archetype:Storyteller|Speaker:Alex]
+        ### [Opening]
+        [staccato][energy:3][melody:8]Once upon a time[/melody][/energy][/staccato] there was a story.
+
+        ## [Main|focused|Archetype:Educator]
+        ### [Body|130WPM]
+        [legato][energy:9]Important lesson here.[/energy][/legato]
+        """)
+        XCTAssertTrue(result.ok)
+        XCTAssertEqual(result.script.segments.count, 2)
+
+        let introSegment = result.script.segments[0]
+        XCTAssertEqual(introSegment.archetype, "storyteller")
+        XCTAssertEqual(introSegment.targetWpm, 125)
+        XCTAssertEqual(introSegment.speaker, "Alex")
+
+        let mainSegment = result.script.segments[1]
+        XCTAssertEqual(mainSegment.archetype, "educator")
+        XCTAssertEqual(mainSegment.targetWpm, 120)
+
+        let words = spokenWords(result.script)
+        let onceWord = words.first(where: { $0.cleanText == "Once" })
+        XCTAssertEqual(onceWord?.metadata.articulationStyle, "staccato")
+        XCTAssertEqual(onceWord?.metadata.energyLevel, 3)
+        XCTAssertEqual(onceWord?.metadata.melodyLevel, 8)
+
+        let storyWord = words.first(where: { $0.cleanText == "story." })
+        XCTAssertNil(storyWord?.metadata.articulationStyle)
+        XCTAssertNil(storyWord?.metadata.energyLevel)
+        XCTAssertNil(storyWord?.metadata.melodyLevel)
+
+        let lessonWord = words.first(where: { $0.cleanText == "lesson" })
+        XCTAssertEqual(lessonWord?.metadata.articulationStyle, "legato")
+        XCTAssertEqual(lessonWord?.metadata.energyLevel, 9)
+        XCTAssertNil(lessonWord?.metadata.melodyLevel)
+    }
+
+    // MARK: - New Spec Constants Tests
+
+    func testSpecConstantsArticulationEnergyMelodyArchetype() {
+        // Articulation styles
+        XCTAssertEqual(TpsTags.legato, "legato")
+        XCTAssertEqual(TpsTags.staccato, "staccato")
+        XCTAssertEqual(TpsSpec.articulationStyles, ["legato", "staccato"])
+        XCTAssertEqual(TpsKeywords.articulationStyles, ["legato", "staccato"])
+
+        // Energy constants
+        XCTAssertEqual(TpsTags.energy, "energy")
+        XCTAssertEqual(TpsSpec.energyLevelMin, 1)
+        XCTAssertEqual(TpsSpec.energyLevelMax, 10)
+
+        // Melody constants
+        XCTAssertEqual(TpsTags.melody, "melody")
+        XCTAssertEqual(TpsSpec.melodyLevelMin, 1)
+        XCTAssertEqual(TpsSpec.melodyLevelMax, 10)
+
+        // Archetype constants
+        XCTAssertEqual(TpsSpec.archetypePrefix, "Archetype:")
+        XCTAssertEqual(TpsSpec.archetypeFriend, "friend")
+        XCTAssertEqual(TpsSpec.archetypeMotivator, "motivator")
+        XCTAssertEqual(TpsSpec.archetypeEducator, "educator")
+        XCTAssertEqual(TpsSpec.archetypeCoach, "coach")
+        XCTAssertEqual(TpsSpec.archetypeStoryteller, "storyteller")
+        XCTAssertEqual(TpsSpec.archetypeEntertainer, "entertainer")
+        XCTAssertEqual(TpsSpec.archetypes.count, 6)
+        XCTAssertTrue(TpsKeywords.archetypes.contains("friend"))
+        XCTAssertTrue(TpsKeywords.archetypes.contains("entertainer"))
+
+        // Archetype WPM mappings
+        XCTAssertEqual(TpsSpec.archetypeRecommendedWpm["friend"], 135)
+        XCTAssertEqual(TpsSpec.archetypeRecommendedWpm["motivator"], 155)
+        XCTAssertEqual(TpsSpec.archetypeRecommendedWpm["educator"], 120)
+        XCTAssertEqual(TpsSpec.archetypeRecommendedWpm["coach"], 145)
+        XCTAssertEqual(TpsSpec.archetypeRecommendedWpm["storyteller"], 125)
+        XCTAssertEqual(TpsSpec.archetypeRecommendedWpm["entertainer"], 150)
+
+        // Diagnostic codes
+        XCTAssertEqual(TpsDiagnosticCodes.invalidEnergyLevel, "invalid-energy-level")
+        XCTAssertEqual(TpsDiagnosticCodes.invalidMelodyLevel, "invalid-melody-level")
+        XCTAssertEqual(TpsDiagnosticCodes.unknownArchetype, "unknown-archetype")
+    }
+
     func testLargeGeneratedScript() {
         var lines: [String] = ["---", "base_wpm: 140", "---", ""]
         for segmentIndex in 1...8 {

@@ -17,6 +17,8 @@ export declare function tryResolvePauseMilliseconds(argument: string | undefined
 export declare function calculateWordDurationMs(word: string, effectiveWpm: number): number;
 export declare function calculateOrpIndex(word: string): number;
 export declare function resolveEffectiveWpm(inheritedWpm: number, speedOverride: number | undefined, speedMultiplier: number | undefined): number;
+export declare function isKnownArchetype(value: string | undefined): boolean;
+export declare function resolveArchetypeWpm(archetype: string | undefined): number | undefined;
 export declare function isKnownInlineTag(tag: string): boolean;
 export declare function buildInvalidWpmMessage(value: string): string;
 export declare function isInvalidWpm(value: number): boolean;

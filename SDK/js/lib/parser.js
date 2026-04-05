@@ -1,7 +1,7 @@
 import { TpsDiagnosticCodes, TpsFrontMatterKeys, TpsHeaderTokens, TpsSpec } from "./constants.js";
 import { createDiagnostic, createLineStarts, hasErrors, normalizeLineEndings } from "./diagnostics.js";
 import { splitHeaderPartsDetailed } from "./escaping.js";
-import { buildInvalidWpmMessage, isInvalidWpm, isKnownEmotion, isLegacyMetadataKey, isTimingToken, normalizeValue, resolveBaseWpm, resolveEmotion, resolvePalette } from "./runtime-helpers.js";
+import { buildInvalidWpmMessage, isInvalidWpm, isKnownArchetype, isKnownEmotion, isLegacyMetadataKey, isTimingToken, normalizeValue, resolveArchetypeWpm, resolveBaseWpm, resolveEmotion, resolvePalette } from "./runtime-helpers.js";
 export function parseDocument(source) {
     const normalized = normalizeLineEndings(source);
     const lineStarts = createLineStarts(normalized);
@@ -217,6 +217,16 @@ function parseBracketHeader(headerContent, contentOffset, lineStarts, diagnostic
             parsed.speaker = normalizeValue(normalized.slice(TpsSpec.speakerPrefix.length));
             continue;
         }
+        if (normalized.toLowerCase().startsWith(TpsSpec.headerTokens.archetypePrefix.toLowerCase())) {
+            const archetypeValue = normalizeValue(normalized.slice(TpsSpec.headerTokens.archetypePrefix.length));
+            if (archetypeValue && isKnownArchetype(archetypeValue)) {
+                parsed.archetype = archetypeValue.toLowerCase();
+            }
+            else {
+                diagnostics.push(createDiagnostic(TpsDiagnosticCodes.unknownArchetype, `Archetype '${archetypeValue ?? ""}' is not a known vocal archetype.`, tokenRangeStart, tokenRangeEnd, lineStarts, "Use one of: Friend, Motivator, Educator, Coach, Storyteller, Entertainer."));
+            }
+            continue;
+        }
         if (isTimingToken(normalized)) {
             parsed.timing = normalized;
             continue;
@@ -250,13 +260,15 @@ function applyHeaderWpm(parsed, token, start, end, lineStarts, diagnostics) {
 function createSegment(header, metadata, index) {
     const emotion = resolveEmotion(header.emotion);
     const palette = resolvePalette(emotion);
+    const archetypeWpm = resolveArchetypeWpm(header.archetype);
     const segment = {
         id: `segment-${index}`,
         name: header.name,
         content: "",
-        targetWpm: header.targetWpm ?? resolveBaseWpm(metadata),
+        targetWpm: header.targetWpm ?? archetypeWpm ?? resolveBaseWpm(metadata),
         emotion,
         speaker: header.speaker,
+        archetype: header.archetype,
         timing: header.timing,
         backgroundColor: palette.background,
         textColor: palette.text,
@@ -280,7 +292,8 @@ function createBlock(header, blockIndex, segmentId) {
             content: "",
             targetWpm: header.targetWpm,
             emotion: header.emotion,
-            speaker: header.speaker
+            speaker: header.speaker,
+            archetype: header.archetype
         }
     };
 }

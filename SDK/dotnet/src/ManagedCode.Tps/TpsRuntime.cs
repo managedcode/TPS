@@ -58,7 +58,7 @@ public static class TpsRuntime
         DocumentAnalysis analysis)
     {
         var segmentEmotion = TpsSupport.ResolveEmotion(parsedSegment.Segment.Emotion);
-        var inherited = new InheritedFormattingState(parsedSegment.Segment.TargetWpm ?? baseWpm, segmentEmotion, parsedSegment.Segment.Speaker, speedOffsets);
+        var inherited = new InheritedFormattingState(parsedSegment.Segment.TargetWpm ?? baseWpm, segmentEmotion, parsedSegment.Segment.Speaker, speedOffsets, parsedSegment.Segment.Archetype);
         var blocks = BuildBlocks(parsedSegment).Select(entry => CompileBlock(entry, inherited, analysis)).ToList();
         var compiledBlocks = new List<CompiledBlock>();
         var compiledWords = new List<CompiledWord>();
@@ -70,6 +70,7 @@ public static class TpsRuntime
                 TargetWpm = inherited.TargetWpm,
                 Emotion = segmentEmotion,
                 Speaker = parsedSegment.Segment.Speaker,
+                Archetype = parsedSegment.Segment.Archetype,
                 Timing = parsedSegment.Segment.Timing,
                 BackgroundColor = parsedSegment.Segment.BackgroundColor,
                 TextColor = parsedSegment.Segment.TextColor,
@@ -95,7 +96,8 @@ public static class TpsRuntime
                     Content = leadingContent,
                     TargetWpm = parsedSegment.Segment.TargetWpm,
                     Emotion = parsedSegment.Segment.Emotion,
-                    Speaker = parsedSegment.Segment.Speaker
+                    Speaker = parsedSegment.Segment.Speaker,
+                    Archetype = parsedSegment.Segment.Archetype
                 },
                 true,
                 parsedSegment.LeadingContent);
@@ -111,7 +113,8 @@ public static class TpsRuntime
                     Content = parsedSegment.DirectContent?.Text ?? string.Empty,
                     TargetWpm = parsedSegment.Segment.TargetWpm,
                     Emotion = parsedSegment.Segment.Emotion,
-                    Speaker = parsedSegment.Segment.Speaker
+                    Speaker = parsedSegment.Segment.Speaker,
+                    Archetype = parsedSegment.Segment.Archetype
                 },
                 true,
                 parsedSegment.DirectContent);
@@ -125,11 +128,15 @@ public static class TpsRuntime
 
     private static BlockCandidate CompileBlock(BlockDefinition definition, InheritedFormattingState inherited, DocumentAnalysis analysis)
     {
+        var blockArchetype = definition.Block.Archetype ?? inherited.Archetype;
+        var blockTargetWpm = definition.Block.TargetWpm
+            ?? (blockArchetype is not null && TpsSpec.ArchetypeRecommendedWpm.TryGetValue(blockArchetype, out var archetypeWpm) ? archetypeWpm : inherited.TargetWpm);
         var blockInherited = new InheritedFormattingState(
-            definition.Block.TargetWpm ?? inherited.TargetWpm,
+            blockTargetWpm,
             TpsSupport.ResolveEmotion(definition.Block.Emotion, inherited.Emotion),
             definition.Block.Speaker ?? inherited.Speaker,
-            inherited.SpeedOffsets);
+            inherited.SpeedOffsets,
+            blockArchetype);
 
         var content = new TpsContentCompiler().Compile(
             definition.Content?.Text ?? string.Empty,
@@ -148,6 +155,7 @@ public static class TpsRuntime
                 TargetWpm = blockInherited.TargetWpm,
                 Emotion = blockInherited.Emotion,
                 Speaker = blockInherited.Speaker,
+                Archetype = blockArchetype,
                 IsImplicit = definition.IsImplicit,
                 Phrases = phrases,
                 Words = words

@@ -52,6 +52,12 @@ public final class ManagedCodeTpsTests {
         testPlaybackNavigationAndTimer();
         testConcurrentControlCommands();
         testLargeGeneratedScript();
+        testArticulationStyle();
+        testEnergyLevel();
+        testMelodyLevel();
+        testVocalArchetypes();
+        testCombinedNewFeatures();
+        testNewSpecConstants();
         System.out.println("ManagedCode.Tps Java tests passed.");
     }
 
@@ -333,6 +339,293 @@ public final class ManagedCodeTpsTests {
         List<ManagedCodeTps.PlayerState> checkpoints = player.enumerateStates(Math.max(1, result.script().totalDurationMs() / 10));
         assertEquals("Segment 1", checkpoints.get(0).currentSegment().name(), "large script first segment");
         assertTrue(checkpoints.get(checkpoints.size() - 1).isComplete(), "large script should complete");
+    }
+
+    // ── Articulation style tests ──
+
+    private static void testArticulationStyle() {
+        // [legato] sets articulationStyle
+        ManagedCodeTps.TpsCompilationResult legato = ManagedCodeTps.TpsRuntime.compileTps("## [Signal]\n### [Body]\n[legato]smooth flow[/legato]");
+        assertTrue(legato.ok(), "legato should compile");
+        List<ManagedCodeTps.CompiledWord> legatoWords = spokenWords(legato.script());
+        assertEquals("legato", legatoWords.stream().filter(w -> "smooth".equals(w.cleanText())).findFirst().orElseThrow().metadata().articulationStyle(), "legato articulationStyle");
+        assertEquals("legato", legatoWords.stream().filter(w -> "flow".equals(w.cleanText())).findFirst().orElseThrow().metadata().articulationStyle(), "legato articulationStyle on second word");
+
+        // [staccato] sets articulationStyle
+        ManagedCodeTps.TpsCompilationResult staccato = ManagedCodeTps.TpsRuntime.compileTps("## [Signal]\n### [Body]\n[staccato]crisp beat[/staccato]");
+        assertTrue(staccato.ok(), "staccato should compile");
+        List<ManagedCodeTps.CompiledWord> staccatoWords = spokenWords(staccato.script());
+        assertEquals("staccato", staccatoWords.stream().filter(w -> "crisp".equals(w.cleanText())).findFirst().orElseThrow().metadata().articulationStyle(), "staccato articulationStyle");
+
+        // No tag = null articulationStyle
+        ManagedCodeTps.TpsCompilationResult noTag = ManagedCodeTps.TpsRuntime.compileTps("## [Signal]\n### [Body]\nplain word");
+        assertTrue(noTag.ok(), "no tag should compile");
+        assertEquals(null, spokenWords(noTag.script()).stream().filter(w -> "plain".equals(w.cleanText())).findFirst().orElseThrow().metadata().articulationStyle(), "no tag articulationStyle is null");
+
+        // Nesting: innermost wins
+        ManagedCodeTps.TpsCompilationResult nested = ManagedCodeTps.TpsRuntime.compileTps("## [Signal]\n### [Body]\n[legato]outer [staccato]inner[/staccato] back[/legato]");
+        assertTrue(nested.ok(), "nested articulation should compile");
+        List<ManagedCodeTps.CompiledWord> nestedWords = spokenWords(nested.script());
+        assertEquals("legato", nestedWords.stream().filter(w -> "outer".equals(w.cleanText())).findFirst().orElseThrow().metadata().articulationStyle(), "nested outer is legato");
+        assertEquals("staccato", nestedWords.stream().filter(w -> "inner".equals(w.cleanText())).findFirst().orElseThrow().metadata().articulationStyle(), "nested inner is staccato");
+        assertEquals("legato", nestedWords.stream().filter(w -> "back".equals(w.cleanText())).findFirst().orElseThrow().metadata().articulationStyle(), "nested back is legato");
+
+        // Stacks with other tags
+        ManagedCodeTps.TpsCompilationResult stacked = ManagedCodeTps.TpsRuntime.compileTps("## [Signal]\n### [Body]\n[emphasis][legato]both[/legato][/emphasis]");
+        assertTrue(stacked.ok(), "stacked should compile");
+        ManagedCodeTps.CompiledWord bothWord = spokenWords(stacked.script()).stream().filter(w -> "both".equals(w.cleanText())).findFirst().orElseThrow();
+        assertEquals("legato", bothWord.metadata().articulationStyle(), "stacked articulationStyle");
+        assertTrue(bothWord.metadata().isEmphasis(), "stacked emphasis");
+
+        // Case insensitive
+        ManagedCodeTps.TpsCompilationResult caseInsensitive = ManagedCodeTps.TpsRuntime.compileTps("## [Signal]\n### [Body]\n[Legato]upper[/Legato] [STACCATO]allcaps[/STACCATO]");
+        assertTrue(caseInsensitive.ok(), "case insensitive articulation should compile");
+        List<ManagedCodeTps.CompiledWord> ciWords = spokenWords(caseInsensitive.script());
+        assertEquals("legato", ciWords.stream().filter(w -> "upper".equals(w.cleanText())).findFirst().orElseThrow().metadata().articulationStyle(), "case insensitive legato");
+        assertEquals("staccato", ciWords.stream().filter(w -> "allcaps".equals(w.cleanText())).findFirst().orElseThrow().metadata().articulationStyle(), "case insensitive staccato");
+    }
+
+    // ── Energy level tests ──
+
+    private static void testEnergyLevel() {
+        // [energy:5] sets energyLevel
+        ManagedCodeTps.TpsCompilationResult basic = ManagedCodeTps.TpsRuntime.compileTps("## [Signal]\n### [Body]\n[energy:5]powered[/energy]");
+        assertTrue(basic.ok(), "energy:5 should compile");
+        assertEquals(5, (int) spokenWords(basic.script()).stream().filter(w -> "powered".equals(w.cleanText())).findFirst().orElseThrow().metadata().energyLevel(), "energy level 5");
+
+        // Boundary: minimum (1)
+        ManagedCodeTps.TpsCompilationResult min = ManagedCodeTps.TpsRuntime.compileTps("## [Signal]\n### [Body]\n[energy:1]low[/energy]");
+        assertTrue(min.ok(), "energy:1 should compile");
+        assertEquals(1, (int) spokenWords(min.script()).stream().filter(w -> "low".equals(w.cleanText())).findFirst().orElseThrow().metadata().energyLevel(), "energy level 1");
+
+        // Boundary: maximum (10)
+        ManagedCodeTps.TpsCompilationResult max = ManagedCodeTps.TpsRuntime.compileTps("## [Signal]\n### [Body]\n[energy:10]high[/energy]");
+        assertTrue(max.ok(), "energy:10 should compile");
+        assertEquals(10, (int) spokenWords(max.script()).stream().filter(w -> "high".equals(w.cleanText())).findFirst().orElseThrow().metadata().energyLevel(), "energy level 10");
+
+        // No tag = null energyLevel
+        ManagedCodeTps.TpsCompilationResult noTag = ManagedCodeTps.TpsRuntime.compileTps("## [Signal]\n### [Body]\nplain word");
+        assertTrue(noTag.ok(), "no energy tag should compile");
+        assertEquals(null, spokenWords(noTag.script()).stream().filter(w -> "plain".equals(w.cleanText())).findFirst().orElseThrow().metadata().energyLevel(), "no energy tag is null");
+
+        // Nested: innermost wins
+        ManagedCodeTps.TpsCompilationResult nested = ManagedCodeTps.TpsRuntime.compileTps("## [Signal]\n### [Body]\n[energy:3]outer [energy:8]inner[/energy] back[/energy]");
+        assertTrue(nested.ok(), "nested energy should compile");
+        List<ManagedCodeTps.CompiledWord> nestedWords = spokenWords(nested.script());
+        assertEquals(3, (int) nestedWords.stream().filter(w -> "outer".equals(w.cleanText())).findFirst().orElseThrow().metadata().energyLevel(), "nested outer energy 3");
+        assertEquals(8, (int) nestedWords.stream().filter(w -> "inner".equals(w.cleanText())).findFirst().orElseThrow().metadata().energyLevel(), "nested inner energy 8");
+        assertEquals(3, (int) nestedWords.stream().filter(w -> "back".equals(w.cleanText())).findFirst().orElseThrow().metadata().energyLevel(), "nested back energy 3");
+
+        // Invalid: 0 (below minimum)
+        ManagedCodeTps.TpsCompilationResult zero = ManagedCodeTps.TpsRuntime.compileTps("## [Signal]\n### [Body]\n[energy:0]bad[/energy]");
+        assertTrue(!zero.ok(), "energy:0 should fail");
+        assertTrue(zero.diagnostics().stream().anyMatch(d -> "invalid-energy-level".equals(d.code())), "energy:0 diagnostic");
+
+        // Invalid: 11 (above maximum)
+        ManagedCodeTps.TpsCompilationResult eleven = ManagedCodeTps.TpsRuntime.compileTps("## [Signal]\n### [Body]\n[energy:11]bad[/energy]");
+        assertTrue(!eleven.ok(), "energy:11 should fail");
+        assertTrue(eleven.diagnostics().stream().anyMatch(d -> "invalid-energy-level".equals(d.code())), "energy:11 diagnostic");
+
+        // Invalid: non-numeric
+        ManagedCodeTps.TpsCompilationResult abc = ManagedCodeTps.TpsRuntime.compileTps("## [Signal]\n### [Body]\n[energy:abc]bad[/energy]");
+        assertTrue(!abc.ok(), "energy:abc should fail");
+        assertTrue(abc.diagnostics().stream().anyMatch(d -> "invalid-energy-level".equals(d.code())), "energy:abc diagnostic");
+
+        // Invalid: missing argument
+        ManagedCodeTps.TpsCompilationResult missing = ManagedCodeTps.TpsRuntime.compileTps("## [Signal]\n### [Body]\n[energy]bad[/energy]");
+        assertTrue(!missing.ok(), "energy without argument should fail");
+        assertTrue(missing.diagnostics().stream().anyMatch(d -> "invalid-energy-level".equals(d.code())), "energy missing arg diagnostic");
+    }
+
+    // ── Melody level tests ──
+
+    private static void testMelodyLevel() {
+        // [melody:5] sets melodyLevel
+        ManagedCodeTps.TpsCompilationResult basic = ManagedCodeTps.TpsRuntime.compileTps("## [Signal]\n### [Body]\n[melody:5]tuned[/melody]");
+        assertTrue(basic.ok(), "melody:5 should compile");
+        assertEquals(5, (int) spokenWords(basic.script()).stream().filter(w -> "tuned".equals(w.cleanText())).findFirst().orElseThrow().metadata().melodyLevel(), "melody level 5");
+
+        // Boundary: minimum (1)
+        ManagedCodeTps.TpsCompilationResult min = ManagedCodeTps.TpsRuntime.compileTps("## [Signal]\n### [Body]\n[melody:1]low[/melody]");
+        assertTrue(min.ok(), "melody:1 should compile");
+        assertEquals(1, (int) spokenWords(min.script()).stream().filter(w -> "low".equals(w.cleanText())).findFirst().orElseThrow().metadata().melodyLevel(), "melody level 1");
+
+        // Boundary: maximum (10)
+        ManagedCodeTps.TpsCompilationResult max = ManagedCodeTps.TpsRuntime.compileTps("## [Signal]\n### [Body]\n[melody:10]high[/melody]");
+        assertTrue(max.ok(), "melody:10 should compile");
+        assertEquals(10, (int) spokenWords(max.script()).stream().filter(w -> "high".equals(w.cleanText())).findFirst().orElseThrow().metadata().melodyLevel(), "melody level 10");
+
+        // No tag = null
+        ManagedCodeTps.TpsCompilationResult noTag = ManagedCodeTps.TpsRuntime.compileTps("## [Signal]\n### [Body]\nplain word");
+        assertTrue(noTag.ok(), "no melody tag should compile");
+        assertEquals(null, spokenWords(noTag.script()).stream().filter(w -> "plain".equals(w.cleanText())).findFirst().orElseThrow().metadata().melodyLevel(), "no melody tag is null");
+
+        // Nested: innermost wins
+        ManagedCodeTps.TpsCompilationResult nested = ManagedCodeTps.TpsRuntime.compileTps("## [Signal]\n### [Body]\n[melody:2]outer [melody:9]inner[/melody] back[/melody]");
+        assertTrue(nested.ok(), "nested melody should compile");
+        List<ManagedCodeTps.CompiledWord> nestedWords = spokenWords(nested.script());
+        assertEquals(2, (int) nestedWords.stream().filter(w -> "outer".equals(w.cleanText())).findFirst().orElseThrow().metadata().melodyLevel(), "nested outer melody 2");
+        assertEquals(9, (int) nestedWords.stream().filter(w -> "inner".equals(w.cleanText())).findFirst().orElseThrow().metadata().melodyLevel(), "nested inner melody 9");
+        assertEquals(2, (int) nestedWords.stream().filter(w -> "back".equals(w.cleanText())).findFirst().orElseThrow().metadata().melodyLevel(), "nested back melody 2");
+
+        // Invalid: 0 (below minimum)
+        ManagedCodeTps.TpsCompilationResult zero = ManagedCodeTps.TpsRuntime.compileTps("## [Signal]\n### [Body]\n[melody:0]bad[/melody]");
+        assertTrue(!zero.ok(), "melody:0 should fail");
+        assertTrue(zero.diagnostics().stream().anyMatch(d -> "invalid-melody-level".equals(d.code())), "melody:0 diagnostic");
+
+        // Invalid: 11 (above maximum)
+        ManagedCodeTps.TpsCompilationResult eleven = ManagedCodeTps.TpsRuntime.compileTps("## [Signal]\n### [Body]\n[melody:11]bad[/melody]");
+        assertTrue(!eleven.ok(), "melody:11 should fail");
+        assertTrue(eleven.diagnostics().stream().anyMatch(d -> "invalid-melody-level".equals(d.code())), "melody:11 diagnostic");
+
+        // Invalid: non-numeric
+        ManagedCodeTps.TpsCompilationResult abc = ManagedCodeTps.TpsRuntime.compileTps("## [Signal]\n### [Body]\n[melody:abc]bad[/melody]");
+        assertTrue(!abc.ok(), "melody:abc should fail");
+        assertTrue(abc.diagnostics().stream().anyMatch(d -> "invalid-melody-level".equals(d.code())), "melody:abc diagnostic");
+
+        // Invalid: missing argument
+        ManagedCodeTps.TpsCompilationResult missing = ManagedCodeTps.TpsRuntime.compileTps("## [Signal]\n### [Body]\n[melody]bad[/melody]");
+        assertTrue(!missing.ok(), "melody without argument should fail");
+        assertTrue(missing.diagnostics().stream().anyMatch(d -> "invalid-melody-level".equals(d.code())), "melody missing arg diagnostic");
+    }
+
+    // ── Vocal archetype tests ──
+
+    private static void testVocalArchetypes() {
+        // All 6 archetypes set correct WPM
+        for (Map.Entry<String, Integer> entry : ManagedCodeTps.TpsSpec.ARCHETYPE_RECOMMENDED_WPM.entrySet()) {
+            String archetype = entry.getKey();
+            int expectedWpm = entry.getValue();
+            String archetypeTitle = archetype.substring(0, 1).toUpperCase() + archetype.substring(1);
+            ManagedCodeTps.TpsCompilationResult result = ManagedCodeTps.TpsRuntime.compileTps("## [Signal|Archetype:" + archetypeTitle + "]\n### [Body]\nHello.");
+            assertTrue(result.ok(), archetype + " archetype should compile");
+            assertEquals(expectedWpm, result.script().segments().get(0).targetWpm(), archetype + " archetype WPM");
+            assertEquals(archetype, result.script().segments().get(0).archetype(), archetype + " archetype value on segment");
+        }
+
+        // Archetype on segment is inherited by blocks
+        ManagedCodeTps.TpsCompilationResult inherited = ManagedCodeTps.TpsRuntime.compileTps("## [Signal|Archetype:Educator]\n### [Body]\nLearn.\n### [Detail]\nMore.");
+        assertTrue(inherited.ok(), "archetype inheritance should compile");
+        assertEquals("educator", inherited.script().segments().get(0).archetype(), "inherited archetype on segment");
+        assertEquals(120, inherited.script().segments().get(0).blocks().get(0).targetWpm(), "inherited archetype WPM on first block");
+        assertEquals(120, inherited.script().segments().get(0).blocks().get(1).targetWpm(), "inherited archetype WPM on second block");
+
+        // Block-level WPM overrides archetype WPM
+        ManagedCodeTps.TpsCompilationResult overridden = ManagedCodeTps.TpsRuntime.compileTps("## [Signal|Archetype:Friend]\n### [Body|180WPM]\nOverride.");
+        assertTrue(overridden.ok(), "archetype override should compile");
+        assertEquals(180, overridden.script().segments().get(0).blocks().get(0).targetWpm(), "block WPM overrides archetype");
+
+        // Case insensitive archetype
+        ManagedCodeTps.TpsCompilationResult caseLower = ManagedCodeTps.TpsRuntime.compileTps("## [Signal|Archetype:coach]\n### [Body]\nGo.");
+        assertTrue(caseLower.ok(), "lowercase archetype should compile");
+        assertEquals("coach", caseLower.script().segments().get(0).archetype(), "lowercase archetype value");
+        assertEquals(145, caseLower.script().segments().get(0).targetWpm(), "lowercase archetype WPM");
+
+        ManagedCodeTps.TpsCompilationResult caseUpper = ManagedCodeTps.TpsRuntime.compileTps("## [Signal|Archetype:MOTIVATOR]\n### [Body]\nPush.");
+        assertTrue(caseUpper.ok(), "uppercase archetype should compile");
+        assertEquals("motivator", caseUpper.script().segments().get(0).archetype(), "uppercase archetype value");
+        assertEquals(155, caseUpper.script().segments().get(0).targetWpm(), "uppercase archetype WPM");
+
+        // Unknown archetype produces diagnostic
+        ManagedCodeTps.TpsCompilationResult unknown = ManagedCodeTps.TpsRuntime.compileTps("## [Signal|Archetype:Wizard]\n### [Body]\nMagic.");
+        assertTrue(!unknown.ok(), "unknown archetype should fail");
+        assertTrue(unknown.diagnostics().stream().anyMatch(d -> "unknown-archetype".equals(d.code())), "unknown archetype diagnostic");
+    }
+
+    // ── Combined e2e test ──
+
+    private static void testCombinedNewFeatures() {
+        ManagedCodeTps.TpsCompilationResult result = ManagedCodeTps.TpsRuntime.compileTps("""
+            ## [Presentation|warm|Archetype:Storyteller|Speaker:Narrator]
+            ### [Opening]
+            [legato][energy:7][melody:4]Once upon a time[/melody][/energy][/legato] there was [staccato][energy:2]a pause[/staccato][/energy] in the story.
+            ### [Climax|180WPM]
+            [energy:10][melody:10][emphasis]Everything changed.[/emphasis][/melody][/energy]
+            """);
+        assertTrue(result.ok(), "combined features should compile");
+
+        // Verify archetype
+        assertEquals("storyteller", result.script().segments().get(0).archetype(), "combined archetype");
+        assertEquals(125, result.script().segments().get(0).blocks().get(0).targetWpm(), "combined archetype WPM on first block");
+        assertEquals(180, result.script().segments().get(0).blocks().get(1).targetWpm(), "combined explicit WPM overrides archetype");
+
+        // Verify speaker inheritance
+        assertEquals("Narrator", result.script().segments().get(0).speaker(), "combined speaker");
+
+        // Verify inline tag metadata on words
+        List<ManagedCodeTps.CompiledWord> words = spokenWords(result.script());
+
+        ManagedCodeTps.CompiledWord onceWord = words.stream().filter(w -> "Once".equals(w.cleanText())).findFirst().orElseThrow();
+        assertEquals("legato", onceWord.metadata().articulationStyle(), "combined Once articulationStyle");
+        assertEquals(7, (int) onceWord.metadata().energyLevel(), "combined Once energyLevel");
+        assertEquals(4, (int) onceWord.metadata().melodyLevel(), "combined Once melodyLevel");
+
+        ManagedCodeTps.CompiledWord pauseWord = words.stream().filter(w -> "pause".equals(w.cleanText())).findFirst().orElseThrow();
+        assertEquals("staccato", pauseWord.metadata().articulationStyle(), "combined pause articulationStyle");
+        assertEquals(2, (int) pauseWord.metadata().energyLevel(), "combined pause energyLevel");
+        assertEquals(null, pauseWord.metadata().melodyLevel(), "combined pause melodyLevel null outside melody tag");
+
+        ManagedCodeTps.CompiledWord changedWord = words.stream().filter(w -> w.cleanText().startsWith("changed")).findFirst().orElseThrow();
+        assertEquals(10, (int) changedWord.metadata().energyLevel(), "combined changed energyLevel");
+        assertEquals(10, (int) changedWord.metadata().melodyLevel(), "combined changed melodyLevel");
+        assertTrue(changedWord.metadata().isEmphasis(), "combined changed emphasis");
+    }
+
+    // ── New spec constants test ──
+
+    private static void testNewSpecConstants() {
+        // Articulation styles constant
+        assertEquals(List.of("legato", "staccato"), ManagedCodeTps.TpsSpec.ARTICULATION_STYLES, "ARTICULATION_STYLES");
+
+        // Energy level bounds
+        assertEquals(1, ManagedCodeTps.TpsSpec.ENERGY_LEVEL_MIN, "ENERGY_LEVEL_MIN");
+        assertEquals(10, ManagedCodeTps.TpsSpec.ENERGY_LEVEL_MAX, "ENERGY_LEVEL_MAX");
+
+        // Melody level bounds
+        assertEquals(1, ManagedCodeTps.TpsSpec.MELODY_LEVEL_MIN, "MELODY_LEVEL_MIN");
+        assertEquals(10, ManagedCodeTps.TpsSpec.MELODY_LEVEL_MAX, "MELODY_LEVEL_MAX");
+
+        // Archetype constants
+        assertEquals("friend", ManagedCodeTps.TpsSpec.ARCHETYPE_FRIEND, "ARCHETYPE_FRIEND");
+        assertEquals("motivator", ManagedCodeTps.TpsSpec.ARCHETYPE_MOTIVATOR, "ARCHETYPE_MOTIVATOR");
+        assertEquals("educator", ManagedCodeTps.TpsSpec.ARCHETYPE_EDUCATOR, "ARCHETYPE_EDUCATOR");
+        assertEquals("coach", ManagedCodeTps.TpsSpec.ARCHETYPE_COACH, "ARCHETYPE_COACH");
+        assertEquals("storyteller", ManagedCodeTps.TpsSpec.ARCHETYPE_STORYTELLER, "ARCHETYPE_STORYTELLER");
+        assertEquals("entertainer", ManagedCodeTps.TpsSpec.ARCHETYPE_ENTERTAINER, "ARCHETYPE_ENTERTAINER");
+        assertEquals(6, ManagedCodeTps.TpsSpec.ARCHETYPES.size(), "ARCHETYPES count");
+        assertTrue(ManagedCodeTps.TpsSpec.ARCHETYPES.containsAll(List.of("friend", "motivator", "educator", "coach", "storyteller", "entertainer")), "ARCHETYPES contains all");
+
+        // Archetype recommended WPM
+        assertEquals(135, (int) ManagedCodeTps.TpsSpec.ARCHETYPE_RECOMMENDED_WPM.get("friend"), "friend WPM");
+        assertEquals(155, (int) ManagedCodeTps.TpsSpec.ARCHETYPE_RECOMMENDED_WPM.get("motivator"), "motivator WPM");
+        assertEquals(120, (int) ManagedCodeTps.TpsSpec.ARCHETYPE_RECOMMENDED_WPM.get("educator"), "educator WPM");
+        assertEquals(145, (int) ManagedCodeTps.TpsSpec.ARCHETYPE_RECOMMENDED_WPM.get("coach"), "coach WPM");
+        assertEquals(125, (int) ManagedCodeTps.TpsSpec.ARCHETYPE_RECOMMENDED_WPM.get("storyteller"), "storyteller WPM");
+        assertEquals(150, (int) ManagedCodeTps.TpsSpec.ARCHETYPE_RECOMMENDED_WPM.get("entertainer"), "entertainer WPM");
+
+        // Diagnostic codes
+        assertEquals("invalid-energy-level", ManagedCodeTps.TpsDiagnosticCodes.INVALID_ENERGY_LEVEL, "INVALID_ENERGY_LEVEL code");
+        assertEquals("invalid-melody-level", ManagedCodeTps.TpsDiagnosticCodes.INVALID_MELODY_LEVEL, "INVALID_MELODY_LEVEL code");
+        assertEquals("unknown-archetype", ManagedCodeTps.TpsDiagnosticCodes.UNKNOWN_ARCHETYPE, "UNKNOWN_ARCHETYPE code");
+
+        // Tag constants
+        assertEquals("energy", ManagedCodeTps.TpsTags.ENERGY, "ENERGY tag");
+        assertEquals("melody", ManagedCodeTps.TpsTags.MELODY, "MELODY tag");
+        assertEquals("legato", ManagedCodeTps.TpsTags.LEGATO, "LEGATO tag");
+        assertEquals("staccato", ManagedCodeTps.TpsTags.STACCATO, "STACCATO tag");
+
+        // Keywords include new tags
+        assertEquals("energy", ManagedCodeTps.TpsKeywords.TAGS.get("energy"), "keywords energy tag");
+        assertEquals("melody", ManagedCodeTps.TpsKeywords.TAGS.get("melody"), "keywords melody tag");
+        assertEquals("legato", ManagedCodeTps.TpsKeywords.TAGS.get("legato"), "keywords legato tag");
+        assertEquals("staccato", ManagedCodeTps.TpsKeywords.TAGS.get("staccato"), "keywords staccato tag");
+        assertTrue(ManagedCodeTps.TpsKeywords.ARTICULATION_STYLES.contains("legato"), "keywords articulation includes legato");
+        assertTrue(ManagedCodeTps.TpsKeywords.ARTICULATION_STYLES.contains("staccato"), "keywords articulation includes staccato");
+        assertTrue(ManagedCodeTps.TpsKeywords.ARCHETYPES.contains("friend"), "keywords archetypes includes friend");
+        assertTrue(ManagedCodeTps.TpsKeywords.ARCHETYPES.contains("entertainer"), "keywords archetypes includes entertainer");
+
+        // Archetype prefix
+        assertEquals("Archetype:", ManagedCodeTps.TpsSpec.ARCHETYPE_PREFIX, "ARCHETYPE_PREFIX");
     }
 
     private static Map<String, Object> normalizeExampleSnapshot(String fileName, ManagedCodeTps.CompiledScript script) {

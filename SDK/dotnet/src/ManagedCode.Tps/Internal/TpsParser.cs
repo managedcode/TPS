@@ -314,6 +314,24 @@ internal sealed partial class TpsParser
                 continue;
             }
 
+            if (normalized.StartsWith(TpsSpec.ArchetypePrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                var archetypeValue = TpsSupport.NormalizeValue(normalized[TpsSpec.ArchetypePrefix.Length..]);
+                if (archetypeValue is not null && TpsSpec.Archetypes.Contains(archetypeValue, StringComparer.OrdinalIgnoreCase))
+                {
+                    header = header with { Archetype = archetypeValue.ToLowerInvariant() };
+                }
+                else
+                {
+                    diagnostics.Add(TpsSupport.CreateDiagnostic(
+                        TpsSpec.DiagnosticCodes.UnknownArchetype,
+                        $"Archetype '{archetypeValue ?? ""}' is not a known vocal archetype.",
+                        tokenStart, tokenEnd, lineStarts,
+                        "Use one of: Friend, Motivator, Educator, Coach, Storyteller, Entertainer."));
+                }
+                continue;
+            }
+
             if (TpsSupport.IsTimingToken(normalized))
             {
                 header = header with { Timing = normalized };
@@ -380,14 +398,17 @@ internal sealed partial class TpsParser
         var emotion = TpsSupport.ResolveEmotion(header.Emotion);
         var palette = TpsSupport.ResolvePalette(emotion);
         var blocks = new List<TpsBlock>();
+        var targetWpm = header.TargetWpm
+            ?? (header.Archetype is not null && TpsSpec.ArchetypeRecommendedWpm.TryGetValue(header.Archetype, out var archetypeWpm) ? archetypeWpm : TpsSupport.ResolveBaseWpm(metadata));
         return new ParsedSegmentInternal(
             new TpsSegment
             {
                 Id = $"segment-{index}",
                 Name = header.Name,
-                TargetWpm = header.TargetWpm ?? TpsSupport.ResolveBaseWpm(metadata),
+                TargetWpm = targetWpm,
                 Emotion = emotion,
                 Speaker = header.Speaker,
+                Archetype = header.Archetype,
                 Timing = header.Timing,
                 BackgroundColor = palette.Background,
                 TextColor = palette.Text,
@@ -411,7 +432,8 @@ internal sealed partial class TpsParser
             Name = header.Name,
             TargetWpm = header.TargetWpm,
             Emotion = header.Emotion,
-            Speaker = header.Speaker
+            Speaker = header.Speaker,
+            Archetype = header.Archetype
         });
 
     private static ContentSection? CreateContentSection(IReadOnlyList<LineRecord> lines)
@@ -465,6 +487,7 @@ internal sealed partial class TpsParser
             TargetWpm = segment.TargetWpm,
             Emotion = segment.Emotion,
             Speaker = segment.Speaker,
+            Archetype = segment.Archetype,
             Timing = segment.Timing,
             BackgroundColor = segment.BackgroundColor,
             TextColor = segment.TextColor,
@@ -481,7 +504,8 @@ internal sealed partial class TpsParser
             Content = block.Content,
             TargetWpm = block.TargetWpm,
             Emotion = block.Emotion,
-            Speaker = block.Speaker
+            Speaker = block.Speaker,
+            Archetype = block.Archetype
         };
 
     private static (int Index, int Length)? FindFrontMatterClosing(string source)
@@ -561,7 +585,8 @@ internal sealed record ParsedHeader(
     int? TargetWpm = null,
     string? Emotion = null,
     string? Timing = null,
-    string? Speaker = null);
+    string? Speaker = null,
+    string? Archetype = null);
 
 internal sealed record LineRecord(string Text, int StartOffset);
 

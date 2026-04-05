@@ -28,9 +28,12 @@ export declare const TpsTags: Readonly<{
     building: "building";
     editPoint: "edit_point";
     emphasis: "emphasis";
+    energy: "energy";
     fast: "fast";
     highlight: "highlight";
+    legato: "legato";
     loud: "loud";
+    melody: "melody";
     normal: "normal";
     pause: "pause";
     phonetic: "phonetic";
@@ -39,6 +42,7 @@ export declare const TpsTags: Readonly<{
     sarcasm: "sarcasm";
     slow: "slow";
     soft: "soft";
+    staccato: "staccato";
     stress: "stress";
     whisper: "whisper";
     xfast: "xfast";
@@ -49,11 +53,38 @@ export declare const TpsHeaderTokens: Readonly<{
     segment: "## ";
     block: "### ";
     speakerPrefix: "Speaker:";
+    archetypePrefix: "Archetype:";
     wpmSuffix: "WPM";
 }>;
 export declare const TpsEmotions: readonly ["neutral", "warm", "professional", "focused", "concerned", "urgent", "motivational", "excited", "happy", "sad", "calm", "energetic"];
 export declare const TpsVolumeLevels: readonly ["loud", "soft", "whisper"];
 export declare const TpsDeliveryModes: readonly ["sarcasm", "aside", "rhetorical", "building"];
+export declare const TpsArticulationStyles: readonly ["legato", "staccato"];
+export declare const TpsArchetypeNames: Readonly<{
+    friend: "friend";
+    motivator: "motivator";
+    educator: "educator";
+    coach: "coach";
+    storyteller: "storyteller";
+    entertainer: "entertainer";
+}>;
+export declare const TpsArchetypes: readonly ["friend", "motivator", "educator", "coach", "storyteller", "entertainer"];
+export declare const TpsArchetypeRecommendedWpm: Readonly<{
+    friend: 135;
+    motivator: 155;
+    educator: 120;
+    coach: 145;
+    storyteller: 125;
+    entertainer: 150;
+}>;
+export declare const TpsEnergyLevels: Readonly<{
+    min: 1;
+    max: 10;
+}>;
+export declare const TpsMelodyLevels: Readonly<{
+    min: 1;
+    max: 10;
+}>;
 export declare const TpsRelativeSpeedTags: readonly ["xslow", "slow", "fast", "xfast", "normal"];
 export declare const TpsEditPointPriorities: readonly ["high", "medium", "low"];
 export declare const TpsControlMarkers: Readonly<{
@@ -151,6 +182,9 @@ export declare const TpsDiagnosticCodes: Readonly<{
     invalidPause: "invalid-pause";
     invalidTagArgument: "invalid-tag-argument";
     invalidWpm: "invalid-wpm";
+    invalidEnergyLevel: "invalid-energy-level";
+    invalidMelodyLevel: "invalid-melody-level";
+    unknownArchetype: "unknown-archetype";
     mismatchedClosingTag: "mismatched-closing-tag";
     unclosedTag: "unclosed-tag";
 }>;
@@ -184,6 +218,7 @@ export declare const TpsKeywords: Readonly<{
         segment: "## ";
         block: "### ";
         speakerPrefix: "Speaker:";
+        archetypePrefix: "Archetype:";
         wpmSuffix: "WPM";
     }>;
     tags: Readonly<{
@@ -192,9 +227,12 @@ export declare const TpsKeywords: Readonly<{
         building: "building";
         editPoint: "edit_point";
         emphasis: "emphasis";
+        energy: "energy";
         fast: "fast";
         highlight: "highlight";
+        legato: "legato";
         loud: "loud";
+        melody: "melody";
         normal: "normal";
         pause: "pause";
         phonetic: "phonetic";
@@ -203,6 +241,7 @@ export declare const TpsKeywords: Readonly<{
         sarcasm: "sarcasm";
         slow: "slow";
         soft: "soft";
+        staccato: "staccato";
         stress: "stress";
         whisper: "whisper";
         xfast: "xfast";
@@ -211,6 +250,8 @@ export declare const TpsKeywords: Readonly<{
     emotions: readonly ["neutral", "warm", "professional", "focused", "concerned", "urgent", "motivational", "excited", "happy", "sad", "calm", "energetic"];
     volumeLevels: readonly ["loud", "soft", "whisper"];
     deliveryModes: readonly ["sarcasm", "aside", "rhetorical", "building"];
+    articulationStyles: readonly ["legato", "staccato"];
+    archetypes: readonly ["friend", "motivator", "educator", "coach", "storyteller", "entertainer"];
     relativeSpeedTags: readonly ["xslow", "slow", "fast", "xfast", "normal"];
     editPointPriorities: readonly ["high", "medium", "low"];
     controlMarkers: Readonly<{
@@ -258,6 +299,7 @@ export declare const TpsSpec: Readonly<{
         segment: "## ";
         block: "### ";
         speakerPrefix: "Speaker:";
+        archetypePrefix: "Archetype:";
         wpmSuffix: "WPM";
     }>;
     tags: Readonly<{
@@ -266,9 +308,12 @@ export declare const TpsSpec: Readonly<{
         building: "building";
         editPoint: "edit_point";
         emphasis: "emphasis";
+        energy: "energy";
         fast: "fast";
         highlight: "highlight";
+        legato: "legato";
         loud: "loud";
+        melody: "melody";
         normal: "normal";
         pause: "pause";
         phonetic: "phonetic";
@@ -277,6 +322,7 @@ export declare const TpsSpec: Readonly<{
         sarcasm: "sarcasm";
         slow: "slow";
         soft: "soft";
+        staccato: "staccato";
         stress: "stress";
         whisper: "whisper";
         xfast: "xfast";
@@ -382,6 +428,9 @@ export declare const TpsSpec: Readonly<{
         invalidPause: "invalid-pause";
         invalidTagArgument: "invalid-tag-argument";
         invalidWpm: "invalid-wpm";
+        invalidEnergyLevel: "invalid-energy-level";
+        invalidMelodyLevel: "invalid-melody-level";
+        unknownArchetype: "unknown-archetype";
         mismatchedClosingTag: "mismatched-closing-tag";
         unclosedTag: "unclosed-tag";
     }>;
@@ -415,6 +464,7 @@ export declare const TpsSpec: Readonly<{
             segment: "## ";
             block: "### ";
             speakerPrefix: "Speaker:";
+            archetypePrefix: "Archetype:";
             wpmSuffix: "WPM";
         }>;
         tags: Readonly<{
@@ -423,9 +473,12 @@ export declare const TpsSpec: Readonly<{
             building: "building";
             editPoint: "edit_point";
             emphasis: "emphasis";
+            energy: "energy";
             fast: "fast";
             highlight: "highlight";
+            legato: "legato";
             loud: "loud";
+            melody: "melody";
             normal: "normal";
             pause: "pause";
             phonetic: "phonetic";
@@ -434,6 +487,7 @@ export declare const TpsSpec: Readonly<{
             sarcasm: "sarcasm";
             slow: "slow";
             soft: "soft";
+            staccato: "staccato";
             stress: "stress";
             whisper: "whisper";
             xfast: "xfast";
@@ -442,6 +496,8 @@ export declare const TpsSpec: Readonly<{
         emotions: readonly ["neutral", "warm", "professional", "focused", "concerned", "urgent", "motivational", "excited", "happy", "sad", "calm", "energetic"];
         volumeLevels: readonly ["loud", "soft", "whisper"];
         deliveryModes: readonly ["sarcasm", "aside", "rhetorical", "building"];
+        articulationStyles: readonly ["legato", "staccato"];
+        archetypes: readonly ["friend", "motivator", "educator", "coach", "storyteller", "entertainer"];
         relativeSpeedTags: readonly ["xslow", "slow", "fast", "xfast", "normal"];
         editPointPriorities: readonly ["high", "medium", "low"];
         controlMarkers: Readonly<{
@@ -449,8 +505,28 @@ export declare const TpsSpec: Readonly<{
             mediumPause: "//";
         }>;
     }>;
+    articulationStyles: readonly ["legato", "staccato"];
+    archetypes: readonly ["friend", "motivator", "educator", "coach", "storyteller", "entertainer"];
+    archetypeRecommendedWpm: Readonly<{
+        friend: 135;
+        motivator: 155;
+        educator: 120;
+        coach: 145;
+        storyteller: 125;
+        entertainer: 150;
+    }>;
+    energyLevels: Readonly<{
+        min: 1;
+        max: 10;
+    }>;
+    melodyLevels: Readonly<{
+        min: 1;
+        max: 10;
+    }>;
 }>;
 export type TpsEmotion = (typeof TpsEmotions)[number];
 export type TpsVolumeLevel = (typeof TpsVolumeLevels)[number];
 export type TpsDeliveryMode = (typeof TpsDeliveryModes)[number];
+export type TpsArticulationStyle = (typeof TpsArticulationStyles)[number];
+export type TpsArchetype = (typeof TpsArchetypes)[number];
 export type TpsEditPointPriority = (typeof TpsEditPointPriorities)[number];

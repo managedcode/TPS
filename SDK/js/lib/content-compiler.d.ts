@@ -3,6 +3,7 @@ export interface InheritedFormattingState {
     targetWpm: number;
     emotion: string;
     speaker?: string;
+    archetype?: string;
     speedOffsets: Record<string, number>;
 }
 export interface ContentCompilationResult {

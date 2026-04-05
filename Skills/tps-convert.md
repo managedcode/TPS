@@ -1,7 +1,7 @@
 ---
 name: tps-convert
-description: Convert plain text into a richly formatted TPS (TelePrompterScript) file with dramatic pacing, emotions, pauses, emphasis, volume, delivery modes, pronunciation, stress, breath marks, edit points, speakers, and all TPS format attributes.
-version: "1.0"
+description: Convert plain text into a richly formatted TPS (TelePrompterScript) file with vocal archetypes, articulation, energy, melody, dramatic pacing, emotions, pauses, emphasis, volume, delivery modes, pronunciation, stress, breath marks, edit points, speakers, and all TPS format attributes.
+version: "1.1.0"
 user_invocable: true
 ---
 
@@ -41,7 +41,11 @@ Analyze the input text and produce a `.tps` file that uses the full TPS tag voca
 15. **Pronunciation guides** — `[phonetic:IPA]word[/phonetic]`, `[pronunciation:GUIDE]word[/pronunciation]`
 16. **Syllable stress** — inline `[stress]syllable[/stress]` and guide `[stress:SYL-LA-ble]word[/stress]`
 17. **Speaker tags** — `Speaker:Name` in headers (if multiple speakers)
-18. **Escape sequences** — `\[`, `\]`, `\|`, `\/`, `\*`, `\\` (only when literal characters are needed in text)
+18. **Articulation tags** — `[legato]...[/legato]`, `[staccato]...[/staccato]`
+19. **Energy tags** — `[energy:N]...[/energy]` where N is 1–10
+20. **Melody tags** — `[melody:N]...[/melody]` where N is 1–10
+21. **Vocal archetype** — `Archetype:Name` in segment/block headers (Friend, Motivator, Educator, Coach, Storyteller, Entertainer)
+22. **Escape sequences** — `\[`, `\]`, `\|`, `\/`, `\*`, `\\` (only when literal characters are needed in text)
 
 ---
 
@@ -108,14 +112,15 @@ Optional `#` heading after front matter. Display metadata only. Does not create 
 Major sections of the script. Parameters are inside `[...]` brackets, separated by `|`. Parameters are **format-identified** (position-independent):
 
 ```markdown
-## [SegmentName|WPM|Emotion|Timing|Speaker:Name]
+## [SegmentName|WPM|Emotion|Timing|Speaker:Name|Archetype:Name]
 ```
 
 - **Name** (required) — first value before first `|`. Free text label.
-- **WPM** — integer or integer + `WPM` suffix (e.g., `145` or `145WPM`). Omit to inherit base_wpm.
+- **WPM** — integer or integer + `WPM` suffix (e.g., `145` or `145WPM`). Omit to inherit. If Archetype is set and WPM is omitted, the archetype's recommended WPM is used.
 - **Emotion** — one of the 12 emotion keywords (case-insensitive). Omit to inherit (default: `neutral`).
 - **Timing** — `MM:SS` or `MM:SS-MM:SS` range. Hint for tooling.
 - **Speaker** — `Speaker:Name` prefix. For multi-talent scripts.
+- **Archetype** — `Archetype:Name` prefix. Sets vocal delivery persona. One of: `Friend`, `Motivator`, `Educator`, `Coach`, `Storyteller`, `Entertainer`.
 
 Parameters can appear in **any order**. Unneeded parameters simply omit (no empty `||` slots).
 
@@ -141,13 +146,14 @@ This inherits default emotion and base WPM.
 Topic groups within a segment. Same bracket parameter syntax as segments, minus Timing:
 
 ```markdown
-### [BlockName|WPM|Emotion|Speaker:Name]
+### [BlockName|WPM|Emotion|Speaker:Name|Archetype:Name]
 ```
 
 - **Name** (required) — free text label
 - **WPM** — integer speed override. Inherits segment WPM if omitted.
 - **Emotion** — emotion override. Inherits segment emotion if omitted.
 - **Speaker** — talent assignment. Inherits segment speaker if omitted.
+- **Archetype** — vocal archetype override. Inherits segment archetype if omitted.
 
 **Examples:**
 ```markdown
@@ -228,6 +234,58 @@ Volume and emotion are independent and can be combined: `[soft][urgent]critical 
 | `[building]text[/building]` | Start at lower energy, gradually increase | Reveals, motivational build-ups, crescendo moments |
 
 Delivery modes are a **closed set**.
+
+### 11a. Articulation Tags
+
+| Tag | Delivery | Use when |
+|-----|----------|----------|
+| `[legato]text[/legato]` | Smooth, connected flow. Words blend together. | Storytelling, emotional connection, motivational passages, friendly tone |
+| `[staccato]text[/staccato]` | Sharp, separated, punchy. Each word lands distinctly. | Instructions, coaching, urgency, authority, key takeaways |
+
+Articulation is independent of speed. You can be slow-and-staccato or fast-and-legato.
+
+### 11b. Energy Tag
+
+```markdown
+[energy:8]high intensity delivery[/energy]
+[energy:3]calm and measured[/energy]
+```
+
+Sets overall intensity on a 1–10 scale. Different from volume (loudness) and speed (rate). Energy is about physicality, vocal projection, and dynamism. Values outside 1–10 are invalid.
+
+| Range | Description |
+|-------|-------------|
+| 1–2 | Minimal. Still, meditative. |
+| 3–4 | Low. Calm, measured. |
+| 5–6 | Moderate. Engaged but controlled. |
+| 7–8 | High. Dynamic, animated. |
+| 9–10 | Maximum. Explosive, commanding. |
+
+### 11c. Melody Tag
+
+```markdown
+[melody:8]expressive and musical[/melody]
+[melody:2]flat and matter-of-fact[/melody]
+```
+
+Sets pitch variation on a 1–10 scale. Low = monotone, informational. High = musical, expressive. Values outside 1–10 are invalid.
+
+### 11d. Vocal Archetypes
+
+Set on segment or block headers with `Archetype:Name`. Each archetype defines a composite delivery persona with expected ranges for articulation, energy, melody, volume, speed, and pauses.
+
+| Archetype | Goal | Recommended WPM | Articulation | Energy | Melody |
+|-----------|------|-----------------|--------------|--------|--------|
+| `Friend` | Connect | 135 | legato | 4–6 | 6–8 |
+| `Motivator` | Inspire | 155 | legato | 7–10 | 7–9 |
+| `Educator` | Inform | 120 | neutral | 3–5 | 2–4 |
+| `Coach` | Guide | 145 | staccato | 7–9 | 1–3 |
+| `Storyteller` | Engage | 125 | mixed | 4–7 | 8–10 |
+| `Entertainer` | Delight | 150 | mixed | 6–8 | 7–9 |
+
+When Archetype is set without explicit WPM, the archetype's recommended WPM is used automatically.
+
+**Recommended sequencing:** Friend → Motivator → Educator → Coach → Friend (connect → inspire → inform → instruct → close with connection).
 
 ### 12. Inline Emotion Override Tags
 
@@ -355,31 +413,101 @@ Escape sequences apply **only in plain text**, not inside tag parameters or head
 
 ## CONVERSION STRATEGY
 
-### Analysis Phase
+### Step 1: Read and Analyze
 
-Before writing any TPS, analyze the source text for:
-1. **Overall tone** — formal/casual, serious/light, instructional/narrative
-2. **Emotional arc** — how does the mood shift through the piece?
-3. **Key moments** — what are the most important points/reveals?
-4. **Structure** — natural section breaks, topic changes
-5. **Pacing needs** — which parts should be faster/slower?
-6. **Speaker changes** — are there multiple voices/characters?
-7. **Technical terms** — any words needing pronunciation guides?
-8. **Rhetorical devices** — questions, irony, asides, build-ups?
+Before writing any TPS, read the entire source text and analyze:
+1. **Content type** — speech, lecture, pitch, narration, dialogue, tutorial, interview?
+2. **Overall tone** — formal/casual, serious/light, instructional/narrative
+3. **Emotional arc** — how does the mood shift through the piece?
+4. **Key moments** — what are the most important points/reveals?
+5. **Structure** — natural section breaks, topic changes
+6. **Pacing needs** — which parts should be faster/slower?
+7. **Speaker changes** — are there multiple voices/characters?
+8. **Technical terms** — any words needing pronunciation guides?
+9. **Rhetorical devices** — questions, irony, asides, build-ups?
+
+### Step 2: Select Archetype Flow
+
+Based on the content analysis, determine the **vocal archetype sequence** for the script. Each segment should have an archetype that matches its communicative intent:
+
+| If the segment is about... | Use Archetype |
+|---------------------------|---------------|
+| Greeting, rapport, personal story | `Friend` |
+| Why this matters, vision, calling to action | `Motivator` |
+| Facts, data, explanation, how it works | `Educator` |
+| Action items, instructions, what to do now | `Coach` |
+| Narrative, story, journey, case study | `Storyteller` |
+| Humor, light moments, audience engagement | `Entertainer` |
+
+**Ask the user** before proceeding: present the proposed archetype sequence and let them confirm or adjust. Example:
+
+> I've analyzed your text and here's the proposed delivery structure:
+> 1. Opening (Friend) — build connection
+> 2. The Problem (Educator) — present the data
+> 3. Why It Matters (Motivator) — inspire action
+> 4. Next Steps (Coach) — give clear instructions
+> 5. Closing (Friend) — end with warmth
+>
+> Does this feel right, or would you like to adjust?
+
+### Step 3: Format with Tags
+
+Once the archetype flow is confirmed, format the text using the full TPS vocabulary. Apply articulation, energy, and melody tags to match each archetype's profile:
+
+**Friend segments**: `[legato]`, `[energy:5]`, `[melody:7]`, soft/default volume
+**Motivator segments**: `[legato]`, `[energy:8-9]`, `[melody:8]`, `[loud]`
+**Educator segments**: no articulation tags, `[energy:3-4]`, `[melody:3]`, default volume
+**Coach segments**: `[staccato]`, `[energy:8]`, `[melody:2]`, `[loud]`
+**Storyteller segments**: mixed articulation, `[energy:5-7]`, `[melody:9]`, variable volume
+**Entertainer segments**: mixed articulation, `[energy:7]`, `[melody:8]`, variable volume
+
+### Step 4: Shape Text Rhythm to Match Archetype
+
+Each archetype has a distinct rhythm. When formatting text, actively **restructure phrases and pauses** to match the archetype's expected rhythm profile. This is critical — the same text should read differently under different archetypes.
+
+**Rhythm targets per archetype:**
+
+| Archetype | Phrase length | Pause frequency | Pause duration | Emphasis density |
+|-----------|--------------|-----------------|----------------|-----------------|
+| **Friend** | 8–15 words | 4–8 per 100w | 300–600 ms (`/`, `//`) | Low (3–8%) |
+| **Motivator** | 8–20 words | 3–6 per 100w | 600–2000 ms (`//`, `[pause:2s]`) | High (10–20%) |
+| **Educator** | 10–25 words | 6–12 per 100w | 400–800 ms (`/`, `//`) | Low (3–8%) |
+| **Coach** | 3–8 words | 8–15 per 100w | 200–400 ms (`/`) | Very high (15–30%) |
+| **Storyteller** | 5–20 words | 4–10 per 100w | 500–3000 ms (variable) | Medium (5–12%) |
+| **Entertainer** | 5–15 words | 5–10 per 100w | 300–2000 ms (variable) | Medium (5–15%) |
+
+**How to apply rhythm:**
+
+- **Coach text**: Break long sentences into short directives. Add `/` between each. Bold key action words. Example:
+  - Before: "You should download the beta, run the benchmark, and share your feedback today."
+  - After: `**Download** the beta. / **Run** the benchmark. / **Share** your feedback. / **Today.**`
+
+- **Educator text**: Keep sentences complete and explanatory. Add `//` between concepts. Minimal emphasis. Example:
+  - Before: "The system uses three layers."
+  - After: `The system uses three layers. // First, the ingestion layer handles incoming data. // Second, the processing pipeline transforms it.`
+
+- **Motivator text**: Build momentum with connected phrases. Use dramatic pauses after peaks. Heavy emphasis. Example:
+  - Before: "You can change this. Every one of you has what it takes."
+  - After: `[emphasis]You[/emphasis] can change this. / [pause:1s] Every [emphasis]single one[/emphasis] of you / has what it takes. [pause:2s]`
+
+- **Friend text**: Natural conversational flow. Light pauses. Minimal emphasis. Example:
+  - Before: "Hey, thanks for being here. Let me tell you what we've been working on."
+  - After: `Hey, / thanks for being here today. // So, / let me tell you what we've been working on...`
 
 ### Dramatic Pacing Principles
 
-- **Openings**: `warm` or `calm` emotion, moderate pace. Draw the listener in.
+- **Openings**: `Archetype:Friend` + `warm` emotion. Draw the listener in.
 - **Key revelations**: `[pause:2s]` before, `[emphasis]` or `[highlight]` on the key phrase. Slow down.
 - **Emotional peaks**: `[building]` leading up, then peak emotion (`urgent`, `excited`, `motivational`), then a pause.
 - **Transitions**: `//` or `[pause:1s]` + `[edit_point]` between topics.
-- **Conclusions**: `[slow]` + `motivational` or `calm` emotion. Let it breathe.
-- **Lists/rapid content**: `[fast]` or `energetic` emotion.
+- **Conclusions**: `Archetype:Friend` + `[slow]` + `calm` emotion. Let it breathe.
+- **Lists/rapid content**: `Archetype:Coach` + `[staccato]` + `energetic` emotion.
+- **Data/facts**: `Archetype:Educator` + `[energy:3]` + `professional` emotion.
 - **Serious/sensitive content**: `[slow]` + `concerned` or `sad` emotion.
 - **Questions**: `[rhetorical]` for non-answer questions. `//` after to let them land.
 - **Parenthetical remarks**: `[aside]...[/aside]`.
 - **Irony**: `[sarcasm]...[/sarcasm]`.
-- **Crescendo sequences**: `[building]...[/building]`.
+- **Crescendo sequences**: `Archetype:Motivator` + `[building]...[/building]`.
 - **Confidential/intimate**: `[soft]` or `[whisper]` + `calm` emotion.
 - **Announcements/declarations**: `[loud]` + `excited` or `urgent` emotion.
 
@@ -404,6 +532,9 @@ Before writing any TPS, analyze the source text for:
 - **Volume tags**: use for genuine projection/intimacy shifts, not decoration.
 - **Speed tags**: cover phrases or sentences, not individual words.
 - **Delivery modes**: use when the text genuinely calls for that delivery style.
+- **Articulation**: use `[legato]` for flowing passages, `[staccato]` for punchy directives. Don't use both in the same phrase.
+- **Energy/Melody**: set once per segment or block scope. Don't change every sentence.
+- **Archetypes**: set on every segment header. Blocks only override if the delivery intent changes within a segment.
 - **Nesting**: max 2 levels deep. Don't over-nest.
 - **Breath marks**: every 20-30 words in continuous passages.
 - **Edit points**: at every major section boundary. `high` for critical cuts, `medium` for optional.
@@ -437,37 +568,37 @@ version: "1.0"
 
 # Product Launch
 
-## [Intro|Warm]
+## [Intro|Warm|Archetype:Friend]
 
-Welcome to what will be a transformative day. /
-Let's begin. //
+[legato][energy:5][melody:7]Welcome to what will be a transformative day. /
+Let's begin.[/melody][/energy][/legato] //
 
 ### [Opening Block]
 
-Good morning everyone, / and [emphasis]welcome[/emphasis] to what I believe /
-will be a [emphasis]transformative moment[/emphasis] for our company. //
+[legato][energy:5][melody:7]Good morning everyone, / and [emphasis]welcome[/emphasis] to what I believe /
+will be a [emphasis]transformative moment[/emphasis] for our company.[/melody][/energy][/legato] //
 
 [pause:2s]
 
-### [Purpose Block|145WPM|Focused]
+### [Purpose Block|Archetype:Motivator]
 
-[emphasis]Today[/emphasis], / we're not just launching a product. / [breath]
+[legato][energy:8][melody:8][emphasis]Today[/emphasis], / we're not just launching a product. / [breath]
 We're introducing a [highlight]solution[/highlight] that will [emphasis]revolutionize[/emphasis] /
-how our customers interact with tech[stress]no[/stress]logy. //
+how our customers interact with tech[stress]no[/stress]logy.[/melody][/energy][/legato] //
 
-## [Problem|135WPM|Concerned]
+## [Problem|Concerned|Archetype:Educator]
 
 ### [Statistics Block|Neutral]
 
-But first, / let's address the [xslow]elephant in the room[/xslow]. /
-Our industry has been [emphasis]struggling[/emphasis] with a fundamental problem. //
+[energy:3][melody:3]But first, / let's address the [xslow]elephant in the room[/xslow]. /
+Our industry has been [emphasis]struggling[/emphasis] with a fundamental problem.[/melody][/energy] //
 
 [edit_point:high]
 
-According to recent studies, /
+[energy:4]According to recent studies, /
 [slow][emphasis]73% of users a[stress]ban[/stress]don[/emphasis] applications
 within the first three interactions[/slow] /
-due to [highlight]complexity and poor user experience[/highlight]. //
+due to [highlight]complexity and poor user experience[/highlight].[/energy] //
 
 ### [Impact Block]
 
@@ -476,7 +607,7 @@ costing businesses [loud][emphasis]billions[/emphasis] in revenue[/loud] annuall
 
 [pause:2s]
 
-## [Solution|Focused]
+## [Solution|Focused|Archetype:Educator]
 
 ### [Introduction Block]
 
@@ -489,7 +620,7 @@ That's where our [emphasis]new platform[/emphasis] comes in. /
 [highlight]simplifies complex processes[/highlight] /
 and [emphasis]enhances user experience[/emphasis].[/building] //
 
-### [Benefits Block|150WPM|Excited]
+### [Benefits Block|Excited]
 
 With our solution, / you can expect a [emphasis]50% reduction[/emphasis] in user abandonment /
 and a [emphasis]30% increase[/emphasis] in engagement. //
@@ -505,12 +636,21 @@ with [phonetic:ˌɛskjuːˈɛl]SQL[/phonetic] backing stores. //
 
 [edit_point:medium]
 
-## [Closing|Motivational]
+## [Action Items|Focused|Archetype:Coach]
 
-### [Call to Action]
+### [Next Steps]
 
-[slow][highlight]Thank you[/highlight] for your time. /
-[soft]Together, / we will build something [emphasis]extraordinary[/emphasis].[/soft][/slow] //
+[staccato][energy:8][melody:2][loud]**Three** things. **Today.** //
+**One** — download the **beta**. //
+**Two** — run the **benchmark**. //
+**Three** — share your **feedback**.[/loud][/melody][/energy][/staccato] //
+
+## [Closing|Warm|Archetype:Friend]
+
+### [Thank You]
+
+[legato][energy:5][melody:7][slow][highlight]Thank you[/highlight] for your time. /
+[soft]Together, / we will build something [emphasis]extraordinary[/emphasis].[/soft][/slow][/melody][/energy][/legato] //
 
 [pause:3s]
 

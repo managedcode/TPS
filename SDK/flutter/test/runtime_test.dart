@@ -257,6 +257,290 @@ void main() {
     session.dispose();
   });
 
+  group("articulation", () {
+    test("legato tag sets articulationStyle on word metadata", () {
+      final result = compileTps("## [Signal]\n### [Body]\n[legato]smooth[/legato] plain");
+      expect(result.ok, isTrue);
+      final words = spokenWords(result.script);
+      final smooth = words.firstWhere((word) => word.cleanText == "smooth");
+      final plain = words.firstWhere((word) => word.cleanText == "plain");
+      expect(smooth.metadata.articulationStyle, "legato");
+      expect(plain.metadata.articulationStyle, isNull);
+    });
+
+    test("staccato tag sets articulationStyle on word metadata", () {
+      final result = compileTps("## [Signal]\n### [Body]\n[staccato]crisp[/staccato] normal");
+      expect(result.ok, isTrue);
+      final words = spokenWords(result.script);
+      final crisp = words.firstWhere((word) => word.cleanText == "crisp");
+      final normal = words.firstWhere((word) => word.cleanText == "normal");
+      expect(crisp.metadata.articulationStyle, "staccato");
+      expect(normal.metadata.articulationStyle, isNull);
+    });
+
+    test("nested articulation tags resolve to innermost style", () {
+      final result = compileTps("## [Signal]\n### [Body]\n[legato][staccato]inner[/staccato] outer[/legato]");
+      expect(result.ok, isTrue);
+      final words = spokenWords(result.script);
+      final inner = words.firstWhere((word) => word.cleanText == "inner");
+      final outer = words.firstWhere((word) => word.cleanText == "outer");
+      expect(inner.metadata.articulationStyle, "staccato");
+      expect(outer.metadata.articulationStyle, "legato");
+    });
+
+    test("no articulation tag leaves articulationStyle null", () {
+      final result = compileTps("## [Signal]\n### [Body]\nJust words here");
+      expect(result.ok, isTrue);
+      final words = spokenWords(result.script);
+      for (final word in words) {
+        expect(word.metadata.articulationStyle, isNull);
+      }
+    });
+
+    test("articulation stacks with volume and emphasis", () {
+      final result = compileTps("## [Signal]\n### [Body]\n[legato][loud]*bold*[/loud][/legato]");
+      expect(result.ok, isTrue);
+      final words = spokenWords(result.script);
+      final bold = words.firstWhere((word) => word.cleanText == "bold");
+      expect(bold.metadata.articulationStyle, "legato");
+      expect(bold.metadata.volumeLevel, "loud");
+      expect(bold.metadata.emphasisLevel, 1);
+    });
+
+    test("articulation tags are case insensitive", () {
+      final result = compileTps("## [Signal]\n### [Body]\n[Legato]word1[/Legato] [STACCATO]word2[/STACCATO]");
+      expect(result.ok, isTrue);
+      final words = spokenWords(result.script);
+      final word1 = words.firstWhere((word) => word.cleanText == "word1");
+      final word2 = words.firstWhere((word) => word.cleanText == "word2");
+      expect(word1.metadata.articulationStyle, "legato");
+      expect(word2.metadata.articulationStyle, "staccato");
+    });
+  });
+
+  group("energy", () {
+    test("energy tag sets energyLevel on word metadata", () {
+      final result = compileTps("## [Signal]\n### [Body]\n[energy:5]pumped[/energy] flat");
+      expect(result.ok, isTrue);
+      final words = spokenWords(result.script);
+      final pumped = words.firstWhere((word) => word.cleanText == "pumped");
+      final flat = words.firstWhere((word) => word.cleanText == "flat");
+      expect(pumped.metadata.energyLevel, 5);
+      expect(flat.metadata.energyLevel, isNull);
+    });
+
+    test("energy boundary value 1 is valid", () {
+      final result = compileTps("## [Signal]\n### [Body]\n[energy:1]low[/energy]");
+      expect(result.ok, isTrue);
+      final words = spokenWords(result.script);
+      expect(words.first.metadata.energyLevel, 1);
+    });
+
+    test("energy boundary value 10 is valid", () {
+      final result = compileTps("## [Signal]\n### [Body]\n[energy:10]high[/energy]");
+      expect(result.ok, isTrue);
+      final words = spokenWords(result.script);
+      expect(words.first.metadata.energyLevel, 10);
+    });
+
+    test("energy applies to multiple words in scope", () {
+      final result = compileTps("## [Signal]\n### [Body]\n[energy:7]one two three[/energy]");
+      expect(result.ok, isTrue);
+      final words = spokenWords(result.script);
+      for (final word in words) {
+        expect(word.metadata.energyLevel, 7);
+      }
+    });
+
+    test("nested energy tags resolve to innermost level", () {
+      final result = compileTps("## [Signal]\n### [Body]\n[energy:3][energy:8]inner[/energy] outer[/energy]");
+      expect(result.ok, isTrue);
+      final words = spokenWords(result.script);
+      final inner = words.firstWhere((word) => word.cleanText == "inner");
+      final outer = words.firstWhere((word) => word.cleanText == "outer");
+      expect(inner.metadata.energyLevel, 8);
+      expect(outer.metadata.energyLevel, 3);
+    });
+
+    test("invalid energy values produce invalid-energy-level diagnostic", () {
+      final cases = ["[energy:0]word[/energy]", "[energy:11]word[/energy]", "[energy:-1]word[/energy]", "[energy:abc]word[/energy]", "[energy]word[/energy]"];
+      for (final invalid in cases) {
+        final result = compileTps("## [Signal]\n### [Body]\n$invalid");
+        expect(result.diagnostics.any((diagnostic) => diagnostic.code == "invalid-energy-level"), isTrue, reason: invalid);
+      }
+    });
+  });
+
+  group("melody", () {
+    test("melody tag sets melodyLevel on word metadata", () {
+      final result = compileTps("## [Signal]\n### [Body]\n[melody:6]sing[/melody] flat");
+      expect(result.ok, isTrue);
+      final words = spokenWords(result.script);
+      final sing = words.firstWhere((word) => word.cleanText == "sing");
+      final flat = words.firstWhere((word) => word.cleanText == "flat");
+      expect(sing.metadata.melodyLevel, 6);
+      expect(flat.metadata.melodyLevel, isNull);
+    });
+
+    test("melody boundary value 1 is valid", () {
+      final result = compileTps("## [Signal]\n### [Body]\n[melody:1]low[/melody]");
+      expect(result.ok, isTrue);
+      final words = spokenWords(result.script);
+      expect(words.first.metadata.melodyLevel, 1);
+    });
+
+    test("melody boundary value 10 is valid", () {
+      final result = compileTps("## [Signal]\n### [Body]\n[melody:10]high[/melody]");
+      expect(result.ok, isTrue);
+      final words = spokenWords(result.script);
+      expect(words.first.metadata.melodyLevel, 10);
+    });
+
+    test("melody applies to multiple words in scope", () {
+      final result = compileTps("## [Signal]\n### [Body]\n[melody:4]one two three[/melody]");
+      expect(result.ok, isTrue);
+      final words = spokenWords(result.script);
+      for (final word in words) {
+        expect(word.metadata.melodyLevel, 4);
+      }
+    });
+
+    test("nested melody tags resolve to innermost level", () {
+      final result = compileTps("## [Signal]\n### [Body]\n[melody:2][melody:9]inner[/melody] outer[/melody]");
+      expect(result.ok, isTrue);
+      final words = spokenWords(result.script);
+      final inner = words.firstWhere((word) => word.cleanText == "inner");
+      final outer = words.firstWhere((word) => word.cleanText == "outer");
+      expect(inner.metadata.melodyLevel, 9);
+      expect(outer.metadata.melodyLevel, 2);
+    });
+
+    test("invalid melody values produce invalid-melody-level diagnostic", () {
+      final cases = ["[melody:0]word[/melody]", "[melody:11]word[/melody]", "[melody:-1]word[/melody]", "[melody:abc]word[/melody]", "[melody]word[/melody]"];
+      for (final invalid in cases) {
+        final result = compileTps("## [Signal]\n### [Body]\n$invalid");
+        expect(result.diagnostics.any((diagnostic) => diagnostic.code == "invalid-melody-level"), isTrue, reason: invalid);
+      }
+    });
+  });
+
+  group("archetypes", () {
+    test("all six archetypes set correct recommended WPM", () {
+      final expectedWpm = {"friend": 135, "motivator": 155, "educator": 120, "coach": 145, "storyteller": 125, "entertainer": 150};
+      for (final entry in expectedWpm.entries) {
+        final result = compileTps("## [Signal|neutral|Archetype:${entry.key}]\n### [Body]\nHello.");
+        expect(result.ok, isTrue, reason: entry.key);
+        expect(result.script.segments.first.targetWpm, entry.value, reason: entry.key);
+      }
+    });
+
+    test("segment archetype is set on compiled segment", () {
+      final result = compileTps("## [Signal|Archetype:Coach]\n### [Body]\nHello.");
+      expect(result.ok, isTrue);
+      expect(result.script.segments.first.archetype, "coach");
+    });
+
+    test("block inherits segment archetype", () {
+      final result = compileTps("## [Signal|Archetype:Friend]\n### [Body]\nHello.");
+      expect(result.ok, isTrue);
+      expect(result.script.segments.first.blocks.first.archetype, "friend");
+    });
+
+    test("block overrides segment archetype", () {
+      final result = compileTps("## [Signal|Archetype:Friend]\n### [Body|Archetype:Educator]\nHello.");
+      expect(result.ok, isTrue);
+      expect(result.script.segments.first.archetype, "friend");
+      expect(result.script.segments.first.blocks.first.archetype, "educator");
+    });
+
+    test("explicit WPM overrides archetype WPM", () {
+      final result = compileTps("## [Signal|Archetype:Educator|180WPM]\n### [Body]\nHello.");
+      expect(result.ok, isTrue);
+      expect(result.script.segments.first.targetWpm, 180);
+      expect(result.script.segments.first.archetype, "educator");
+    });
+
+    test("archetype is case insensitive", () {
+      final variants = ["friend", "Friend", "FRIEND", "fRiEnD"];
+      for (final variant in variants) {
+        final result = compileTps("## [Signal|Archetype:$variant]\n### [Body]\nHello.");
+        expect(result.ok, isTrue, reason: variant);
+        expect(result.script.segments.first.archetype, "friend", reason: variant);
+        expect(result.script.segments.first.targetWpm, 135, reason: variant);
+      }
+    });
+
+    test("unknown archetype produces diagnostic", () {
+      final result = compileTps("## [Signal|Archetype:Villain]\n### [Body]\nHello.");
+      expect(result.diagnostics.any((diagnostic) => diagnostic.code == "unknown-archetype"), isTrue);
+    });
+
+    test("no archetype leaves field null", () {
+      final result = compileTps("## [Signal]\n### [Body]\nHello.");
+      expect(result.ok, isTrue);
+      expect(result.script.segments.first.archetype, isNull);
+      expect(result.script.segments.first.blocks.first.archetype, isNull);
+    });
+  });
+
+  group("combined features", () {
+    test("archetype with articulation, energy, and melody together", () {
+      final result = compileTps(
+        "## [Signal|Archetype:Motivator]\n"
+        "### [Body]\n"
+        "[legato][energy:7][melody:5]Rise up and shine[/melody][/energy][/legato] today.",
+      );
+      expect(result.ok, isTrue);
+      expect(result.script.segments.first.archetype, "motivator");
+      expect(result.script.segments.first.targetWpm, 155);
+      final words = spokenWords(result.script);
+      final rise = words.firstWhere((word) => word.cleanText == "Rise");
+      final today = words.firstWhere((word) => word.cleanText == "today.");
+      expect(rise.metadata.articulationStyle, "legato");
+      expect(rise.metadata.energyLevel, 7);
+      expect(rise.metadata.melodyLevel, 5);
+      expect(today.metadata.articulationStyle, isNull);
+      expect(today.metadata.energyLevel, isNull);
+      expect(today.metadata.melodyLevel, isNull);
+    });
+  });
+
+  group("spec constants", () {
+    test("archetypes list has 6 entries", () {
+      expect(TpsSpec.archetypes.length, 6);
+    });
+
+    test("articulationStyles has 2 entries", () {
+      expect(TpsSpec.articulationStyles.length, 2);
+      expect(TpsSpec.articulationStyles, contains("legato"));
+      expect(TpsSpec.articulationStyles, contains("staccato"));
+    });
+
+    test("energy bounds are 1 to 10", () {
+      expect(TpsSpec.energyLevelMin, 1);
+      expect(TpsSpec.energyLevelMax, 10);
+    });
+
+    test("melody bounds are 1 to 10", () {
+      expect(TpsSpec.melodyLevelMin, 1);
+      expect(TpsSpec.melodyLevelMax, 10);
+    });
+
+    test("all archetype WPM values are correct", () {
+      expect(TpsSpec.archetypeRecommendedWpm["friend"], 135);
+      expect(TpsSpec.archetypeRecommendedWpm["motivator"], 155);
+      expect(TpsSpec.archetypeRecommendedWpm["educator"], 120);
+      expect(TpsSpec.archetypeRecommendedWpm["coach"], 145);
+      expect(TpsSpec.archetypeRecommendedWpm["storyteller"], 125);
+      expect(TpsSpec.archetypeRecommendedWpm["entertainer"], 150);
+    });
+
+    test("TpsKeywords exposes articulationStyles and archetypes", () {
+      expect(TpsKeywords.articulationStyles, equals(TpsSpec.articulationStyles));
+      expect(TpsKeywords.archetypes, equals(TpsSpec.archetypes));
+    });
+  });
+
   test("compiles and navigates a large generated script", () {
     final buffer = StringBuffer()
       ..writeln("---")

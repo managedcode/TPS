@@ -65,6 +65,10 @@ public final class ManagedCodeTps {
         public static final String WHISPER = "whisper";
         public static final String XFAST = "xfast";
         public static final String XSLOW = "xslow";
+        public static final String ENERGY = "energy";
+        public static final String LEGATO = "legato";
+        public static final String MELODY = "melody";
+        public static final String STACCATO = "staccato";
 
         private TpsTags() {
         }
@@ -81,6 +85,9 @@ public final class ManagedCodeTps {
         public static final String INVALID_WPM = "invalid-wpm";
         public static final String MISMATCHED_CLOSING_TAG = "mismatched-closing-tag";
         public static final String UNCLOSED_TAG = "unclosed-tag";
+        public static final String INVALID_ENERGY_LEVEL = "invalid-energy-level";
+        public static final String INVALID_MELODY_LEVEL = "invalid-melody-level";
+        public static final String UNKNOWN_ARCHETYPE = "unknown-archetype";
 
         private TpsDiagnosticCodes() {
         }
@@ -96,12 +103,34 @@ public final class ManagedCodeTps {
         public static final int SHORT_PAUSE_DURATION_MS = 300;
         public static final int MEDIUM_PAUSE_DURATION_MS = 600;
         public static final String SPEAKER_PREFIX = "Speaker:";
+        public static final String ARCHETYPE_PREFIX = "Archetype:";
         public static final String WPM_SUFFIX = "WPM";
         public static final List<String> EMOTIONS = List.of("neutral", "warm", "professional", "focused", "concerned", "urgent", "motivational", "excited", "happy", "sad", "calm", "energetic");
         public static final List<String> VOLUME_LEVELS = List.of(TpsTags.LOUD, TpsTags.SOFT, TpsTags.WHISPER);
         public static final List<String> DELIVERY_MODES = List.of(TpsTags.SARCASM, TpsTags.ASIDE, TpsTags.RHETORICAL, TpsTags.BUILDING);
+        public static final List<String> ARTICULATION_STYLES = List.of(TpsTags.LEGATO, TpsTags.STACCATO);
         public static final List<String> RELATIVE_SPEED_TAGS = List.of(TpsTags.XSLOW, TpsTags.SLOW, TpsTags.FAST, TpsTags.XFAST, TpsTags.NORMAL);
         public static final List<String> EDIT_POINT_PRIORITIES = List.of("high", "medium", "low");
+        public static final String ARCHETYPE_FRIEND = "friend";
+        public static final String ARCHETYPE_MOTIVATOR = "motivator";
+        public static final String ARCHETYPE_EDUCATOR = "educator";
+        public static final String ARCHETYPE_COACH = "coach";
+        public static final String ARCHETYPE_STORYTELLER = "storyteller";
+        public static final String ARCHETYPE_ENTERTAINER = "entertainer";
+
+        public static final List<String> ARCHETYPES = List.of(ARCHETYPE_FRIEND, ARCHETYPE_MOTIVATOR, ARCHETYPE_EDUCATOR, ARCHETYPE_COACH, ARCHETYPE_STORYTELLER, ARCHETYPE_ENTERTAINER);
+        public static final Map<String, Integer> ARCHETYPE_RECOMMENDED_WPM = Map.of(
+            ARCHETYPE_FRIEND, 135,
+            ARCHETYPE_MOTIVATOR, 155,
+            ARCHETYPE_EDUCATOR, 120,
+            ARCHETYPE_COACH, 145,
+            ARCHETYPE_STORYTELLER, 125,
+            ARCHETYPE_ENTERTAINER, 150
+        );
+        public static final int ENERGY_LEVEL_MIN = 1;
+        public static final int ENERGY_LEVEL_MAX = 10;
+        public static final int MELODY_LEVEL_MIN = 1;
+        public static final int MELODY_LEVEL_MAX = 10;
         public static final Map<String, Integer> DEFAULT_SPEED_OFFSETS = Map.of(
             TpsTags.XSLOW, -40,
             TpsTags.SLOW, -20,
@@ -139,9 +168,12 @@ public final class ManagedCodeTps {
             Map.entry("building", TpsTags.BUILDING),
             Map.entry("editPoint", TpsTags.EDIT_POINT),
             Map.entry("emphasis", TpsTags.EMPHASIS),
+            Map.entry("energy", TpsTags.ENERGY),
             Map.entry("fast", TpsTags.FAST),
             Map.entry("highlight", TpsTags.HIGHLIGHT),
+            Map.entry("legato", TpsTags.LEGATO),
             Map.entry("loud", TpsTags.LOUD),
+            Map.entry("melody", TpsTags.MELODY),
             Map.entry("normal", TpsTags.NORMAL),
             Map.entry("pause", TpsTags.PAUSE),
             Map.entry("phonetic", TpsTags.PHONETIC),
@@ -150,6 +182,7 @@ public final class ManagedCodeTps {
             Map.entry("sarcasm", TpsTags.SARCASM),
             Map.entry("slow", TpsTags.SLOW),
             Map.entry("soft", TpsTags.SOFT),
+            Map.entry("staccato", TpsTags.STACCATO),
             Map.entry("stress", TpsTags.STRESS),
             Map.entry("whisper", TpsTags.WHISPER),
             Map.entry("xfast", TpsTags.XFAST),
@@ -158,8 +191,10 @@ public final class ManagedCodeTps {
         public static final List<String> EMOTIONS = TpsSpec.EMOTIONS;
         public static final List<String> VOLUME_LEVELS = TpsSpec.VOLUME_LEVELS;
         public static final List<String> DELIVERY_MODES = TpsSpec.DELIVERY_MODES;
+        public static final List<String> ARTICULATION_STYLES = TpsSpec.ARTICULATION_STYLES;
         public static final List<String> RELATIVE_SPEED_TAGS = TpsSpec.RELATIVE_SPEED_TAGS;
         public static final List<String> EDIT_POINT_PRIORITIES = TpsSpec.EDIT_POINT_PRIORITIES;
+        public static final List<String> ARCHETYPES = TpsSpec.ARCHETYPES;
 
         private TpsKeywords() {
         }
@@ -223,6 +258,7 @@ public final class ManagedCodeTps {
         Integer targetWpm,
         String emotion,
         String speaker,
+        String archetype,
         String timing,
         String backgroundColor,
         String textColor,
@@ -235,7 +271,7 @@ public final class ManagedCodeTps {
         }
     }
 
-    public record TpsBlock(String id, String name, String content, Integer targetWpm, String emotion, String speaker) {
+    public record TpsBlock(String id, String name, String content, Integer targetWpm, String emotion, String speaker, String archetype) {
     }
 
     public record WordMetadata(
@@ -251,6 +287,9 @@ public final class ManagedCodeTps {
         String inlineEmotionHint,
         String volumeLevel,
         String deliveryMode,
+        String articulationStyle,
+        Integer energyLevel,
+        Integer melodyLevel,
         String phoneticGuide,
         String pronunciationGuide,
         String stressText,
@@ -291,6 +330,7 @@ public final class ManagedCodeTps {
         int targetWpm,
         String emotion,
         String speaker,
+        String archetype,
         boolean isImplicit,
         int startWordIndex,
         int endWordIndex,
@@ -311,6 +351,7 @@ public final class ManagedCodeTps {
         int targetWpm,
         String emotion,
         String speaker,
+        String archetype,
         String timing,
         String backgroundColor,
         String textColor,
@@ -1152,6 +1193,7 @@ public final class ManagedCodeTps {
         private String emotion;
         private String timing;
         private String speaker;
+        private String archetype;
 
         private ParsedHeader(String name) {
             this.name = name;
@@ -1170,19 +1212,19 @@ public final class ManagedCodeTps {
     private record PhraseSeed(List<WordSeed> words, String text) {
     }
 
-    private record InheritedFormattingState(int targetWpm, String emotion, String speaker, Map<String, Integer> speedOffsets) {
+    private record InheritedFormattingState(int targetWpm, String emotion, String speaker, String archetype, Map<String, Integer> speedOffsets) {
     }
 
     private record ContentCompilationResult(List<WordSeed> words, List<PhraseSeed> phrases) {
     }
 
-    private record InlineScope(String name, Integer emphasisLevel, Boolean highlight, String inlineEmotion, String volumeLevel, String deliveryMode, String phoneticGuide, String pronunciationGuide, String stressGuide, Boolean stressWrap, Integer absoluteSpeed, Double relativeSpeedMultiplier, Boolean resetSpeed) {
+    private record InlineScope(String name, Integer emphasisLevel, Boolean highlight, String inlineEmotion, String volumeLevel, String deliveryMode, String articulationStyle, Integer energyLevel, Integer melodyLevel, String phoneticGuide, String pronunciationGuide, String stressGuide, Boolean stressWrap, Integer absoluteSpeed, Double relativeSpeedMultiplier, Boolean resetSpeed) {
     }
 
     private record LiteralScope(String name) {
     }
 
-    private record ActiveInlineState(String emotion, String inlineEmotion, String speaker, int emphasisLevel, boolean highlight, String volumeLevel, String deliveryMode, String phoneticGuide, String pronunciationGuide, String stressGuide, boolean stressWrap, boolean hasAbsoluteSpeed, int absoluteSpeed, boolean hasRelativeSpeed, double relativeSpeedMultiplier) {
+    private record ActiveInlineState(String emotion, String inlineEmotion, String speaker, int emphasisLevel, boolean highlight, String volumeLevel, String deliveryMode, String articulationStyle, Integer energyLevel, Integer melodyLevel, String phoneticGuide, String pronunciationGuide, String stressGuide, boolean stressWrap, boolean hasAbsoluteSpeed, int absoluteSpeed, boolean hasRelativeSpeed, double relativeSpeedMultiplier) {
     }
 
     private record TagToken(String raw, String inner, String name, String argument, boolean isClosing) {
@@ -1208,6 +1250,9 @@ public final class ManagedCodeTps {
         private String inlineEmotionHint;
         private String volumeLevel;
         private String deliveryMode;
+        private String articulationStyle;
+        private Integer energyLevel;
+        private Integer melodyLevel;
         private String phoneticGuide;
         private String pronunciationGuide;
         private String stressGuide;
@@ -1224,6 +1269,13 @@ public final class ManagedCodeTps {
             inlineEmotionHint = state.inlineEmotion() != null ? state.inlineEmotion() : inlineEmotionHint;
             volumeLevel = state.volumeLevel() != null ? state.volumeLevel() : volumeLevel;
             deliveryMode = state.deliveryMode() != null ? state.deliveryMode() : deliveryMode;
+            articulationStyle = state.articulationStyle() != null ? state.articulationStyle() : articulationStyle;
+            if (state.energyLevel() != null) {
+                energyLevel = state.energyLevel();
+            }
+            if (state.melodyLevel() != null) {
+                melodyLevel = state.melodyLevel();
+            }
             phoneticGuide = state.phoneticGuide() != null ? state.phoneticGuide() : phoneticGuide;
             pronunciationGuide = state.pronunciationGuide() != null ? state.pronunciationGuide() : pronunciationGuide;
             stressGuide = state.stressGuide() != null ? state.stressGuide() : stressGuide;
@@ -1253,6 +1305,9 @@ public final class ManagedCodeTps {
                 inlineEmotionHint,
                 volumeLevel,
                 deliveryMode,
+                articulationStyle,
+                energyLevel,
+                melodyLevel,
                 phoneticGuide,
                 pronunciationGuide,
                 stressText.isEmpty() ? null : String.join("", stressText),
@@ -1268,7 +1323,7 @@ public final class ManagedCodeTps {
                     metadata = new WordMetadata(
                         metadata.isEmphasis(), metadata.emphasisLevel(), metadata.isPause(), metadata.pauseDurationMs(), metadata.isHighlight(), metadata.isBreath(),
                         metadata.isEditPoint(), metadata.editPointPriority(), metadata.emotionHint(), metadata.inlineEmotionHint(), metadata.volumeLevel(),
-                        metadata.deliveryMode(), metadata.phoneticGuide(), metadata.pronunciationGuide(), metadata.stressText(), metadata.stressGuide(),
+                        metadata.deliveryMode(), metadata.articulationStyle(), metadata.energyLevel(), metadata.melodyLevel(), metadata.phoneticGuide(), metadata.pronunciationGuide(), metadata.stressText(), metadata.stressGuide(),
                         effectiveWpm, metadata.speedMultiplier(), metadata.speaker(), metadata.headCue()
                     );
                 }
@@ -1276,7 +1331,7 @@ public final class ManagedCodeTps {
                 metadata = new WordMetadata(
                     metadata.isEmphasis(), metadata.emphasisLevel(), metadata.isPause(), metadata.pauseDurationMs(), metadata.isHighlight(), metadata.isBreath(),
                     metadata.isEditPoint(), metadata.editPointPriority(), metadata.emotionHint(), metadata.inlineEmotionHint(), metadata.volumeLevel(),
-                    metadata.deliveryMode(), metadata.phoneticGuide(), metadata.pronunciationGuide(), metadata.stressText(), metadata.stressGuide(),
+                    metadata.deliveryMode(), metadata.articulationStyle(), metadata.energyLevel(), metadata.melodyLevel(), metadata.phoneticGuide(), metadata.pronunciationGuide(), metadata.stressText(), metadata.stressGuide(),
                     metadata.speedOverride(), relativeSpeedMultiplier, metadata.speaker(), metadata.headCue()
                 );
             }
@@ -1464,6 +1519,15 @@ public final class ManagedCodeTps {
                 parsed.speaker = normalizeValue(normalized.substring(TpsSpec.SPEAKER_PREFIX.length()));
                 continue;
             }
+            if (normalized.toLowerCase(Locale.ROOT).startsWith(TpsSpec.ARCHETYPE_PREFIX.toLowerCase(Locale.ROOT))) {
+                String archetypeValue = normalizeValue(normalized.substring(TpsSpec.ARCHETYPE_PREFIX.length()));
+                if (archetypeValue != null && TpsSpec.ARCHETYPES.stream().anyMatch(a -> a.equalsIgnoreCase(archetypeValue))) {
+                    parsed.archetype = archetypeValue.toLowerCase(Locale.ROOT);
+                } else {
+                    diagnostics.add(createDiagnostic(TpsDiagnosticCodes.UNKNOWN_ARCHETYPE, "Archetype '" + (archetypeValue == null ? "" : archetypeValue) + "' is not a known vocal archetype.", tokenRangeStart, tokenRangeEnd, lineStarts, "Use one of: Friend, Motivator, Educator, Coach, Storyteller, Entertainer."));
+                }
+                continue;
+            }
             if (isTimingToken(normalized)) {
                 parsed.timing = normalized;
                 continue;
@@ -1499,13 +1563,15 @@ public final class ManagedCodeTps {
     private static ParsedSegmentInternal createSegment(ParsedHeader header, Map<String, String> metadata, int index) {
         String emotion = resolveEmotion(header.emotion, TpsSpec.DEFAULT_EMOTION);
         Map<String, String> palette = resolvePalette(emotion);
+        Integer archetypeWpm = resolveArchetypeWpm(header.archetype);
         return new ParsedSegmentInternal(new TpsSegment(
             "segment-" + index,
             header.name,
             "",
-            header.targetWpm == null ? resolveBaseWpm(metadata) : header.targetWpm,
+            header.targetWpm != null ? header.targetWpm : archetypeWpm != null ? archetypeWpm : resolveBaseWpm(metadata),
             emotion,
             header.speaker,
+            header.archetype,
             header.timing,
             palette.get("background"),
             palette.get("text"),
@@ -1523,7 +1589,7 @@ public final class ManagedCodeTps {
     }
 
     private static ParsedBlockInternal createBlock(ParsedHeader header, int blockIndex, String segmentId) {
-        return new ParsedBlockInternal(new TpsBlock(segmentId + "-block-" + blockIndex, header.name, "", header.targetWpm, header.emotion, header.speaker));
+        return new ParsedBlockInternal(new TpsBlock(segmentId + "-block-" + blockIndex, header.name, "", header.targetWpm, header.emotion, header.speaker, header.archetype));
     }
 
     private static void finalizeParsedBlock(ParsedSegmentInternal current, ParsedBlockInternal block, List<LineRecord> lines) {
@@ -1531,7 +1597,7 @@ public final class ManagedCodeTps {
             return;
         }
         block.content = createContentSection(lines);
-        block.block = new TpsBlock(block.block.id(), block.block.name(), block.content == null ? "" : block.content.text, block.block.targetWpm(), block.block.emotion(), block.block.speaker());
+        block.block = new TpsBlock(block.block.id(), block.block.name(), block.content == null ? "" : block.content.text, block.block.targetWpm(), block.block.emotion(), block.block.speaker(), block.block.archetype());
         current.parsedBlocks.add(block);
     }
 
@@ -1542,7 +1608,7 @@ public final class ManagedCodeTps {
         segment.leadingContent = createContentSection(lines);
         List<TpsBlock> blocks = segment.parsedBlocks.stream().map(entry -> entry.block).toList();
         String content = segment.parsedBlocks.isEmpty() ? segment.leadingContent == null ? "" : segment.leadingContent.text : "";
-        segment.segment = new TpsSegment(segment.segment.id(), segment.segment.name(), content, segment.segment.targetWpm(), segment.segment.emotion(), segment.segment.speaker(), segment.segment.timing(), segment.segment.backgroundColor(), segment.segment.textColor(), segment.segment.accentColor(), segment.leadingContent == null ? null : segment.leadingContent.text, blocks);
+        segment.segment = new TpsSegment(segment.segment.id(), segment.segment.name(), content, segment.segment.targetWpm(), segment.segment.emotion(), segment.segment.speaker(), segment.segment.archetype(), segment.segment.timing(), segment.segment.backgroundColor(), segment.segment.textColor(), segment.segment.accentColor(), segment.leadingContent == null ? null : segment.leadingContent.text, blocks);
         if (segment.parsedBlocks.isEmpty()) {
             segment.directContent = segment.leadingContent;
         }
@@ -1575,12 +1641,12 @@ public final class ManagedCodeTps {
 
     private static SegmentCandidate compileSegment(ParsedSegmentInternal parsedSegment, int baseWpm, Map<String, Integer> speedOffsets, DocumentAnalysis analysis, List<TpsDiagnostic> diagnostics) {
         String segmentEmotion = resolveEmotion(parsedSegment.segment.emotion(), TpsSpec.DEFAULT_EMOTION);
-        InheritedFormattingState inherited = new InheritedFormattingState(parsedSegment.segment.targetWpm(), segmentEmotion, parsedSegment.segment.speaker(), speedOffsets);
+        InheritedFormattingState inherited = new InheritedFormattingState(parsedSegment.segment.targetWpm(), segmentEmotion, parsedSegment.segment.speaker(), parsedSegment.segment.archetype(), speedOffsets);
         List<BlockCandidate> blocks = new ArrayList<>();
         for (BlockEntry entry : buildBlocks(parsedSegment)) {
             blocks.add(compileBlock(entry, inherited, analysis, diagnostics));
         }
-        CompiledSegment segment = new CompiledSegment(parsedSegment.segment.id(), parsedSegment.segment.name(), inherited.targetWpm(), segmentEmotion, parsedSegment.segment.speaker(), parsedSegment.segment.timing(), parsedSegment.segment.backgroundColor(), parsedSegment.segment.textColor(), parsedSegment.segment.accentColor(), 0, 0, 0, 0, List.of(), List.of());
+        CompiledSegment segment = new CompiledSegment(parsedSegment.segment.id(), parsedSegment.segment.name(), inherited.targetWpm(), segmentEmotion, parsedSegment.segment.speaker(), parsedSegment.segment.archetype(), parsedSegment.segment.timing(), parsedSegment.segment.backgroundColor(), parsedSegment.segment.textColor(), parsedSegment.segment.accentColor(), 0, 0, 0, 0, List.of(), List.of());
         return new SegmentCandidate(segment, blocks);
     }
 
@@ -1590,10 +1656,10 @@ public final class ManagedCodeTps {
     private static List<BlockEntry> buildBlocks(ParsedSegmentInternal parsedSegment) {
         List<BlockEntry> blocks = new ArrayList<>();
         if (parsedSegment.leadingContent != null && !parsedSegment.leadingContent.text.isEmpty() && !parsedSegment.parsedBlocks.isEmpty()) {
-            blocks.add(new BlockEntry(new TpsBlock(parsedSegment.segment.id() + "-implicit-lead", parsedSegment.segment.name() + " Lead", parsedSegment.leadingContent.text, parsedSegment.segment.targetWpm(), parsedSegment.segment.emotion(), parsedSegment.segment.speaker()), true, parsedSegment.leadingContent));
+            blocks.add(new BlockEntry(new TpsBlock(parsedSegment.segment.id() + "-implicit-lead", parsedSegment.segment.name() + " Lead", parsedSegment.leadingContent.text, parsedSegment.segment.targetWpm(), parsedSegment.segment.emotion(), parsedSegment.segment.speaker(), parsedSegment.segment.archetype()), true, parsedSegment.leadingContent));
         }
         if (parsedSegment.parsedBlocks.isEmpty()) {
-            blocks.add(new BlockEntry(new TpsBlock(parsedSegment.segment.id() + "-implicit-body", parsedSegment.segment.name(), parsedSegment.directContent == null ? "" : parsedSegment.directContent.text, parsedSegment.segment.targetWpm(), parsedSegment.segment.emotion(), parsedSegment.segment.speaker()), true, parsedSegment.directContent));
+            blocks.add(new BlockEntry(new TpsBlock(parsedSegment.segment.id() + "-implicit-body", parsedSegment.segment.name(), parsedSegment.directContent == null ? "" : parsedSegment.directContent.text, parsedSegment.segment.targetWpm(), parsedSegment.segment.emotion(), parsedSegment.segment.speaker(), parsedSegment.segment.archetype()), true, parsedSegment.directContent));
         }
         for (ParsedBlockInternal parsedBlock : parsedSegment.parsedBlocks) {
             blocks.add(new BlockEntry(parsedBlock.block, false, parsedBlock.content));
@@ -1602,9 +1668,12 @@ public final class ManagedCodeTps {
     }
 
     private static BlockCandidate compileBlock(BlockEntry entry, InheritedFormattingState inherited, DocumentAnalysis analysis, List<TpsDiagnostic> diagnostics) {
-        InheritedFormattingState blockInherited = new InheritedFormattingState(entry.block.targetWpm() == null ? inherited.targetWpm() : entry.block.targetWpm(), resolveEmotion(entry.block.emotion(), inherited.emotion()), entry.block.speaker() == null ? inherited.speaker() : entry.block.speaker(), inherited.speedOffsets());
+        String resolvedArchetype = entry.block.archetype() != null ? entry.block.archetype() : inherited.archetype();
+        Integer archetypeWpm = resolveArchetypeWpm(resolvedArchetype);
+        int blockWpm = entry.block.targetWpm() != null ? entry.block.targetWpm() : archetypeWpm != null ? archetypeWpm : inherited.targetWpm();
+        InheritedFormattingState blockInherited = new InheritedFormattingState(blockWpm, resolveEmotion(entry.block.emotion(), inherited.emotion()), entry.block.speaker() == null ? inherited.speaker() : entry.block.speaker(), resolvedArchetype, inherited.speedOffsets());
         ContentCompilationResult content = compileContent(entry.content == null ? "" : entry.content.text, entry.content == null ? 0 : entry.content.startOffset, blockInherited, analysis.lineStarts, diagnostics);
-        CompiledBlock block = new CompiledBlock(entry.block.id(), entry.block.name(), blockInherited.targetWpm(), blockInherited.emotion(), blockInherited.speaker(), entry.isImplicit, 0, 0, 0, 0, List.of(), List.of());
+        CompiledBlock block = new CompiledBlock(entry.block.id(), entry.block.name(), blockInherited.targetWpm(), blockInherited.emotion(), blockInherited.speaker(), resolvedArchetype, entry.isImplicit, 0, 0, 0, 0, List.of(), List.of());
         return new BlockCandidate(block, content);
     }
 
@@ -1679,7 +1748,7 @@ public final class ManagedCodeTps {
         int endWordIndex = words.isEmpty() ? startWordIndex : words.get(words.size() - 1).index();
         int startMs = words.isEmpty() ? 0 : words.get(0).startMs();
         int endMs = words.isEmpty() ? startMs : words.get(words.size() - 1).endMs();
-        return new CompiledBlock(block.id(), block.name(), block.targetWpm(), block.emotion(), block.speaker(), block.isImplicit(), startWordIndex, endWordIndex, startMs, endMs, phrases, words);
+        return new CompiledBlock(block.id(), block.name(), block.targetWpm(), block.emotion(), block.speaker(), block.archetype(), block.isImplicit(), startWordIndex, endWordIndex, startMs, endMs, phrases, words);
     }
 
     private static CompiledSegment finalizeSegmentRange(CompiledSegment segment, List<CompiledBlock> blocks, List<CompiledWord> words) {
@@ -1687,7 +1756,7 @@ public final class ManagedCodeTps {
         int endWordIndex = words.isEmpty() ? startWordIndex : words.get(words.size() - 1).index();
         int startMs = words.isEmpty() ? 0 : words.get(0).startMs();
         int endMs = words.isEmpty() ? startMs : words.get(words.size() - 1).endMs();
-        return new CompiledSegment(segment.id(), segment.name(), segment.targetWpm(), segment.emotion(), segment.speaker(), segment.timing(), segment.backgroundColor(), segment.textColor(), segment.accentColor(), startWordIndex, endWordIndex, startMs, endMs, blocks, words);
+        return new CompiledSegment(segment.id(), segment.name(), segment.targetWpm(), segment.emotion(), segment.speaker(), segment.archetype(), segment.timing(), segment.backgroundColor(), segment.textColor(), segment.accentColor(), startWordIndex, endWordIndex, startMs, endMs, blocks, words);
     }
 
     private static ContentCompilationResult compileContent(String rawText, int startOffset, InheritedFormattingState inherited, List<Integer> lineStarts, List<TpsDiagnostic> diagnostics) {
@@ -1833,36 +1902,69 @@ public final class ManagedCodeTps {
                 diagnostics.add(createDiagnostic(TpsDiagnosticCodes.INVALID_TAG_ARGUMENT, "Tag '" + tag.name() + "' requires a pronunciation parameter.", absoluteOffset, absoluteOffset + tag.raw().length(), lineStarts, null));
                 return null;
             }
-            return new InlineScope(tag.name(), null, null, null, null, null, TpsTags.PHONETIC.equals(tag.name()) ? tag.argument() : null, TpsTags.PRONUNCIATION.equals(tag.name()) ? tag.argument() : null, null, null, null, null, null);
+            return new InlineScope(tag.name(), null, null, null, null, null, null, null, null, TpsTags.PHONETIC.equals(tag.name()) ? tag.argument() : null, TpsTags.PRONUNCIATION.equals(tag.name()) ? tag.argument() : null, null, null, null, null, null);
         }
         if (TpsTags.STRESS.equals(tag.name())) {
-            return new InlineScope(tag.name(), null, null, null, null, null, null, null, tag.argument(), tag.argument() == null, null, null, null);
+            return new InlineScope(tag.name(), null, null, null, null, null, null, null, null, null, null, tag.argument(), tag.argument() == null, null, null, null);
         }
         if (TpsTags.EMPHASIS.equals(tag.name())) {
-            return new InlineScope(tag.name(), 1, null, null, null, null, null, null, null, null, null, null, null);
+            return new InlineScope(tag.name(), 1, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         }
         if (TpsTags.HIGHLIGHT.equals(tag.name())) {
-            return new InlineScope(tag.name(), null, true, null, null, null, null, null, null, null, null, null, null);
+            return new InlineScope(tag.name(), null, true, null, null, null, null, null, null, null, null, null, null, null, null, null);
         }
         if (TpsSpec.VOLUME_LEVELS.contains(tag.name())) {
-            return new InlineScope(tag.name(), null, null, null, tag.name(), null, null, null, null, null, null, null, null);
+            return new InlineScope(tag.name(), null, null, null, tag.name(), null, null, null, null, null, null, null, null, null, null, null);
         }
         if (TpsSpec.DELIVERY_MODES.contains(tag.name())) {
-            return new InlineScope(tag.name(), null, null, null, null, tag.name(), null, null, null, null, null, null, null);
+            return new InlineScope(tag.name(), null, null, null, null, tag.name(), null, null, null, null, null, null, null, null, null, null);
+        }
+        if (TpsSpec.ARTICULATION_STYLES.contains(tag.name())) {
+            return new InlineScope(tag.name(), null, null, null, null, null, tag.name(), null, null, null, null, null, null, null, null, null);
+        }
+        if (TpsTags.ENERGY.equals(tag.name())) {
+            String arg = tag.argument();
+            int level;
+            try {
+                level = Integer.parseInt(arg == null ? "" : arg.trim());
+            } catch (NumberFormatException e) {
+                diagnostics.add(createDiagnostic(TpsDiagnosticCodes.INVALID_ENERGY_LEVEL, "Energy level must be an integer between " + TpsSpec.ENERGY_LEVEL_MIN + " and " + TpsSpec.ENERGY_LEVEL_MAX + ".", absoluteOffset, absoluteOffset + tag.raw().length(), lineStarts, null));
+                return null;
+            }
+            if (level < TpsSpec.ENERGY_LEVEL_MIN || level > TpsSpec.ENERGY_LEVEL_MAX) {
+                diagnostics.add(createDiagnostic(TpsDiagnosticCodes.INVALID_ENERGY_LEVEL, "Energy level must be an integer between " + TpsSpec.ENERGY_LEVEL_MIN + " and " + TpsSpec.ENERGY_LEVEL_MAX + ".", absoluteOffset, absoluteOffset + tag.raw().length(), lineStarts, null));
+                return null;
+            }
+            return new InlineScope(tag.name(), null, null, null, null, null, null, level, null, null, null, null, null, null, null, null);
+        }
+        if (TpsTags.MELODY.equals(tag.name())) {
+            String arg = tag.argument();
+            int level;
+            try {
+                level = Integer.parseInt(arg == null ? "" : arg.trim());
+            } catch (NumberFormatException e) {
+                diagnostics.add(createDiagnostic(TpsDiagnosticCodes.INVALID_MELODY_LEVEL, "Melody level must be an integer between " + TpsSpec.MELODY_LEVEL_MIN + " and " + TpsSpec.MELODY_LEVEL_MAX + ".", absoluteOffset, absoluteOffset + tag.raw().length(), lineStarts, null));
+                return null;
+            }
+            if (level < TpsSpec.MELODY_LEVEL_MIN || level > TpsSpec.MELODY_LEVEL_MAX) {
+                diagnostics.add(createDiagnostic(TpsDiagnosticCodes.INVALID_MELODY_LEVEL, "Melody level must be an integer between " + TpsSpec.MELODY_LEVEL_MIN + " and " + TpsSpec.MELODY_LEVEL_MAX + ".", absoluteOffset, absoluteOffset + tag.raw().length(), lineStarts, null));
+                return null;
+            }
+            return new InlineScope(tag.name(), null, null, null, null, null, null, null, level, null, null, null, null, null, null, null);
         }
         if (TpsSpec.EMOTIONS.contains(tag.name())) {
-            return new InlineScope(tag.name(), null, null, tag.name(), null, null, null, null, null, null, null, null, null);
+            return new InlineScope(tag.name(), null, null, tag.name(), null, null, null, null, null, null, null, null, null, null, null, null);
         }
         Integer absoluteSpeed = tryParseAbsoluteWpm(tag.name());
         if (absoluteSpeed != null) {
-            return new InlineScope(tag.name(), null, null, null, null, null, null, null, null, null, absoluteSpeed, null, null);
+            return new InlineScope(tag.name(), null, null, null, null, null, null, null, null, null, null, null, null, absoluteSpeed, null, null);
         }
         Double multiplier = resolveSpeedMultiplier(tag.name(), speedOffsets);
         if (multiplier != null) {
-            return new InlineScope(tag.name(), null, null, null, null, null, null, null, null, null, null, multiplier, null);
+            return new InlineScope(tag.name(), null, null, null, null, null, null, null, null, null, null, null, null, null, multiplier, null);
         }
         if (TpsTags.NORMAL.equals(tag.name())) {
-            return new InlineScope(tag.name(), null, null, null, null, null, null, null, null, null, null, null, true);
+            return new InlineScope(tag.name(), null, null, null, null, null, null, null, null, null, null, null, null, null, null, true);
         }
         diagnostics.add(createDiagnostic(TpsDiagnosticCodes.UNKNOWN_TAG, "Tag '" + tag.name() + "' is not part of the TPS specification.", absoluteOffset, absoluteOffset + tag.raw().length(), lineStarts, null));
         return null;
@@ -1883,7 +1985,7 @@ public final class ManagedCodeTps {
         if (!text.substring(index + markerLength).contains(marker)) {
             return false;
         }
-        scopes.add(new InlineScope(scopeName, markerLength == 2 ? 2 : 1, null, null, null, null, null, null, null, null, null, null, null));
+        scopes.add(new InlineScope(scopeName, markerLength == 2 ? 2 : 1, null, null, null, null, null, null, null, null, null, null, null, null, null, null));
         return true;
     }
 
@@ -1992,7 +2094,7 @@ public final class ManagedCodeTps {
     }
 
     private static WordSeed createControlWord(String kind, InheritedFormattingState inherited, Integer pauseDurationMs, String editPointPriority) {
-        return new WordSeed(kind, "", 0, 0, pauseDurationMs == null ? 0 : pauseDurationMs, new WordMetadata(false, 0, "pause".equals(kind), pauseDurationMs, false, "breath".equals(kind), "edit-point".equals(kind), editPointPriority, inherited.emotion(), null, null, null, null, null, null, null, null, null, inherited.speaker(), TpsSpec.EMOTION_HEAD_CUES.get(inherited.emotion())));
+        return new WordSeed(kind, "", 0, 0, pauseDurationMs == null ? 0 : pauseDurationMs, new WordMetadata(false, 0, "pause".equals(kind), pauseDurationMs, false, "breath".equals(kind), "edit-point".equals(kind), editPointPriority, inherited.emotion(), null, null, null, null, null, null, null, null, null, null, null, null, inherited.speaker(), TpsSpec.EMOTION_HEAD_CUES.get(inherited.emotion())));
     }
 
     private static ActiveInlineState resolveActiveState(List<InlineScope> scopes, InheritedFormattingState inherited) {
@@ -2006,6 +2108,9 @@ public final class ManagedCodeTps {
         String inlineEmotion = null;
         String volumeLevel = null;
         String deliveryMode = null;
+        String articulationStyle = null;
+        Integer energyLevel = null;
+        Integer melodyLevel = null;
         String phoneticGuide = null;
         String pronunciationGuide = null;
         String stressGuide = null;
@@ -2033,12 +2138,19 @@ public final class ManagedCodeTps {
             }
             volumeLevel = scope.volumeLevel() != null ? scope.volumeLevel() : volumeLevel;
             deliveryMode = scope.deliveryMode() != null ? scope.deliveryMode() : deliveryMode;
+            articulationStyle = scope.articulationStyle() != null ? scope.articulationStyle() : articulationStyle;
+            if (scope.energyLevel() != null) {
+                energyLevel = scope.energyLevel();
+            }
+            if (scope.melodyLevel() != null) {
+                melodyLevel = scope.melodyLevel();
+            }
             phoneticGuide = scope.phoneticGuide() != null ? scope.phoneticGuide() : phoneticGuide;
             pronunciationGuide = scope.pronunciationGuide() != null ? scope.pronunciationGuide() : pronunciationGuide;
             stressGuide = scope.stressGuide() != null ? scope.stressGuide() : stressGuide;
             stressWrap = stressWrap || Boolean.TRUE.equals(scope.stressWrap());
         }
-        return new ActiveInlineState(emotion, inlineEmotion, inherited.speaker(), emphasisLevel, highlight, volumeLevel, deliveryMode, phoneticGuide, pronunciationGuide, stressGuide, stressWrap, hasAbsoluteSpeed, absoluteSpeed, hasRelativeSpeed, relativeSpeedMultiplier);
+        return new ActiveInlineState(emotion, inlineEmotion, inherited.speaker(), emphasisLevel, highlight, volumeLevel, deliveryMode, articulationStyle, energyLevel, melodyLevel, phoneticGuide, pronunciationGuide, stressGuide, stressWrap, hasAbsoluteSpeed, absoluteSpeed, hasRelativeSpeed, relativeSpeedMultiplier);
     }
 
     private static TpsPlaybackWordView createWordView(CompiledWord word, PlayerState state) {
@@ -2187,13 +2299,13 @@ public final class ManagedCodeTps {
     private static CompiledSegment normalizeSegment(CompiledSegment segment, Map<String, CompiledWord> wordById) {
         List<CompiledBlock> blocks = segment.blocks().stream().map(block -> normalizeBlock(block, wordById)).toList();
         List<CompiledWord> words = segment.words().stream().map(word -> wordById.get(word.id())).filter(Objects::nonNull).toList();
-        return new CompiledSegment(segment.id(), segment.name(), segment.targetWpm(), segment.emotion(), segment.speaker(), segment.timing(), segment.backgroundColor(), segment.textColor(), segment.accentColor(), segment.startWordIndex(), segment.endWordIndex(), segment.startMs(), segment.endMs(), blocks, words);
+        return new CompiledSegment(segment.id(), segment.name(), segment.targetWpm(), segment.emotion(), segment.speaker(), segment.archetype(), segment.timing(), segment.backgroundColor(), segment.textColor(), segment.accentColor(), segment.startWordIndex(), segment.endWordIndex(), segment.startMs(), segment.endMs(), blocks, words);
     }
 
     private static CompiledBlock normalizeBlock(CompiledBlock block, Map<String, CompiledWord> wordById) {
         List<CompiledPhrase> phrases = block.phrases().stream().map(phrase -> normalizePhrase(phrase, wordById)).toList();
         List<CompiledWord> words = block.words().stream().map(word -> wordById.get(word.id())).filter(Objects::nonNull).toList();
-        return new CompiledBlock(block.id(), block.name(), block.targetWpm(), block.emotion(), block.speaker(), block.isImplicit(), block.startWordIndex(), block.endWordIndex(), block.startMs(), block.endMs(), phrases, words);
+        return new CompiledBlock(block.id(), block.name(), block.targetWpm(), block.emotion(), block.speaker(), block.archetype(), block.isImplicit(), block.startWordIndex(), block.endWordIndex(), block.startMs(), block.endMs(), phrases, words);
     }
 
     private static CompiledPhrase normalizePhrase(CompiledPhrase phrase, Map<String, CompiledWord> wordById) {
@@ -2217,7 +2329,7 @@ public final class ManagedCodeTps {
     private static Map<String, Object> segmentToTransport(CompiledSegment segment) {
         Map<String, Object> result = new LinkedHashMap<>();
         putCompact(result, "id", segment.id()); putCompact(result, "name", segment.name()); putCompact(result, "targetWpm", segment.targetWpm());
-        putCompact(result, "emotion", segment.emotion()); putCompact(result, "speaker", segment.speaker()); putCompact(result, "timing", segment.timing());
+        putCompact(result, "emotion", segment.emotion()); putCompact(result, "speaker", segment.speaker()); putCompact(result, "archetype", segment.archetype()); putCompact(result, "timing", segment.timing());
         putCompact(result, "backgroundColor", segment.backgroundColor()); putCompact(result, "textColor", segment.textColor()); putCompact(result, "accentColor", segment.accentColor());
         putCompact(result, "startWordIndex", segment.startWordIndex()); putCompact(result, "endWordIndex", segment.endWordIndex()); putCompact(result, "startMs", segment.startMs()); putCompact(result, "endMs", segment.endMs());
         putCompact(result, "blocks", segment.blocks().stream().map(ManagedCodeTps::blockToTransport).toList());
@@ -2227,7 +2339,7 @@ public final class ManagedCodeTps {
 
     private static Map<String, Object> blockToTransport(CompiledBlock block) {
         Map<String, Object> result = new LinkedHashMap<>();
-        putCompact(result, "id", block.id()); putCompact(result, "name", block.name()); putCompact(result, "targetWpm", block.targetWpm()); putCompact(result, "emotion", block.emotion()); putCompact(result, "speaker", block.speaker());
+        putCompact(result, "id", block.id()); putCompact(result, "name", block.name()); putCompact(result, "targetWpm", block.targetWpm()); putCompact(result, "emotion", block.emotion()); putCompact(result, "speaker", block.speaker()); putCompact(result, "archetype", block.archetype());
         putCompact(result, "isImplicit", block.isImplicit()); putCompact(result, "startWordIndex", block.startWordIndex()); putCompact(result, "endWordIndex", block.endWordIndex()); putCompact(result, "startMs", block.startMs()); putCompact(result, "endMs", block.endMs());
         putCompact(result, "phrases", block.phrases().stream().map(ManagedCodeTps::phraseToTransport).toList());
         putCompact(result, "words", block.words().stream().map(ManagedCodeTps::wordToTransport).toList());
@@ -2253,7 +2365,7 @@ public final class ManagedCodeTps {
         Map<String, Object> result = new LinkedHashMap<>();
         putCompact(result, "isEmphasis", metadata.isEmphasis()); putCompact(result, "emphasisLevel", metadata.emphasisLevel()); putCompact(result, "isPause", metadata.isPause()); putCompact(result, "pauseDurationMs", metadata.pauseDurationMs()); putCompact(result, "isHighlight", metadata.isHighlight());
         putCompact(result, "isBreath", metadata.isBreath()); putCompact(result, "isEditPoint", metadata.isEditPoint()); putCompact(result, "editPointPriority", metadata.editPointPriority()); putCompact(result, "emotionHint", metadata.emotionHint()); putCompact(result, "inlineEmotionHint", metadata.inlineEmotionHint());
-        putCompact(result, "volumeLevel", metadata.volumeLevel()); putCompact(result, "deliveryMode", metadata.deliveryMode()); putCompact(result, "phoneticGuide", metadata.phoneticGuide()); putCompact(result, "pronunciationGuide", metadata.pronunciationGuide());
+        putCompact(result, "volumeLevel", metadata.volumeLevel()); putCompact(result, "deliveryMode", metadata.deliveryMode()); putCompact(result, "articulationStyle", metadata.articulationStyle()); putCompact(result, "energyLevel", metadata.energyLevel()); putCompact(result, "melodyLevel", metadata.melodyLevel()); putCompact(result, "phoneticGuide", metadata.phoneticGuide()); putCompact(result, "pronunciationGuide", metadata.pronunciationGuide());
         putCompact(result, "stressText", metadata.stressText()); putCompact(result, "stressGuide", metadata.stressGuide()); putCompact(result, "speedOverride", metadata.speedOverride()); putCompact(result, "speedMultiplier", metadata.speedMultiplier()); putCompact(result, "speaker", metadata.speaker()); putCompact(result, "headCue", metadata.headCue());
         return result;
     }
@@ -2271,11 +2383,11 @@ public final class ManagedCodeTps {
     }
 
     private static CompiledSegment segmentFromTransport(Map<String, Object> map) {
-        return new CompiledSegment(asString(map.get("id")), asString(map.get("name")), asInt(map.get("targetWpm")), asString(map.get("emotion")), nullableString(map.get("speaker")), nullableString(map.get("timing")), asString(map.get("backgroundColor")), asString(map.get("textColor")), asString(map.get("accentColor")), asInt(map.get("startWordIndex")), asInt(map.get("endWordIndex")), asInt(map.get("startMs")), asInt(map.get("endMs")), castList(map.get("blocks")).stream().map(item -> blockFromTransport(castMap(item))).toList(), castList(map.get("words")).stream().map(item -> wordFromTransport(castMap(item))).toList());
+        return new CompiledSegment(asString(map.get("id")), asString(map.get("name")), asInt(map.get("targetWpm")), asString(map.get("emotion")), nullableString(map.get("speaker")), nullableString(map.get("archetype")), nullableString(map.get("timing")), asString(map.get("backgroundColor")), asString(map.get("textColor")), asString(map.get("accentColor")), asInt(map.get("startWordIndex")), asInt(map.get("endWordIndex")), asInt(map.get("startMs")), asInt(map.get("endMs")), castList(map.get("blocks")).stream().map(item -> blockFromTransport(castMap(item))).toList(), castList(map.get("words")).stream().map(item -> wordFromTransport(castMap(item))).toList());
     }
 
     private static CompiledBlock blockFromTransport(Map<String, Object> map) {
-        return new CompiledBlock(asString(map.get("id")), asString(map.get("name")), asInt(map.get("targetWpm")), asString(map.get("emotion")), nullableString(map.get("speaker")), asBoolean(map.get("isImplicit")), asInt(map.get("startWordIndex")), asInt(map.get("endWordIndex")), asInt(map.get("startMs")), asInt(map.get("endMs")), castList(map.get("phrases")).stream().map(item -> phraseFromTransport(castMap(item))).toList(), castList(map.get("words")).stream().map(item -> wordFromTransport(castMap(item))).toList());
+        return new CompiledBlock(asString(map.get("id")), asString(map.get("name")), asInt(map.get("targetWpm")), asString(map.get("emotion")), nullableString(map.get("speaker")), nullableString(map.get("archetype")), asBoolean(map.get("isImplicit")), asInt(map.get("startWordIndex")), asInt(map.get("endWordIndex")), asInt(map.get("startMs")), asInt(map.get("endMs")), castList(map.get("phrases")).stream().map(item -> phraseFromTransport(castMap(item))).toList(), castList(map.get("words")).stream().map(item -> wordFromTransport(castMap(item))).toList());
     }
 
     private static CompiledPhrase phraseFromTransport(Map<String, Object> map) {
@@ -2287,7 +2399,7 @@ public final class ManagedCodeTps {
     }
 
     private static WordMetadata metadataFromTransport(Map<String, Object> map) {
-        return new WordMetadata(asBoolean(map.get("isEmphasis")), asInt(map.get("emphasisLevel")), asBoolean(map.get("isPause")), asNullableInt(map.get("pauseDurationMs")), asBoolean(map.get("isHighlight")), asBoolean(map.get("isBreath")), asBoolean(map.get("isEditPoint")), nullableString(map.get("editPointPriority")), nullableString(map.get("emotionHint")), nullableString(map.get("inlineEmotionHint")), nullableString(map.get("volumeLevel")), nullableString(map.get("deliveryMode")), nullableString(map.get("phoneticGuide")), nullableString(map.get("pronunciationGuide")), nullableString(map.get("stressText")), nullableString(map.get("stressGuide")), asNullableInt(map.get("speedOverride")), asNullableDouble(map.get("speedMultiplier")), nullableString(map.get("speaker")), nullableString(map.get("headCue")));
+        return new WordMetadata(asBoolean(map.get("isEmphasis")), asInt(map.get("emphasisLevel")), asBoolean(map.get("isPause")), asNullableInt(map.get("pauseDurationMs")), asBoolean(map.get("isHighlight")), asBoolean(map.get("isBreath")), asBoolean(map.get("isEditPoint")), nullableString(map.get("editPointPriority")), nullableString(map.get("emotionHint")), nullableString(map.get("inlineEmotionHint")), nullableString(map.get("volumeLevel")), nullableString(map.get("deliveryMode")), nullableString(map.get("articulationStyle")), asNullableInt(map.get("energyLevel")), asNullableInt(map.get("melodyLevel")), nullableString(map.get("phoneticGuide")), nullableString(map.get("pronunciationGuide")), nullableString(map.get("stressText")), nullableString(map.get("stressGuide")), asNullableInt(map.get("speedOverride")), asNullableDouble(map.get("speedMultiplier")), nullableString(map.get("speaker")), nullableString(map.get("headCue")));
     }
 
     private static String normalizeLineEndings(String value) { return value.replace("\r\n", "\n").replace("\r", "\n"); }
@@ -2305,6 +2417,8 @@ public final class ManagedCodeTps {
     private static boolean isInvalidWpm(int value) { return value < TpsSpec.MINIMUM_WPM || value > TpsSpec.MAXIMUM_WPM; }
     private static String buildInvalidWpmMessage(String value) { return "WPM value '" + value + "' must be between " + TpsSpec.MINIMUM_WPM + " and " + TpsSpec.MAXIMUM_WPM + "."; }
     private static boolean isKnownEmotion(String value) { return TpsSpec.EMOTIONS.contains(value.toLowerCase(Locale.ROOT)); }
+    private static boolean isKnownArchetype(String value) { return value != null && TpsSpec.ARCHETYPES.stream().anyMatch(a -> a.equalsIgnoreCase(value)); }
+    private static Integer resolveArchetypeWpm(String archetype) { if (archetype == null) return null; return TpsSpec.ARCHETYPE_RECOMMENDED_WPM.get(archetype.toLowerCase(Locale.ROOT)); }
     private static boolean isWhitespace(String value) { return value != null && !value.isEmpty() && Character.isWhitespace(value.charAt(0)); }
     private static boolean isSentenceEndingPunctuation(String text) { String trimmed = text.trim(); return !trimmed.isEmpty() && List.of(".", "!", "?").contains(trimmed.substring(trimmed.length() - 1)); }
     private static Integer tryResolvePauseMilliseconds(String argument) { String trimmed = normalizeValue(argument); if (trimmed == null) return null; String normalized = trimmed.toLowerCase(Locale.ROOT); if (normalized.endsWith("ms")) return Integer.parseInt(normalized.substring(0, normalized.length() - 2)); if (!normalized.endsWith("s")) return null; return (int) Math.round(Double.parseDouble(normalized.substring(0, normalized.length() - 1)) * 1000D); }

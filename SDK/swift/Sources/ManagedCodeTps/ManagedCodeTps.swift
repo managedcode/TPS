@@ -49,6 +49,7 @@ public struct TpsSegment {
     public let targetWpm: Int?
     public let emotion: String?
     public let speaker: String?
+    public let archetype: String?
     public let timing: String?
     public let backgroundColor: String?
     public let textColor: String?
@@ -64,6 +65,7 @@ public struct TpsBlock {
     public let targetWpm: Int?
     public let emotion: String?
     public let speaker: String?
+    public let archetype: String?
 }
 
 public struct WordMetadata: Codable, Equatable {
@@ -85,6 +87,9 @@ public struct WordMetadata: Codable, Equatable {
     public let stressGuide: String?
     public let speedOverride: Int?
     public let speedMultiplier: Double?
+    public let articulationStyle: String?
+    public let energyLevel: Int?
+    public let melodyLevel: Int?
     public let speaker: String?
     public let headCue: String?
 }
@@ -121,6 +126,7 @@ public struct CompiledBlock: Codable, Equatable {
     public let targetWpm: Int
     public let emotion: String
     public let speaker: String?
+    public let archetype: String?
     public let isImplicit: Bool
     public let startWordIndex: Int
     public let endWordIndex: Int
@@ -136,6 +142,7 @@ public struct CompiledSegment: Codable, Equatable {
     public let targetWpm: Int
     public let emotion: String
     public let speaker: String?
+    public let archetype: String?
     public let timing: String?
     public let backgroundColor: String
     public let textColor: String
@@ -274,9 +281,12 @@ public enum TpsTags {
     public static let building = "building"
     public static let editPoint = "edit_point"
     public static let emphasis = "emphasis"
+    public static let energy = "energy"
     public static let fast = "fast"
     public static let highlight = "highlight"
+    public static let legato = "legato"
     public static let loud = "loud"
+    public static let melody = "melody"
     public static let normal = "normal"
     public static let pause = "pause"
     public static let phonetic = "phonetic"
@@ -285,6 +295,7 @@ public enum TpsTags {
     public static let sarcasm = "sarcasm"
     public static let slow = "slow"
     public static let soft = "soft"
+    public static let staccato = "staccato"
     public static let stress = "stress"
     public static let whisper = "whisper"
     public static let xfast = "xfast"
@@ -300,6 +311,9 @@ public enum TpsDiagnosticCodes {
     public static let invalidPause = "invalid-pause"
     public static let invalidTagArgument = "invalid-tag-argument"
     public static let invalidWpm = "invalid-wpm"
+    public static let invalidEnergyLevel = "invalid-energy-level"
+    public static let invalidMelodyLevel = "invalid-melody-level"
+    public static let unknownArchetype = "unknown-archetype"
     public static let mismatchedClosingTag = "mismatched-closing-tag"
     public static let unclosedTag = "unclosed-tag"
 }
@@ -314,6 +328,7 @@ public enum TpsSpec {
     public static let shortPauseDurationMs = 300
     public static let mediumPauseDurationMs = 600
     public static let speakerPrefix = "Speaker:"
+    public static let archetypePrefix = "Archetype:"
     public static let wpmSuffix = "WPM"
     public static let emotions = [
         "neutral", "warm", "professional", "focused", "concerned", "urgent",
@@ -321,6 +336,20 @@ public enum TpsSpec {
     ]
     public static let volumeLevels = [TpsTags.loud, TpsTags.soft, TpsTags.whisper]
     public static let deliveryModes = [TpsTags.sarcasm, TpsTags.aside, TpsTags.rhetorical, TpsTags.building]
+    public static let articulationStyles = [TpsTags.legato, TpsTags.staccato]
+    public static let archetypeFriend = "friend"
+    public static let archetypeMotivator = "motivator"
+    public static let archetypeEducator = "educator"
+    public static let archetypeCoach = "coach"
+    public static let archetypeStoryteller = "storyteller"
+    public static let archetypeEntertainer = "entertainer"
+
+    public static let archetypes = [archetypeFriend, archetypeMotivator, archetypeEducator, archetypeCoach, archetypeStoryteller, archetypeEntertainer]
+    public static let archetypeRecommendedWpm: [String: Int] = [archetypeFriend: 135, archetypeMotivator: 155, archetypeEducator: 120, archetypeCoach: 145, archetypeStoryteller: 125, archetypeEntertainer: 150]
+    public static let energyLevelMin = 1
+    public static let energyLevelMax = 10
+    public static let melodyLevelMin = 1
+    public static let melodyLevelMax = 10
     public static let relativeSpeedTags = [TpsTags.xslow, TpsTags.slow, TpsTags.fast, TpsTags.xfast, TpsTags.normal]
     public static let editPointPriorities = ["high", "medium", "low"]
     public static let defaultSpeedOffsets = [
@@ -357,9 +386,12 @@ public enum TpsKeywords {
         "building": TpsTags.building,
         "editPoint": TpsTags.editPoint,
         "emphasis": TpsTags.emphasis,
+        "energy": TpsTags.energy,
         "fast": TpsTags.fast,
         "highlight": TpsTags.highlight,
+        "legato": TpsTags.legato,
         "loud": TpsTags.loud,
+        "melody": TpsTags.melody,
         "normal": TpsTags.normal,
         "pause": TpsTags.pause,
         "phonetic": TpsTags.phonetic,
@@ -368,6 +400,7 @@ public enum TpsKeywords {
         "sarcasm": TpsTags.sarcasm,
         "slow": TpsTags.slow,
         "soft": TpsTags.soft,
+        "staccato": TpsTags.staccato,
         "stress": TpsTags.stress,
         "whisper": TpsTags.whisper,
         "xfast": TpsTags.xfast,
@@ -376,6 +409,8 @@ public enum TpsKeywords {
     public static let emotions = TpsSpec.emotions
     public static let volumeLevels = TpsSpec.volumeLevels
     public static let deliveryModes = TpsSpec.deliveryModes
+    public static let articulationStyles = TpsSpec.articulationStyles
+    public static let archetypes = TpsSpec.archetypes
     public static let relativeSpeedTags = TpsSpec.relativeSpeedTags
     public static let editPointPriorities = TpsSpec.editPointPriorities
 }
@@ -896,13 +931,13 @@ private func validateCompiledScript(_ script: CompiledScript) throws {
 private func normalizeSegment(_ segment: CompiledSegment, wordById: [String: CompiledWord]) -> CompiledSegment {
     let blocks = segment.blocks.map { normalizeBlock($0, wordById: wordById) }
     let words = segment.words.compactMap { wordById[$0.id] }
-    return CompiledSegment(id: segment.id, name: segment.name, targetWpm: segment.targetWpm, emotion: segment.emotion, speaker: segment.speaker, timing: segment.timing, backgroundColor: segment.backgroundColor, textColor: segment.textColor, accentColor: segment.accentColor, startWordIndex: segment.startWordIndex, endWordIndex: segment.endWordIndex, startMs: segment.startMs, endMs: segment.endMs, blocks: blocks, words: words)
+    return CompiledSegment(id: segment.id, name: segment.name, targetWpm: segment.targetWpm, emotion: segment.emotion, speaker: segment.speaker, archetype: segment.archetype, timing: segment.timing, backgroundColor: segment.backgroundColor, textColor: segment.textColor, accentColor: segment.accentColor, startWordIndex: segment.startWordIndex, endWordIndex: segment.endWordIndex, startMs: segment.startMs, endMs: segment.endMs, blocks: blocks, words: words)
 }
 
 private func normalizeBlock(_ block: CompiledBlock, wordById: [String: CompiledWord]) -> CompiledBlock {
     let phrases = block.phrases.map { normalizePhrase($0, wordById: wordById) }
     let words = block.words.compactMap { wordById[$0.id] }
-    return CompiledBlock(id: block.id, name: block.name, targetWpm: block.targetWpm, emotion: block.emotion, speaker: block.speaker, isImplicit: block.isImplicit, startWordIndex: block.startWordIndex, endWordIndex: block.endWordIndex, startMs: block.startMs, endMs: block.endMs, phrases: phrases, words: words)
+    return CompiledBlock(id: block.id, name: block.name, targetWpm: block.targetWpm, emotion: block.emotion, speaker: block.speaker, archetype: block.archetype, isImplicit: block.isImplicit, startWordIndex: block.startWordIndex, endWordIndex: block.endWordIndex, startMs: block.startMs, endMs: block.endMs, phrases: phrases, words: words)
 }
 
 private func normalizePhrase(_ phrase: CompiledPhrase, wordById: [String: CompiledWord]) -> CompiledPhrase {
@@ -916,16 +951,16 @@ private struct ParsedBlockInternal { var block: TpsBlock; var content: ContentSe
 private struct ParsedSegmentInternal { var segment: TpsSegment; var leadingContent: ContentSection? = nil; var directContent: ContentSection? = nil; var parsedBlocks: [ParsedBlockInternal] }
 private struct ContentSection { let text: String; let startOffset: Int }
 private struct DocumentAnalysis { let source: String; let lineStarts: [Int]; var diagnostics: [TpsDiagnostic]; let document: TpsDocument; let parsedSegments: [ParsedSegmentInternal] }
-private struct ParsedHeader { var name: String; var targetWpm: Int? = nil; var emotion: String? = nil; var timing: String? = nil; var speaker: String? = nil }
+private struct ParsedHeader { var name: String; var targetWpm: Int? = nil; var emotion: String? = nil; var timing: String? = nil; var speaker: String? = nil; var archetype: String? = nil }
 private struct SegmentCandidate { let segment: CompiledSegment; let blocks: [BlockCandidate] }
 private struct BlockCandidate { let block: CompiledBlock; let content: ContentCompilationResult }
 private struct WordSeed { var kind: String; var cleanText: String; var characterCount: Int; var orpPosition: Int; var displayDurationMs: Int; let metadata: WordMetadata }
 private struct PhraseSeed { let words: [WordSeed]; let text: String }
-private struct InheritedFormattingState { let targetWpm: Int; let emotion: String; let speaker: String?; let speedOffsets: [String: Int] }
+private struct InheritedFormattingState { let targetWpm: Int; let emotion: String; let speaker: String?; let archetype: String?; let speedOffsets: [String: Int] }
 private struct ContentCompilationResult { let words: [WordSeed]; let phrases: [PhraseSeed] }
-private struct InlineScope { let name: String; let emphasisLevel: Int?; let highlight: Bool?; let inlineEmotion: String?; let volumeLevel: String?; let deliveryMode: String?; let phoneticGuide: String?; let pronunciationGuide: String?; let stressGuide: String?; let stressWrap: Bool?; let absoluteSpeed: Int?; let relativeSpeedMultiplier: Double?; let resetSpeed: Bool? }
+private struct InlineScope { let name: String; let emphasisLevel: Int?; let highlight: Bool?; let inlineEmotion: String?; let volumeLevel: String?; let deliveryMode: String?; let articulationStyle: String?; let energyLevel: Int?; let melodyLevel: Int?; let phoneticGuide: String?; let pronunciationGuide: String?; let stressGuide: String?; let stressWrap: Bool?; let absoluteSpeed: Int?; let relativeSpeedMultiplier: Double?; let resetSpeed: Bool? }
 private struct LiteralScope { let name: String }
-private struct ActiveInlineState { let emotion: String; let inlineEmotion: String?; let speaker: String?; let emphasisLevel: Int; let highlight: Bool; let volumeLevel: String?; let deliveryMode: String?; let phoneticGuide: String?; let pronunciationGuide: String?; let stressGuide: String?; let stressWrap: Bool; let hasAbsoluteSpeed: Bool; let absoluteSpeed: Int; let hasRelativeSpeed: Bool; let relativeSpeedMultiplier: Double }
+private struct ActiveInlineState { let emotion: String; let inlineEmotion: String?; let speaker: String?; let emphasisLevel: Int; let highlight: Bool; let volumeLevel: String?; let deliveryMode: String?; let articulationStyle: String?; let energyLevel: Int?; let melodyLevel: Int?; let phoneticGuide: String?; let pronunciationGuide: String?; let stressGuide: String?; let stressWrap: Bool; let hasAbsoluteSpeed: Bool; let absoluteSpeed: Int; let hasRelativeSpeed: Bool; let relativeSpeedMultiplier: Double }
 private struct TagToken { let raw: String; let inner: String; let name: String; let argument: String?; let isClosing: Bool }
 private struct HeaderPart { let value: String; let start: Int; let end: Int }
 private struct FrontMatterExtraction { let metadata: [String: String]; let body: String; let bodyStartOffset: Int }
@@ -938,6 +973,9 @@ private struct TokenAccumulator {
     var inlineEmotionHint: String? = nil
     var volumeLevel: String? = nil
     var deliveryMode: String? = nil
+    var articulationStyle: String? = nil
+    var energyLevel: Int? = nil
+    var melodyLevel: Int? = nil
     var phoneticGuide: String? = nil
     var pronunciationGuide: String? = nil
     var stressGuide: String? = nil
@@ -954,6 +992,9 @@ private struct TokenAccumulator {
         inlineEmotionHint = state.inlineEmotion ?? inlineEmotionHint
         volumeLevel = state.volumeLevel ?? volumeLevel
         deliveryMode = state.deliveryMode ?? deliveryMode
+        articulationStyle = state.articulationStyle ?? articulationStyle
+        if let stateEnergyLevel = state.energyLevel { energyLevel = stateEnergyLevel }
+        if let stateMelodyLevel = state.melodyLevel { melodyLevel = stateMelodyLevel }
         phoneticGuide = state.phoneticGuide ?? phoneticGuide
         pronunciationGuide = state.pronunciationGuide ?? pronunciationGuide
         stressGuide = state.stressGuide ?? stressGuide
@@ -968,14 +1009,14 @@ private struct TokenAccumulator {
     }
 
     func buildWordMetadata(inheritedWpm: Int) -> WordMetadata {
-        var metadata = WordMetadata(isEmphasis: emphasisLevel > 0, emphasisLevel: emphasisLevel, isPause: false, pauseDurationMs: nil, isHighlight: isHighlight, isBreath: false, isEditPoint: false, editPointPriority: nil, emotionHint: emotionHint, inlineEmotionHint: inlineEmotionHint, volumeLevel: volumeLevel, deliveryMode: deliveryMode, phoneticGuide: phoneticGuide, pronunciationGuide: pronunciationGuide, stressText: stressText.isEmpty ? nil : stressText.joined(), stressGuide: stressGuide, speedOverride: nil, speedMultiplier: nil, speaker: speaker, headCue: TpsSpec.emotionHeadCues[emotionHint.isEmpty ? TpsSpec.defaultEmotion : emotionHint])
+        var metadata = WordMetadata(isEmphasis: emphasisLevel > 0, emphasisLevel: emphasisLevel, isPause: false, pauseDurationMs: nil, isHighlight: isHighlight, isBreath: false, isEditPoint: false, editPointPriority: nil, emotionHint: emotionHint, inlineEmotionHint: inlineEmotionHint, volumeLevel: volumeLevel, deliveryMode: deliveryMode, phoneticGuide: phoneticGuide, pronunciationGuide: pronunciationGuide, stressText: stressText.isEmpty ? nil : stressText.joined(), stressGuide: stressGuide, speedOverride: nil, speedMultiplier: nil, articulationStyle: articulationStyle, energyLevel: energyLevel, melodyLevel: melodyLevel, speaker: speaker, headCue: TpsSpec.emotionHeadCues[emotionHint.isEmpty ? TpsSpec.defaultEmotion : emotionHint])
         if hasAbsoluteSpeed {
             let effectiveWpm = hasRelativeSpeed ? max(1, Int(round(Double(absoluteSpeed) * relativeSpeedMultiplier))) : absoluteSpeed
             if effectiveWpm != inheritedWpm {
-                metadata = WordMetadata(isEmphasis: metadata.isEmphasis, emphasisLevel: metadata.emphasisLevel, isPause: metadata.isPause, pauseDurationMs: metadata.pauseDurationMs, isHighlight: metadata.isHighlight, isBreath: metadata.isBreath, isEditPoint: metadata.isEditPoint, editPointPriority: metadata.editPointPriority, emotionHint: metadata.emotionHint, inlineEmotionHint: metadata.inlineEmotionHint, volumeLevel: metadata.volumeLevel, deliveryMode: metadata.deliveryMode, phoneticGuide: metadata.phoneticGuide, pronunciationGuide: metadata.pronunciationGuide, stressText: metadata.stressText, stressGuide: metadata.stressGuide, speedOverride: effectiveWpm, speedMultiplier: metadata.speedMultiplier, speaker: metadata.speaker, headCue: metadata.headCue)
+                metadata = WordMetadata(isEmphasis: metadata.isEmphasis, emphasisLevel: metadata.emphasisLevel, isPause: metadata.isPause, pauseDurationMs: metadata.pauseDurationMs, isHighlight: metadata.isHighlight, isBreath: metadata.isBreath, isEditPoint: metadata.isEditPoint, editPointPriority: metadata.editPointPriority, emotionHint: metadata.emotionHint, inlineEmotionHint: metadata.inlineEmotionHint, volumeLevel: metadata.volumeLevel, deliveryMode: metadata.deliveryMode, phoneticGuide: metadata.phoneticGuide, pronunciationGuide: metadata.pronunciationGuide, stressText: metadata.stressText, stressGuide: metadata.stressGuide, speedOverride: effectiveWpm, speedMultiplier: metadata.speedMultiplier, articulationStyle: metadata.articulationStyle, energyLevel: metadata.energyLevel, melodyLevel: metadata.melodyLevel, speaker: metadata.speaker, headCue: metadata.headCue)
             }
         } else if hasRelativeSpeed && abs(relativeSpeedMultiplier - 1) > 0.0001 {
-            metadata = WordMetadata(isEmphasis: metadata.isEmphasis, emphasisLevel: metadata.emphasisLevel, isPause: metadata.isPause, pauseDurationMs: metadata.pauseDurationMs, isHighlight: metadata.isHighlight, isBreath: metadata.isBreath, isEditPoint: metadata.isEditPoint, editPointPriority: metadata.editPointPriority, emotionHint: metadata.emotionHint, inlineEmotionHint: metadata.inlineEmotionHint, volumeLevel: metadata.volumeLevel, deliveryMode: metadata.deliveryMode, phoneticGuide: metadata.phoneticGuide, pronunciationGuide: metadata.pronunciationGuide, stressText: metadata.stressText, stressGuide: metadata.stressGuide, speedOverride: metadata.speedOverride, speedMultiplier: relativeSpeedMultiplier, speaker: metadata.speaker, headCue: metadata.headCue)
+            metadata = WordMetadata(isEmphasis: metadata.isEmphasis, emphasisLevel: metadata.emphasisLevel, isPause: metadata.isPause, pauseDurationMs: metadata.pauseDurationMs, isHighlight: metadata.isHighlight, isBreath: metadata.isBreath, isEditPoint: metadata.isEditPoint, editPointPriority: metadata.editPointPriority, emotionHint: metadata.emotionHint, inlineEmotionHint: metadata.inlineEmotionHint, volumeLevel: metadata.volumeLevel, deliveryMode: metadata.deliveryMode, phoneticGuide: metadata.phoneticGuide, pronunciationGuide: metadata.pronunciationGuide, stressText: metadata.stressText, stressGuide: metadata.stressGuide, speedOverride: metadata.speedOverride, speedMultiplier: relativeSpeedMultiplier, articulationStyle: metadata.articulationStyle, energyLevel: metadata.energyLevel, melodyLevel: metadata.melodyLevel, speaker: metadata.speaker, headCue: metadata.headCue)
         }
         return metadata
     }
@@ -1136,6 +1177,15 @@ private func parseBracketHeader(_ headerContent: String, contentOffset: Int, lin
             parsed.speaker = normalizeValue(String(normalized.dropFirst(TpsSpec.speakerPrefix.count)))
             continue
         }
+        if normalized.lowercased().hasPrefix(TpsSpec.archetypePrefix.lowercased()) {
+            let archetypeValue = normalizeValue(String(normalized.dropFirst(TpsSpec.archetypePrefix.count)))
+            if let value = archetypeValue, TpsSpec.archetypes.contains(value.lowercased()) {
+                parsed.archetype = value.lowercased()
+            } else {
+                diagnostics.append(createDiagnostic(TpsDiagnosticCodes.unknownArchetype, message: "Archetype '\(archetypeValue ?? "")' is not a known vocal archetype.", start: tokenRangeStart, end: tokenRangeEnd, lineStarts: lineStarts))
+            }
+            continue
+        }
         if isTimingToken(normalized) { parsed.timing = normalized; continue }
         if let updated = applyHeaderWpm(parsed: parsed, token: normalized, start: tokenRangeStart, end: tokenRangeEnd, lineStarts: lineStarts, diagnostics: &diagnostics) {
             parsed = updated
@@ -1165,7 +1215,8 @@ private func applyHeaderWpm(parsed: ParsedHeader, token: String, start: Int, end
 private func createSegment(_ header: ParsedHeader, metadata: [String: String], index: Int) -> ParsedSegmentInternal {
     let emotion = resolveEmotion(header.emotion)
     let palette = resolvePalette(emotion)
-    return ParsedSegmentInternal(segment: TpsSegment(id: "segment-\(index)", name: header.name, content: "", targetWpm: header.targetWpm ?? resolveBaseWpm(metadata), emotion: emotion, speaker: header.speaker, timing: header.timing, backgroundColor: palette["background"], textColor: palette["text"], accentColor: palette["accent"], leadingContent: nil, blocks: []), parsedBlocks: [])
+    let archetypeWpm = resolveArchetypeWpm(header.archetype)
+    return ParsedSegmentInternal(segment: TpsSegment(id: "segment-\(index)", name: header.name, content: "", targetWpm: header.targetWpm ?? archetypeWpm ?? resolveBaseWpm(metadata), emotion: emotion, speaker: header.speaker, archetype: header.archetype, timing: header.timing, backgroundColor: palette["background"], textColor: palette["text"], accentColor: palette["accent"], leadingContent: nil, blocks: []), parsedBlocks: [])
 }
 
 private func createImplicitSegment(metadata: [String: String], index: Int) -> ParsedSegmentInternal {
@@ -1173,13 +1224,13 @@ private func createImplicitSegment(metadata: [String: String], index: Int) -> Pa
 }
 
 private func createBlock(_ header: ParsedHeader, blockIndex: Int, segmentId: String) -> ParsedBlockInternal {
-    ParsedBlockInternal(block: TpsBlock(id: "\(segmentId)-block-\(blockIndex)", name: header.name, content: "", targetWpm: header.targetWpm, emotion: header.emotion, speaker: header.speaker))
+    ParsedBlockInternal(block: TpsBlock(id: "\(segmentId)-block-\(blockIndex)", name: header.name, content: "", targetWpm: header.targetWpm, emotion: header.emotion, speaker: header.speaker, archetype: header.archetype))
 }
 
 private func finalizeParsedBlock(current: inout ParsedSegmentInternal?, block: inout ParsedBlockInternal?, lines: [LineRecord]) {
     guard var segment = current, var block else { return }
     block.content = createContentSection(lines)
-    block.block = TpsBlock(id: block.block.id, name: block.block.name, content: block.content?.text ?? "", targetWpm: block.block.targetWpm, emotion: block.block.emotion, speaker: block.block.speaker)
+    block.block = TpsBlock(id: block.block.id, name: block.block.name, content: block.content?.text ?? "", targetWpm: block.block.targetWpm, emotion: block.block.emotion, speaker: block.block.speaker, archetype: block.block.archetype)
     segment.parsedBlocks.append(block)
     current = segment
 }
@@ -1189,7 +1240,7 @@ private func finalizeSegment(target: inout [ParsedSegmentInternal], segment: ino
     segment.leadingContent = createContentSection(lines)
     let blocks = segment.parsedBlocks.map(\.block)
     let content = segment.parsedBlocks.isEmpty ? (segment.leadingContent?.text ?? "") : ""
-    segment.segment = TpsSegment(id: segment.segment.id, name: segment.segment.name, content: content, targetWpm: segment.segment.targetWpm, emotion: segment.segment.emotion, speaker: segment.segment.speaker, timing: segment.segment.timing, backgroundColor: segment.segment.backgroundColor, textColor: segment.segment.textColor, accentColor: segment.segment.accentColor, leadingContent: segment.leadingContent?.text, blocks: blocks)
+    segment.segment = TpsSegment(id: segment.segment.id, name: segment.segment.name, content: content, targetWpm: segment.segment.targetWpm, emotion: segment.segment.emotion, speaker: segment.segment.speaker, archetype: segment.segment.archetype, timing: segment.segment.timing, backgroundColor: segment.segment.backgroundColor, textColor: segment.segment.textColor, accentColor: segment.segment.accentColor, leadingContent: segment.leadingContent?.text, blocks: blocks)
     if segment.parsedBlocks.isEmpty { segment.directContent = segment.leadingContent }
     target.append(segment)
 }
@@ -1213,19 +1264,19 @@ private func splitLines(_ text: String, startOffset: Int) -> [LineRecord] {
 
 private func compileSegment(_ parsedSegment: ParsedSegmentInternal, baseWpm: Int, speedOffsets: [String: Int], analysis: DocumentAnalysis, diagnostics: inout [TpsDiagnostic]) -> SegmentCandidate {
     let segmentEmotion = resolveEmotion(parsedSegment.segment.emotion)
-    let inherited = InheritedFormattingState(targetWpm: parsedSegment.segment.targetWpm!, emotion: segmentEmotion, speaker: parsedSegment.segment.speaker, speedOffsets: speedOffsets)
+    let inherited = InheritedFormattingState(targetWpm: parsedSegment.segment.targetWpm!, emotion: segmentEmotion, speaker: parsedSegment.segment.speaker, archetype: parsedSegment.segment.archetype, speedOffsets: speedOffsets)
     let blocks = buildBlocks(parsedSegment).map { compileBlock($0, inherited: inherited, analysis: analysis, diagnostics: &diagnostics) }
-    let segment = CompiledSegment(id: parsedSegment.segment.id, name: parsedSegment.segment.name, targetWpm: inherited.targetWpm, emotion: segmentEmotion, speaker: parsedSegment.segment.speaker, timing: parsedSegment.segment.timing, backgroundColor: parsedSegment.segment.backgroundColor!, textColor: parsedSegment.segment.textColor!, accentColor: parsedSegment.segment.accentColor!, startWordIndex: 0, endWordIndex: 0, startMs: 0, endMs: 0, blocks: [], words: [])
+    let segment = CompiledSegment(id: parsedSegment.segment.id, name: parsedSegment.segment.name, targetWpm: inherited.targetWpm, emotion: segmentEmotion, speaker: parsedSegment.segment.speaker, archetype: parsedSegment.segment.archetype, timing: parsedSegment.segment.timing, backgroundColor: parsedSegment.segment.backgroundColor!, textColor: parsedSegment.segment.textColor!, accentColor: parsedSegment.segment.accentColor!, startWordIndex: 0, endWordIndex: 0, startMs: 0, endMs: 0, blocks: [], words: [])
     return SegmentCandidate(segment: segment, blocks: blocks)
 }
 
 private func buildBlocks(_ parsedSegment: ParsedSegmentInternal) -> [(block: TpsBlock, isImplicit: Bool, content: ContentSection?)] {
     var blocks: [(block: TpsBlock, isImplicit: Bool, content: ContentSection?)] = []
     if let leadingText = parsedSegment.leadingContent?.text, !leadingText.isEmpty, !parsedSegment.parsedBlocks.isEmpty {
-        blocks.append((TpsBlock(id: "\(parsedSegment.segment.id)-implicit-lead", name: "\(parsedSegment.segment.name) Lead", content: leadingText, targetWpm: parsedSegment.segment.targetWpm, emotion: parsedSegment.segment.emotion, speaker: parsedSegment.segment.speaker), true, parsedSegment.leadingContent))
+        blocks.append((TpsBlock(id: "\(parsedSegment.segment.id)-implicit-lead", name: "\(parsedSegment.segment.name) Lead", content: leadingText, targetWpm: parsedSegment.segment.targetWpm, emotion: parsedSegment.segment.emotion, speaker: parsedSegment.segment.speaker, archetype: parsedSegment.segment.archetype), true, parsedSegment.leadingContent))
     }
     if parsedSegment.parsedBlocks.isEmpty {
-        blocks.append((TpsBlock(id: "\(parsedSegment.segment.id)-implicit-body", name: parsedSegment.segment.name, content: parsedSegment.directContent?.text ?? "", targetWpm: parsedSegment.segment.targetWpm, emotion: parsedSegment.segment.emotion, speaker: parsedSegment.segment.speaker), true, parsedSegment.directContent))
+        blocks.append((TpsBlock(id: "\(parsedSegment.segment.id)-implicit-body", name: parsedSegment.segment.name, content: parsedSegment.directContent?.text ?? "", targetWpm: parsedSegment.segment.targetWpm, emotion: parsedSegment.segment.emotion, speaker: parsedSegment.segment.speaker, archetype: parsedSegment.segment.archetype), true, parsedSegment.directContent))
     }
     for parsedBlock in parsedSegment.parsedBlocks {
         blocks.append((parsedBlock.block, false, parsedBlock.content))
@@ -1234,9 +1285,11 @@ private func buildBlocks(_ parsedSegment: ParsedSegmentInternal) -> [(block: Tps
 }
 
 private func compileBlock(_ entry: (block: TpsBlock, isImplicit: Bool, content: ContentSection?), inherited: InheritedFormattingState, analysis: DocumentAnalysis, diagnostics: inout [TpsDiagnostic]) -> BlockCandidate {
-    let blockInherited = InheritedFormattingState(targetWpm: entry.block.targetWpm ?? inherited.targetWpm, emotion: resolveEmotion(entry.block.emotion, fallback: inherited.emotion), speaker: entry.block.speaker ?? inherited.speaker, speedOffsets: inherited.speedOffsets)
+    let resolvedArchetype = entry.block.archetype ?? inherited.archetype
+    let blockWpm = entry.block.targetWpm ?? resolveArchetypeWpm(resolvedArchetype) ?? inherited.targetWpm
+    let blockInherited = InheritedFormattingState(targetWpm: blockWpm, emotion: resolveEmotion(entry.block.emotion, fallback: inherited.emotion), speaker: entry.block.speaker ?? inherited.speaker, archetype: resolvedArchetype, speedOffsets: inherited.speedOffsets)
     let content = compileContent(entry.content?.text ?? "", startOffset: entry.content?.startOffset ?? 0, inherited: blockInherited, lineStarts: analysis.lineStarts, diagnostics: &diagnostics)
-    let block = CompiledBlock(id: entry.block.id, name: entry.block.name, targetWpm: blockInherited.targetWpm, emotion: blockInherited.emotion, speaker: blockInherited.speaker, isImplicit: entry.isImplicit, startWordIndex: 0, endWordIndex: 0, startMs: 0, endMs: 0, phrases: [], words: [])
+    let block = CompiledBlock(id: entry.block.id, name: entry.block.name, targetWpm: blockInherited.targetWpm, emotion: blockInherited.emotion, speaker: blockInherited.speaker, archetype: resolvedArchetype, isImplicit: entry.isImplicit, startWordIndex: 0, endWordIndex: 0, startMs: 0, endMs: 0, phrases: [], words: [])
     return BlockCandidate(block: block, content: content)
 }
 
@@ -1304,7 +1357,7 @@ private func withRangeForBlock(_ block: CompiledBlock, words: [CompiledWord], ph
     let endWordIndex = words.last?.index ?? startWordIndex
     let startMs = words.first?.startMs ?? 0
     let endMs = words.last?.endMs ?? startMs
-    return CompiledBlock(id: block.id, name: block.name, targetWpm: block.targetWpm, emotion: block.emotion, speaker: block.speaker, isImplicit: block.isImplicit, startWordIndex: startWordIndex, endWordIndex: endWordIndex, startMs: startMs, endMs: endMs, phrases: phrases, words: words)
+    return CompiledBlock(id: block.id, name: block.name, targetWpm: block.targetWpm, emotion: block.emotion, speaker: block.speaker, archetype: block.archetype, isImplicit: block.isImplicit, startWordIndex: startWordIndex, endWordIndex: endWordIndex, startMs: startMs, endMs: endMs, phrases: phrases, words: words)
 }
 
 private func finalizeSegmentRange(_ segment: CompiledSegment, blocks: [CompiledBlock], words: [CompiledWord]) -> CompiledSegment {
@@ -1312,7 +1365,7 @@ private func finalizeSegmentRange(_ segment: CompiledSegment, blocks: [CompiledB
     let endWordIndex = words.last?.index ?? startWordIndex
     let startMs = words.first?.startMs ?? 0
     let endMs = words.last?.endMs ?? startMs
-    return CompiledSegment(id: segment.id, name: segment.name, targetWpm: segment.targetWpm, emotion: segment.emotion, speaker: segment.speaker, timing: segment.timing, backgroundColor: segment.backgroundColor, textColor: segment.textColor, accentColor: segment.accentColor, startWordIndex: startWordIndex, endWordIndex: endWordIndex, startMs: startMs, endMs: endMs, blocks: blocks, words: words)
+    return CompiledSegment(id: segment.id, name: segment.name, targetWpm: segment.targetWpm, emotion: segment.emotion, speaker: segment.speaker, archetype: segment.archetype, timing: segment.timing, backgroundColor: segment.backgroundColor, textColor: segment.textColor, accentColor: segment.accentColor, startWordIndex: startWordIndex, endWordIndex: endWordIndex, startMs: startMs, endMs: endMs, blocks: blocks, words: words)
 }
 
 private func compileContent(_ rawText: String, startOffset: Int, inherited: InheritedFormattingState, lineStarts: [Int], diagnostics: inout [TpsDiagnostic]) -> ContentCompilationResult {
@@ -1423,17 +1476,32 @@ private func createScope(_ tag: TagToken, speedOffsets: [String: Int], absoluteO
             diagnostics.append(createDiagnostic(TpsDiagnosticCodes.invalidTagArgument, message: "Tag '\(tag.name)' requires a pronunciation parameter.", start: absoluteOffset, end: absoluteOffset + tag.raw.count, lineStarts: lineStarts))
             return nil
         }
-        return InlineScope(name: tag.name, emphasisLevel: nil, highlight: nil, inlineEmotion: nil, volumeLevel: nil, deliveryMode: nil, phoneticGuide: tag.name == TpsTags.phonetic ? argument : nil, pronunciationGuide: tag.name == TpsTags.pronunciation ? argument : nil, stressGuide: nil, stressWrap: nil, absoluteSpeed: nil, relativeSpeedMultiplier: nil, resetSpeed: nil)
+        return InlineScope(name: tag.name, emphasisLevel: nil, highlight: nil, inlineEmotion: nil, volumeLevel: nil, deliveryMode: nil, articulationStyle: nil, energyLevel: nil, melodyLevel: nil, phoneticGuide: tag.name == TpsTags.phonetic ? argument : nil, pronunciationGuide: tag.name == TpsTags.pronunciation ? argument : nil, stressGuide: nil, stressWrap: nil, absoluteSpeed: nil, relativeSpeedMultiplier: nil, resetSpeed: nil)
     }
-    if tag.name == TpsTags.stress { return InlineScope(name: tag.name, emphasisLevel: nil, highlight: nil, inlineEmotion: nil, volumeLevel: nil, deliveryMode: nil, phoneticGuide: nil, pronunciationGuide: nil, stressGuide: tag.argument, stressWrap: tag.argument == nil, absoluteSpeed: nil, relativeSpeedMultiplier: nil, resetSpeed: nil) }
-    if tag.name == TpsTags.emphasis { return InlineScope(name: tag.name, emphasisLevel: 1, highlight: nil, inlineEmotion: nil, volumeLevel: nil, deliveryMode: nil, phoneticGuide: nil, pronunciationGuide: nil, stressGuide: nil, stressWrap: nil, absoluteSpeed: nil, relativeSpeedMultiplier: nil, resetSpeed: nil) }
-    if tag.name == TpsTags.highlight { return InlineScope(name: tag.name, emphasisLevel: nil, highlight: true, inlineEmotion: nil, volumeLevel: nil, deliveryMode: nil, phoneticGuide: nil, pronunciationGuide: nil, stressGuide: nil, stressWrap: nil, absoluteSpeed: nil, relativeSpeedMultiplier: nil, resetSpeed: nil) }
-    if TpsSpec.volumeLevels.contains(tag.name) { return InlineScope(name: tag.name, emphasisLevel: nil, highlight: nil, inlineEmotion: nil, volumeLevel: tag.name, deliveryMode: nil, phoneticGuide: nil, pronunciationGuide: nil, stressGuide: nil, stressWrap: nil, absoluteSpeed: nil, relativeSpeedMultiplier: nil, resetSpeed: nil) }
-    if TpsSpec.deliveryModes.contains(tag.name) { return InlineScope(name: tag.name, emphasisLevel: nil, highlight: nil, inlineEmotion: nil, volumeLevel: nil, deliveryMode: tag.name, phoneticGuide: nil, pronunciationGuide: nil, stressGuide: nil, stressWrap: nil, absoluteSpeed: nil, relativeSpeedMultiplier: nil, resetSpeed: nil) }
-    if TpsSpec.emotions.contains(tag.name) { return InlineScope(name: tag.name, emphasisLevel: nil, highlight: nil, inlineEmotion: tag.name, volumeLevel: nil, deliveryMode: nil, phoneticGuide: nil, pronunciationGuide: nil, stressGuide: nil, stressWrap: nil, absoluteSpeed: nil, relativeSpeedMultiplier: nil, resetSpeed: nil) }
-    if let absoluteSpeed = tryParseAbsoluteWpm(tag.name) { return InlineScope(name: tag.name, emphasisLevel: nil, highlight: nil, inlineEmotion: nil, volumeLevel: nil, deliveryMode: nil, phoneticGuide: nil, pronunciationGuide: nil, stressGuide: nil, stressWrap: nil, absoluteSpeed: absoluteSpeed, relativeSpeedMultiplier: nil, resetSpeed: nil) }
-    if let multiplier = resolveSpeedMultiplier(tag.name, speedOffsets: speedOffsets) { return InlineScope(name: tag.name, emphasisLevel: nil, highlight: nil, inlineEmotion: nil, volumeLevel: nil, deliveryMode: nil, phoneticGuide: nil, pronunciationGuide: nil, stressGuide: nil, stressWrap: nil, absoluteSpeed: nil, relativeSpeedMultiplier: multiplier, resetSpeed: nil) }
-    if tag.name == TpsTags.normal { return InlineScope(name: tag.name, emphasisLevel: nil, highlight: nil, inlineEmotion: nil, volumeLevel: nil, deliveryMode: nil, phoneticGuide: nil, pronunciationGuide: nil, stressGuide: nil, stressWrap: nil, absoluteSpeed: nil, relativeSpeedMultiplier: nil, resetSpeed: true) }
+    if tag.name == TpsTags.stress { return InlineScope(name: tag.name, emphasisLevel: nil, highlight: nil, inlineEmotion: nil, volumeLevel: nil, deliveryMode: nil, articulationStyle: nil, energyLevel: nil, melodyLevel: nil, phoneticGuide: nil, pronunciationGuide: nil, stressGuide: tag.argument, stressWrap: tag.argument == nil, absoluteSpeed: nil, relativeSpeedMultiplier: nil, resetSpeed: nil) }
+    if tag.name == TpsTags.emphasis { return InlineScope(name: tag.name, emphasisLevel: 1, highlight: nil, inlineEmotion: nil, volumeLevel: nil, deliveryMode: nil, articulationStyle: nil, energyLevel: nil, melodyLevel: nil, phoneticGuide: nil, pronunciationGuide: nil, stressGuide: nil, stressWrap: nil, absoluteSpeed: nil, relativeSpeedMultiplier: nil, resetSpeed: nil) }
+    if tag.name == TpsTags.highlight { return InlineScope(name: tag.name, emphasisLevel: nil, highlight: true, inlineEmotion: nil, volumeLevel: nil, deliveryMode: nil, articulationStyle: nil, energyLevel: nil, melodyLevel: nil, phoneticGuide: nil, pronunciationGuide: nil, stressGuide: nil, stressWrap: nil, absoluteSpeed: nil, relativeSpeedMultiplier: nil, resetSpeed: nil) }
+    if TpsSpec.volumeLevels.contains(tag.name) { return InlineScope(name: tag.name, emphasisLevel: nil, highlight: nil, inlineEmotion: nil, volumeLevel: tag.name, deliveryMode: nil, articulationStyle: nil, energyLevel: nil, melodyLevel: nil, phoneticGuide: nil, pronunciationGuide: nil, stressGuide: nil, stressWrap: nil, absoluteSpeed: nil, relativeSpeedMultiplier: nil, resetSpeed: nil) }
+    if TpsSpec.deliveryModes.contains(tag.name) { return InlineScope(name: tag.name, emphasisLevel: nil, highlight: nil, inlineEmotion: nil, volumeLevel: nil, deliveryMode: tag.name, articulationStyle: nil, energyLevel: nil, melodyLevel: nil, phoneticGuide: nil, pronunciationGuide: nil, stressGuide: nil, stressWrap: nil, absoluteSpeed: nil, relativeSpeedMultiplier: nil, resetSpeed: nil) }
+    if TpsSpec.articulationStyles.contains(tag.name) { return InlineScope(name: tag.name, emphasisLevel: nil, highlight: nil, inlineEmotion: nil, volumeLevel: nil, deliveryMode: nil, articulationStyle: tag.name, energyLevel: nil, melodyLevel: nil, phoneticGuide: nil, pronunciationGuide: nil, stressGuide: nil, stressWrap: nil, absoluteSpeed: nil, relativeSpeedMultiplier: nil, resetSpeed: nil) }
+    if tag.name == TpsTags.energy {
+        guard let argument = tag.argument, let level = Int(argument), level >= TpsSpec.energyLevelMin && level <= TpsSpec.energyLevelMax else {
+            diagnostics.append(createDiagnostic(TpsDiagnosticCodes.invalidEnergyLevel, message: "Energy level must be an integer between \(TpsSpec.energyLevelMin) and \(TpsSpec.energyLevelMax).", start: absoluteOffset, end: absoluteOffset + tag.raw.count, lineStarts: lineStarts))
+            return nil
+        }
+        return InlineScope(name: tag.name, emphasisLevel: nil, highlight: nil, inlineEmotion: nil, volumeLevel: nil, deliveryMode: nil, articulationStyle: nil, energyLevel: level, melodyLevel: nil, phoneticGuide: nil, pronunciationGuide: nil, stressGuide: nil, stressWrap: nil, absoluteSpeed: nil, relativeSpeedMultiplier: nil, resetSpeed: nil)
+    }
+    if tag.name == TpsTags.melody {
+        guard let argument = tag.argument, let level = Int(argument), level >= TpsSpec.melodyLevelMin && level <= TpsSpec.melodyLevelMax else {
+            diagnostics.append(createDiagnostic(TpsDiagnosticCodes.invalidMelodyLevel, message: "Melody level must be an integer between \(TpsSpec.melodyLevelMin) and \(TpsSpec.melodyLevelMax).", start: absoluteOffset, end: absoluteOffset + tag.raw.count, lineStarts: lineStarts))
+            return nil
+        }
+        return InlineScope(name: tag.name, emphasisLevel: nil, highlight: nil, inlineEmotion: nil, volumeLevel: nil, deliveryMode: nil, articulationStyle: nil, energyLevel: nil, melodyLevel: level, phoneticGuide: nil, pronunciationGuide: nil, stressGuide: nil, stressWrap: nil, absoluteSpeed: nil, relativeSpeedMultiplier: nil, resetSpeed: nil)
+    }
+    if TpsSpec.emotions.contains(tag.name) { return InlineScope(name: tag.name, emphasisLevel: nil, highlight: nil, inlineEmotion: tag.name, volumeLevel: nil, deliveryMode: nil, articulationStyle: nil, energyLevel: nil, melodyLevel: nil, phoneticGuide: nil, pronunciationGuide: nil, stressGuide: nil, stressWrap: nil, absoluteSpeed: nil, relativeSpeedMultiplier: nil, resetSpeed: nil) }
+    if let absoluteSpeed = tryParseAbsoluteWpm(tag.name) { return InlineScope(name: tag.name, emphasisLevel: nil, highlight: nil, inlineEmotion: nil, volumeLevel: nil, deliveryMode: nil, articulationStyle: nil, energyLevel: nil, melodyLevel: nil, phoneticGuide: nil, pronunciationGuide: nil, stressGuide: nil, stressWrap: nil, absoluteSpeed: absoluteSpeed, relativeSpeedMultiplier: nil, resetSpeed: nil) }
+    if let multiplier = resolveSpeedMultiplier(tag.name, speedOffsets: speedOffsets) { return InlineScope(name: tag.name, emphasisLevel: nil, highlight: nil, inlineEmotion: nil, volumeLevel: nil, deliveryMode: nil, articulationStyle: nil, energyLevel: nil, melodyLevel: nil, phoneticGuide: nil, pronunciationGuide: nil, stressGuide: nil, stressWrap: nil, absoluteSpeed: nil, relativeSpeedMultiplier: multiplier, resetSpeed: nil) }
+    if tag.name == TpsTags.normal { return InlineScope(name: tag.name, emphasisLevel: nil, highlight: nil, inlineEmotion: nil, volumeLevel: nil, deliveryMode: nil, articulationStyle: nil, energyLevel: nil, melodyLevel: nil, phoneticGuide: nil, pronunciationGuide: nil, stressGuide: nil, stressWrap: nil, absoluteSpeed: nil, relativeSpeedMultiplier: nil, resetSpeed: true) }
     diagnostics.append(createDiagnostic(TpsDiagnosticCodes.unknownTag, message: "Tag '\(tag.name)' is not part of the TPS specification.", start: absoluteOffset, end: absoluteOffset + tag.raw.count, lineStarts: lineStarts))
     return nil
 }
@@ -1448,7 +1516,7 @@ private func tryHandleMarkdownMarker(_ text: String, index: Int, scopes: inout [
         return true
     }
     if substring(text, index + markerLength).range(of: marker) == nil { return false }
-    scopes.append(InlineScope(name: scopeName, emphasisLevel: markerLength == 2 ? 2 : 1, highlight: nil, inlineEmotion: nil, volumeLevel: nil, deliveryMode: nil, phoneticGuide: nil, pronunciationGuide: nil, stressGuide: nil, stressWrap: nil, absoluteSpeed: nil, relativeSpeedMultiplier: nil, resetSpeed: nil))
+    scopes.append(InlineScope(name: scopeName, emphasisLevel: markerLength == 2 ? 2 : 1, highlight: nil, inlineEmotion: nil, volumeLevel: nil, deliveryMode: nil, articulationStyle: nil, energyLevel: nil, melodyLevel: nil, phoneticGuide: nil, pronunciationGuide: nil, stressGuide: nil, stressWrap: nil, absoluteSpeed: nil, relativeSpeedMultiplier: nil, resetSpeed: nil))
     return true
 }
 
@@ -1535,7 +1603,7 @@ private func flushPhrase(phrases: inout [PhraseSeed], currentPhrase: inout [Word
 }
 
 private func createControlWord(kind: String, inherited: InheritedFormattingState, pauseDurationMs: Int? = nil, editPointPriority: String? = nil) -> WordSeed {
-    WordSeed(kind: kind, cleanText: "", characterCount: 0, orpPosition: 0, displayDurationMs: pauseDurationMs ?? 0, metadata: WordMetadata(isEmphasis: false, emphasisLevel: 0, isPause: kind == "pause", pauseDurationMs: pauseDurationMs, isHighlight: false, isBreath: kind == "breath", isEditPoint: kind == "edit-point", editPointPriority: editPointPriority, emotionHint: inherited.emotion, inlineEmotionHint: nil, volumeLevel: nil, deliveryMode: nil, phoneticGuide: nil, pronunciationGuide: nil, stressText: nil, stressGuide: nil, speedOverride: nil, speedMultiplier: nil, speaker: inherited.speaker, headCue: TpsSpec.emotionHeadCues[inherited.emotion]))
+    WordSeed(kind: kind, cleanText: "", characterCount: 0, orpPosition: 0, displayDurationMs: pauseDurationMs ?? 0, metadata: WordMetadata(isEmphasis: false, emphasisLevel: 0, isPause: kind == "pause", pauseDurationMs: pauseDurationMs, isHighlight: false, isBreath: kind == "breath", isEditPoint: kind == "edit-point", editPointPriority: editPointPriority, emotionHint: inherited.emotion, inlineEmotionHint: nil, volumeLevel: nil, deliveryMode: nil, phoneticGuide: nil, pronunciationGuide: nil, stressText: nil, stressGuide: nil, speedOverride: nil, speedMultiplier: nil, articulationStyle: nil, energyLevel: nil, melodyLevel: nil, speaker: inherited.speaker, headCue: TpsSpec.emotionHeadCues[inherited.emotion]))
 }
 
 private func resolveActiveState(_ scopes: [InlineScope], inherited: InheritedFormattingState) -> ActiveInlineState {
@@ -1549,6 +1617,9 @@ private func resolveActiveState(_ scopes: [InlineScope], inherited: InheritedFor
     var inlineEmotion: String? = nil
     var volumeLevel: String? = nil
     var deliveryMode: String? = nil
+    var articulationStyle: String? = nil
+    var energyLevel: Int? = nil
+    var melodyLevel: Int? = nil
     var phoneticGuide: String? = nil
     var pronunciationGuide: String? = nil
     var stressGuide: String? = nil
@@ -1576,12 +1647,15 @@ private func resolveActiveState(_ scopes: [InlineScope], inherited: InheritedFor
         }
         volumeLevel = scope.volumeLevel ?? volumeLevel
         deliveryMode = scope.deliveryMode ?? deliveryMode
+        articulationStyle = scope.articulationStyle ?? articulationStyle
+        if let scopeEnergyLevel = scope.energyLevel { energyLevel = scopeEnergyLevel }
+        if let scopeMelodyLevel = scope.melodyLevel { melodyLevel = scopeMelodyLevel }
         phoneticGuide = scope.phoneticGuide ?? phoneticGuide
         pronunciationGuide = scope.pronunciationGuide ?? pronunciationGuide
         stressGuide = scope.stressGuide ?? stressGuide
         stressWrap = stressWrap || (scope.stressWrap ?? false)
     }
-    return ActiveInlineState(emotion: emotion, inlineEmotion: inlineEmotion, speaker: inherited.speaker, emphasisLevel: emphasisLevel, highlight: highlight, volumeLevel: volumeLevel, deliveryMode: deliveryMode, phoneticGuide: phoneticGuide, pronunciationGuide: pronunciationGuide, stressGuide: stressGuide, stressWrap: stressWrap, hasAbsoluteSpeed: hasAbsoluteSpeed, absoluteSpeed: absoluteSpeed, hasRelativeSpeed: hasRelativeSpeed, relativeSpeedMultiplier: relativeSpeedMultiplier)
+    return ActiveInlineState(emotion: emotion, inlineEmotion: inlineEmotion, speaker: inherited.speaker, emphasisLevel: emphasisLevel, highlight: highlight, volumeLevel: volumeLevel, deliveryMode: deliveryMode, articulationStyle: articulationStyle, energyLevel: energyLevel, melodyLevel: melodyLevel, phoneticGuide: phoneticGuide, pronunciationGuide: pronunciationGuide, stressGuide: stressGuide, stressWrap: stressWrap, hasAbsoluteSpeed: hasAbsoluteSpeed, absoluteSpeed: absoluteSpeed, hasRelativeSpeed: hasRelativeSpeed, relativeSpeedMultiplier: relativeSpeedMultiplier)
 }
 
 private func createWordView(_ word: CompiledWord, state: PlayerState) -> TpsPlaybackWordView {
@@ -1609,6 +1683,8 @@ private func createDiagnostic(_ code: String, message: String, start: Int, end: 
 private func hasErrors(_ diagnostics: [TpsDiagnostic]) -> Bool { diagnostics.contains { $0.severity == "error" } }
 private func normalizeValue(_ value: String?) -> String? { let trimmed = value?.trimmingCharacters(in: .whitespacesAndNewlines); return trimmed?.isEmpty == false ? trimmed : nil }
 private func isKnownEmotion(_ value: String) -> Bool { TpsSpec.emotions.contains(value.lowercased()) }
+private func isKnownArchetype(_ value: String?) -> Bool { guard let value else { return false }; return TpsSpec.archetypes.contains(value.lowercased()) }
+private func resolveArchetypeWpm(_ archetype: String?) -> Int? { guard let archetype else { return nil }; return TpsSpec.archetypeRecommendedWpm[archetype.lowercased()] }
 private func resolveEmotion(_ candidate: String?, fallback: String = TpsSpec.defaultEmotion) -> String { guard let normalized = normalizeValue(candidate)?.lowercased(), isKnownEmotion(normalized) else { return fallback }; return normalized }
 private func resolvePalette(_ emotion: String?) -> [String: String] { TpsSpec.emotionPalettes[resolveEmotion(emotion)] ?? TpsSpec.emotionPalettes[TpsSpec.defaultEmotion]! }
 private func resolveBaseWpm(_ metadata: [String: String]) -> Int { clampWpm(Int(metadata[TpsFrontMatterKeys.baseWpm] ?? "") ?? TpsSpec.defaultBaseWpm, fallback: TpsSpec.defaultBaseWpm) }

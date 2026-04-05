@@ -1,9 +1,11 @@
-import { TpsDiagnosticCodes, TpsEmotions, TpsFrontMatterKeys, TpsLegacyKeys, TpsSpec, TpsTags } from "./constants.js";
+import { TpsArchetypes, TpsDiagnosticCodes, TpsEmotions, TpsFrontMatterKeys, TpsLegacyKeys, TpsSpec, TpsTags } from "./constants.js";
 const trailingPunctuation = [".", "!", "?", ",", ";", ":", "\"", "'", ")", "]", "}"];
 const timeFormats = [/^\d{1,2}:\d{2}$/u];
 const legacyKeys = new Set(Object.values(TpsLegacyKeys));
 const emotionSet = new Set(TpsEmotions);
+const archetypeSet = new Set(TpsArchetypes);
 const emotionPalettes = TpsSpec.emotionPalettes;
+const archetypeWpmMap = TpsSpec.archetypeRecommendedWpm;
 const knownTags = new Set(Object.values(TpsTags));
 export function normalizeValue(value) {
     const trimmed = value?.trim();
@@ -97,6 +99,15 @@ export function resolveEffectiveWpm(inheritedWpm, speedOverride, speedMultiplier
         return Math.max(1, Math.round(inheritedWpm * speedMultiplier));
     }
     return Math.max(1, inheritedWpm);
+}
+export function isKnownArchetype(value) {
+    return value ? archetypeSet.has(value.toLowerCase()) : false;
+}
+export function resolveArchetypeWpm(archetype) {
+    if (!archetype) {
+        return undefined;
+    }
+    return archetypeWpmMap[archetype.toLowerCase()];
 }
 export function isKnownInlineTag(tag) {
     const lower = tag.toLowerCase();

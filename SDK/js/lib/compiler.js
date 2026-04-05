@@ -2,7 +2,7 @@ import { compileContent } from "./content-compiler.js";
 import { normalizeCompiledScript } from "./compiled-script.js";
 import { hasErrors } from "./diagnostics.js";
 import { createParseResult, createValidationResult, parseDocument } from "./parser.js";
-import { resolveBaseWpm, resolveEmotion, resolveSpeedOffsets } from "./runtime-helpers.js";
+import { resolveArchetypeWpm, resolveBaseWpm, resolveEmotion, resolveSpeedOffsets } from "./runtime-helpers.js";
 export function validateTps(source) {
     const analysis = parseDocument(source);
     compileAnalysis(analysis);
@@ -35,6 +35,7 @@ function compileSegment(parsedSegment, baseWpm, speedOffsets, analysis) {
         targetWpm: parsedSegment.segment.targetWpm,
         emotion: segmentEmotion,
         speaker: parsedSegment.segment.speaker,
+        archetype: parsedSegment.segment.archetype,
         speedOffsets
     };
     const blocks = buildBlocks(parsedSegment).map((entry) => compileBlock(entry, inherited, analysis));
@@ -43,6 +44,7 @@ function compileSegment(parsedSegment, baseWpm, speedOffsets, analysis) {
             ...parsedSegment.segment,
             targetWpm: inherited.targetWpm,
             emotion: segmentEmotion,
+            archetype: parsedSegment.segment.archetype,
             backgroundColor: parsedSegment.segment.backgroundColor,
             textColor: parsedSegment.segment.textColor,
             accentColor: parsedSegment.segment.accentColor,
@@ -66,7 +68,8 @@ function buildBlocks(parsedSegment) {
                 content: parsedSegment.leadingContent.text,
                 targetWpm: parsedSegment.segment.targetWpm,
                 emotion: parsedSegment.segment.emotion,
-                speaker: parsedSegment.segment.speaker
+                speaker: parsedSegment.segment.speaker,
+                archetype: parsedSegment.segment.archetype
             },
             isImplicit: true,
             content: parsedSegment.leadingContent
@@ -80,7 +83,8 @@ function buildBlocks(parsedSegment) {
                 content: parsedSegment.directContent?.text ?? "",
                 targetWpm: parsedSegment.segment.targetWpm,
                 emotion: parsedSegment.segment.emotion,
-                speaker: parsedSegment.segment.speaker
+                speaker: parsedSegment.segment.speaker,
+                archetype: parsedSegment.segment.archetype
             },
             isImplicit: true,
             content: parsedSegment.directContent
@@ -92,10 +96,13 @@ function buildBlocks(parsedSegment) {
     return blocks;
 }
 function compileBlock(entry, inherited, analysis) {
+    const resolvedArchetype = entry.block.archetype ?? inherited.archetype;
+    const blockWpm = entry.block.targetWpm ?? resolveArchetypeWpm(resolvedArchetype) ?? inherited.targetWpm;
     const blockInherited = {
-        targetWpm: entry.block.targetWpm ?? inherited.targetWpm,
+        targetWpm: blockWpm,
         emotion: resolveEmotion(entry.block.emotion, inherited.emotion),
         speaker: entry.block.speaker ?? inherited.speaker,
+        archetype: resolvedArchetype,
         speedOffsets: inherited.speedOffsets
     };
     const content = compileContent(entry.content?.text ?? "", entry.content?.startOffset ?? 0, blockInherited, analysis.lineStarts, analysis.diagnostics);
@@ -105,6 +112,7 @@ function compileBlock(entry, inherited, analysis) {
             targetWpm: blockInherited.targetWpm,
             emotion: blockInherited.emotion,
             speaker: blockInherited.speaker,
+            archetype: resolvedArchetype,
             isImplicit: entry.isImplicit,
             startWordIndex: 0,
             endWordIndex: 0,

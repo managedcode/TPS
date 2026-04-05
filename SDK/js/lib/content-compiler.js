@@ -137,6 +137,25 @@ function createScope(tag, speedOffsets, absoluteOffset, lineStarts, diagnostics)
     if (TpsSpec.deliveryModes.includes(tag.name)) {
         return { name: tag.name, deliveryMode: tag.name };
     }
+    if (TpsSpec.articulationStyles.includes(tag.name)) {
+        return { name: tag.name, articulationStyle: tag.name };
+    }
+    if (tag.name === TpsTags.energy) {
+        const level = Number.parseInt(tag.argument ?? "", 10);
+        if (!Number.isFinite(level) || level < TpsSpec.energyLevels.min || level > TpsSpec.energyLevels.max) {
+            diagnostics.push(createDiagnostic(TpsDiagnosticCodes.invalidEnergyLevel, `Energy level must be an integer between ${TpsSpec.energyLevels.min} and ${TpsSpec.energyLevels.max}.`, absoluteOffset, absoluteOffset + tag.raw.length, lineStarts));
+            return undefined;
+        }
+        return { name: tag.name, energyLevel: level };
+    }
+    if (tag.name === TpsTags.melody) {
+        const level = Number.parseInt(tag.argument ?? "", 10);
+        if (!Number.isFinite(level) || level < TpsSpec.melodyLevels.min || level > TpsSpec.melodyLevels.max) {
+            diagnostics.push(createDiagnostic(TpsDiagnosticCodes.invalidMelodyLevel, `Melody level must be an integer between ${TpsSpec.melodyLevels.min} and ${TpsSpec.melodyLevels.max}.`, absoluteOffset, absoluteOffset + tag.raw.length, lineStarts));
+            return undefined;
+        }
+        return { name: tag.name, melodyLevel: level };
+    }
     if (TpsSpec.emotions.includes(tag.name)) {
         return { name: tag.name, inlineEmotion: tag.name };
     }
@@ -297,6 +316,9 @@ function resolveActiveState(scopes, inherited) {
     let inlineEmotion;
     let volumeLevel;
     let deliveryMode;
+    let articulationStyle;
+    let energyLevel;
+    let melodyLevel;
     let phoneticGuide;
     let pronunciationGuide;
     let stressGuide;
@@ -324,6 +346,13 @@ function resolveActiveState(scopes, inherited) {
         }
         volumeLevel = scope.volumeLevel ?? volumeLevel;
         deliveryMode = scope.deliveryMode ?? deliveryMode;
+        articulationStyle = scope.articulationStyle ?? articulationStyle;
+        if (typeof scope.energyLevel === "number") {
+            energyLevel = scope.energyLevel;
+        }
+        if (typeof scope.melodyLevel === "number") {
+            melodyLevel = scope.melodyLevel;
+        }
         phoneticGuide = scope.phoneticGuide ?? phoneticGuide;
         pronunciationGuide = scope.pronunciationGuide ?? pronunciationGuide;
         stressGuide = scope.stressGuide ?? stressGuide;
@@ -337,6 +366,9 @@ function resolveActiveState(scopes, inherited) {
         highlight,
         volumeLevel,
         deliveryMode,
+        articulationStyle,
+        energyLevel,
+        melodyLevel,
         phoneticGuide,
         pronunciationGuide,
         stressGuide,
@@ -370,6 +402,9 @@ class TokenAccumulator {
     inlineEmotionHint;
     volumeLevel;
     deliveryMode;
+    articulationStyle;
+    energyLevel;
+    melodyLevel;
     phoneticGuide;
     pronunciationGuide;
     stressGuide;
@@ -385,6 +420,13 @@ class TokenAccumulator {
         this.inlineEmotionHint = state.inlineEmotion ?? this.inlineEmotionHint;
         this.volumeLevel = state.volumeLevel ?? this.volumeLevel;
         this.deliveryMode = state.deliveryMode ?? this.deliveryMode;
+        this.articulationStyle = state.articulationStyle ?? this.articulationStyle;
+        if (typeof state.energyLevel === "number") {
+            this.energyLevel = state.energyLevel;
+        }
+        if (typeof state.melodyLevel === "number") {
+            this.melodyLevel = state.melodyLevel;
+        }
         this.phoneticGuide = state.phoneticGuide ?? this.phoneticGuide;
         this.pronunciationGuide = state.pronunciationGuide ?? this.pronunciationGuide;
         this.stressGuide = state.stressGuide ?? this.stressGuide;
@@ -411,6 +453,9 @@ class TokenAccumulator {
             inlineEmotionHint: this.inlineEmotionHint,
             volumeLevel: this.volumeLevel,
             deliveryMode: this.deliveryMode,
+            articulationStyle: this.articulationStyle,
+            energyLevel: this.energyLevel,
+            melodyLevel: this.melodyLevel,
             phoneticGuide: this.phoneticGuide,
             pronunciationGuide: this.pronunciationGuide,
             stressText: this.stressText.length > 0 ? this.stressText.join("") : undefined,

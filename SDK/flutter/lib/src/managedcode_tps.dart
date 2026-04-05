@@ -112,6 +112,7 @@ class TpsSegment {
     this.targetWpm,
     this.emotion,
     this.speaker,
+    this.archetype,
     this.timing,
     this.backgroundColor,
     this.textColor,
@@ -125,6 +126,7 @@ class TpsSegment {
   final int? targetWpm;
   final String? emotion;
   final String? speaker;
+  final String? archetype;
   final String? timing;
   final String? backgroundColor;
   final String? textColor;
@@ -141,6 +143,7 @@ class TpsBlock {
     this.targetWpm,
     this.emotion,
     this.speaker,
+    this.archetype,
   });
 
   final String id;
@@ -149,6 +152,7 @@ class TpsBlock {
   final int? targetWpm;
   final String? emotion;
   final String? speaker;
+  final String? archetype;
 }
 
 class WordMetadata {
@@ -173,6 +177,9 @@ class WordMetadata {
     this.speedMultiplier,
     this.speaker,
     this.headCue,
+    this.articulationStyle,
+    this.energyLevel,
+    this.melodyLevel,
   });
 
   final bool isEmphasis;
@@ -195,6 +202,9 @@ class WordMetadata {
   final double? speedMultiplier;
   final String? speaker;
   final String? headCue;
+  final String? articulationStyle;
+  final int? energyLevel;
+  final int? melodyLevel;
 
   WordMetadata copyWith({
     bool? isEmphasis,
@@ -217,6 +227,9 @@ class WordMetadata {
     double? speedMultiplier,
     String? speaker,
     String? headCue,
+    String? articulationStyle,
+    int? energyLevel,
+    int? melodyLevel,
   }) =>
       WordMetadata(
         isEmphasis: isEmphasis ?? this.isEmphasis,
@@ -239,6 +252,9 @@ class WordMetadata {
         speedMultiplier: speedMultiplier ?? this.speedMultiplier,
         speaker: speaker ?? this.speaker,
         headCue: headCue ?? this.headCue,
+        articulationStyle: articulationStyle ?? this.articulationStyle,
+        energyLevel: energyLevel ?? this.energyLevel,
+        melodyLevel: melodyLevel ?? this.melodyLevel,
       );
 
   Map<String, Object?> toJson() => _compact({
@@ -262,6 +278,9 @@ class WordMetadata {
         "speedMultiplier": speedMultiplier,
         "speaker": speaker,
         "headCue": headCue,
+        "articulationStyle": articulationStyle,
+        "energyLevel": energyLevel,
+        "melodyLevel": melodyLevel,
       });
 }
 
@@ -388,6 +407,7 @@ class CompiledBlock {
     required this.phrases,
     required this.words,
     this.speaker,
+    this.archetype,
   });
 
   final String id;
@@ -395,6 +415,7 @@ class CompiledBlock {
   final int targetWpm;
   final String emotion;
   final String? speaker;
+  final String? archetype;
   final bool isImplicit;
   final int startWordIndex;
   final int endWordIndex;
@@ -409,6 +430,7 @@ class CompiledBlock {
         "targetWpm": targetWpm,
         "emotion": emotion,
         "speaker": speaker,
+        "archetype": archetype,
         "isImplicit": isImplicit,
         "startWordIndex": startWordIndex,
         "endWordIndex": endWordIndex,
@@ -435,6 +457,7 @@ class CompiledSegment {
     required this.blocks,
     required this.words,
     this.speaker,
+    this.archetype,
     this.timing,
   });
 
@@ -443,6 +466,7 @@ class CompiledSegment {
   final int targetWpm;
   final String emotion;
   final String? speaker;
+  final String? archetype;
   final String? timing;
   final String backgroundColor;
   final String textColor;
@@ -460,6 +484,7 @@ class CompiledSegment {
         "targetWpm": targetWpm,
         "emotion": emotion,
         "speaker": speaker,
+        "archetype": archetype,
         "timing": timing,
         "backgroundColor": backgroundColor,
         "textColor": textColor,
@@ -740,9 +765,12 @@ abstract final class TpsTags {
   static const building = "building";
   static const editPoint = "edit_point";
   static const emphasis = "emphasis";
+  static const energy = "energy";
   static const fast = "fast";
   static const highlight = "highlight";
+  static const legato = "legato";
   static const loud = "loud";
+  static const melody = "melody";
   static const normal = "normal";
   static const pause = "pause";
   static const phonetic = "phonetic";
@@ -751,6 +779,7 @@ abstract final class TpsTags {
   static const sarcasm = "sarcasm";
   static const slow = "slow";
   static const soft = "soft";
+  static const staccato = "staccato";
   static const stress = "stress";
   static const whisper = "whisper";
   static const xfast = "xfast";
@@ -766,6 +795,9 @@ abstract final class TpsDiagnosticCodes {
   static const invalidPause = "invalid-pause";
   static const invalidTagArgument = "invalid-tag-argument";
   static const invalidWpm = "invalid-wpm";
+  static const invalidEnergyLevel = "invalid-energy-level";
+  static const invalidMelodyLevel = "invalid-melody-level";
+  static const unknownArchetype = "unknown-archetype";
   static const mismatchedClosingTag = "mismatched-closing-tag";
   static const unclosedTag = "unclosed-tag";
 }
@@ -780,6 +812,7 @@ abstract final class TpsSpec {
   static const shortPauseDurationMs = 300;
   static const mediumPauseDurationMs = 600;
   static const speakerPrefix = "Speaker:";
+  static const archetypePrefix = "Archetype:";
   static const wpmSuffix = "WPM";
   static const emotions = [
     "neutral",
@@ -797,6 +830,27 @@ abstract final class TpsSpec {
   ];
   static const volumeLevels = [TpsTags.loud, TpsTags.soft, TpsTags.whisper];
   static const deliveryModes = [TpsTags.sarcasm, TpsTags.aside, TpsTags.rhetorical, TpsTags.building];
+  static const articulationStyles = [TpsTags.legato, TpsTags.staccato];
+  static const archetypeFriend = "friend";
+  static const archetypeMotivator = "motivator";
+  static const archetypeEducator = "educator";
+  static const archetypeCoach = "coach";
+  static const archetypeStoryteller = "storyteller";
+  static const archetypeEntertainer = "entertainer";
+
+  static const archetypes = [archetypeFriend, archetypeMotivator, archetypeEducator, archetypeCoach, archetypeStoryteller, archetypeEntertainer];
+  static const archetypeRecommendedWpm = {
+    archetypeFriend: 135,
+    archetypeMotivator: 155,
+    archetypeEducator: 120,
+    archetypeCoach: 145,
+    archetypeStoryteller: 125,
+    archetypeEntertainer: 150,
+  };
+  static const energyLevelMin = 1;
+  static const energyLevelMax = 10;
+  static const melodyLevelMin = 1;
+  static const melodyLevelMax = 10;
   static const relativeSpeedTags = [TpsTags.xslow, TpsTags.slow, TpsTags.fast, TpsTags.xfast, TpsTags.normal];
   static const editPointPriorities = ["high", "medium", "low"];
   static const defaultSpeedOffsets = {
@@ -842,9 +896,12 @@ abstract final class TpsKeywords {
     "building": TpsTags.building,
     "editPoint": TpsTags.editPoint,
     "emphasis": TpsTags.emphasis,
+    "energy": TpsTags.energy,
     "fast": TpsTags.fast,
     "highlight": TpsTags.highlight,
+    "legato": TpsTags.legato,
     "loud": TpsTags.loud,
+    "melody": TpsTags.melody,
     "normal": TpsTags.normal,
     "pause": TpsTags.pause,
     "phonetic": TpsTags.phonetic,
@@ -853,6 +910,7 @@ abstract final class TpsKeywords {
     "sarcasm": TpsTags.sarcasm,
     "slow": TpsTags.slow,
     "soft": TpsTags.soft,
+    "staccato": TpsTags.staccato,
     "stress": TpsTags.stress,
     "whisper": TpsTags.whisper,
     "xfast": TpsTags.xfast,
@@ -861,6 +919,8 @@ abstract final class TpsKeywords {
   static const emotions = TpsSpec.emotions;
   static const volumeLevels = TpsSpec.volumeLevels;
   static const deliveryModes = TpsSpec.deliveryModes;
+  static const articulationStyles = TpsSpec.articulationStyles;
+  static const archetypes = TpsSpec.archetypes;
   static const relativeSpeedTags = TpsSpec.relativeSpeedTags;
   static const editPointPriorities = TpsSpec.editPointPriorities;
 }
@@ -1495,12 +1555,14 @@ class _ParsedHeader {
     this.emotion,
     this.timing,
     this.speaker,
+    this.archetype,
   });
   final String name;
   final int? targetWpm;
   final String? emotion;
   final String? timing;
   final String? speaker;
+  final String? archetype;
 
   _ParsedHeader copyWith({
     String? name,
@@ -1508,6 +1570,7 @@ class _ParsedHeader {
     String? emotion,
     String? timing,
     String? speaker,
+    String? archetype,
   }) =>
       _ParsedHeader(
         name: name ?? this.name,
@@ -1515,6 +1578,7 @@ class _ParsedHeader {
         emotion: emotion ?? this.emotion,
         timing: timing ?? this.timing,
         speaker: speaker ?? this.speaker,
+        archetype: archetype ?? this.archetype,
       );
 }
 
@@ -1551,10 +1615,12 @@ class _InheritedFormattingState {
     required this.emotion,
     required this.speedOffsets,
     this.speaker,
+    this.archetype,
   });
   final int targetWpm;
   final String emotion;
   final String? speaker;
+  final String? archetype;
   final Map<String, int> speedOffsets;
 }
 
@@ -1579,6 +1645,9 @@ class _InlineScope {
     this.absoluteSpeed,
     this.relativeSpeedMultiplier,
     this.resetSpeed,
+    this.articulationStyle,
+    this.energyLevel,
+    this.melodyLevel,
   });
 
   final String name;
@@ -1594,6 +1663,9 @@ class _InlineScope {
   final int? absoluteSpeed;
   final double? relativeSpeedMultiplier;
   final bool? resetSpeed;
+  final String? articulationStyle;
+  final int? energyLevel;
+  final int? melodyLevel;
 }
 
 class _LiteralScope {
@@ -1633,6 +1705,9 @@ class _ActiveInlineState {
     this.phoneticGuide,
     this.pronunciationGuide,
     this.stressGuide,
+    this.articulationStyle,
+    this.energyLevel,
+    this.melodyLevel,
   });
 
   final String emotion;
@@ -1650,6 +1725,9 @@ class _ActiveInlineState {
   final int absoluteSpeed;
   final bool hasRelativeSpeed;
   final double relativeSpeedMultiplier;
+  final String? articulationStyle;
+  final int? energyLevel;
+  final int? melodyLevel;
 }
 
 class _TokenAccumulator {
@@ -1668,6 +1746,9 @@ class _TokenAccumulator {
   bool hasRelativeSpeed = false;
   double relativeSpeedMultiplier = 1;
   String? speaker;
+  String? articulationStyle;
+  int? energyLevel;
+  int? melodyLevel;
 
   void apply(_ActiveInlineState state, String character) {
     emphasisLevel = math.max(emphasisLevel, state.emphasisLevel);
@@ -1680,6 +1761,13 @@ class _TokenAccumulator {
     pronunciationGuide = state.pronunciationGuide ?? pronunciationGuide;
     stressGuide = state.stressGuide ?? stressGuide;
     speaker = state.speaker;
+    articulationStyle = state.articulationStyle ?? articulationStyle;
+    if (state.energyLevel != null) {
+      energyLevel = state.energyLevel;
+    }
+    if (state.melodyLevel != null) {
+      melodyLevel = state.melodyLevel;
+    }
     if (state.stressWrap) {
       _stressText.add(character);
     }
@@ -1709,6 +1797,9 @@ class _TokenAccumulator {
       stressGuide: stressGuide,
       speaker: speaker,
       headCue: TpsSpec.emotionHeadCues[(emotionHint.isEmpty ? TpsSpec.defaultEmotion : emotionHint)],
+      articulationStyle: articulationStyle,
+      energyLevel: energyLevel,
+      melodyLevel: melodyLevel,
     );
     if (hasAbsoluteSpeed) {
       final effectiveWpm = hasRelativeSpeed ? math.max(1, (absoluteSpeed * relativeSpeedMultiplier).round()) : absoluteSpeed;
@@ -1945,6 +2036,22 @@ _ParsedHeader? _parseBracketHeader(String headerContent, int contentOffset, List
       parsed = parsed.copyWith(speaker: _normalizeValue(normalized.substring(TpsSpec.speakerPrefix.length)));
       continue;
     }
+    if (normalized.toLowerCase().startsWith(TpsSpec.archetypePrefix.toLowerCase())) {
+      final archetypeValue = _normalizeValue(normalized.substring(TpsSpec.archetypePrefix.length));
+      if (archetypeValue != null && TpsSpec.archetypes.contains(archetypeValue.toLowerCase())) {
+        parsed = parsed.copyWith(archetype: archetypeValue.toLowerCase());
+      } else {
+        diagnostics.add(_createDiagnostic(
+          TpsDiagnosticCodes.unknownArchetype,
+          "Archetype '${archetypeValue ?? ""}' is not a known vocal archetype.",
+          tokenStart,
+          tokenEnd,
+          lineStarts,
+          "Use one of: ${TpsSpec.archetypes.join(", ")}.",
+        ));
+      }
+      continue;
+    }
     if (_isTimingToken(normalized)) {
       parsed = parsed.copyWith(timing: normalized);
       continue;
@@ -1988,14 +2095,16 @@ _ParsedHeader? _applyHeaderWpm(_ParsedHeader parsed, String token, int start, in
 _ParsedSegmentInternal _createSegment(_ParsedHeader header, Map<String, String> metadata, int index) {
   final emotion = _resolveEmotion(header.emotion);
   final palette = _resolvePalette(emotion);
+  final archetypeWpm = _resolveArchetypeWpm(header.archetype);
   return _ParsedSegmentInternal(
     segment: TpsSegment(
       id: "segment-$index",
       name: header.name,
       content: "",
-      targetWpm: header.targetWpm ?? _resolveBaseWpm(metadata),
+      targetWpm: header.targetWpm ?? archetypeWpm ?? _resolveBaseWpm(metadata),
       emotion: emotion,
       speaker: header.speaker,
+      archetype: header.archetype,
       timing: header.timing,
       backgroundColor: palette["background"],
       textColor: palette["text"],
@@ -2027,6 +2136,7 @@ _ParsedBlockInternal _createBlock(_ParsedHeader header, int blockIndex, String s
       targetWpm: header.targetWpm,
       emotion: header.emotion,
       speaker: header.speaker,
+      archetype: header.archetype,
     ),
   );
 }
@@ -2043,6 +2153,7 @@ void _finalizeParsedBlock(_ParsedSegmentInternal? current, _ParsedBlockInternal?
     targetWpm: block.block.targetWpm,
     emotion: block.block.emotion,
     speaker: block.block.speaker,
+    archetype: block.block.archetype,
   );
   current.parsedBlocks.add(block);
 }
@@ -2061,6 +2172,7 @@ void _finalizeSegment(List<_ParsedSegmentInternal> target, _ParsedSegmentInterna
     targetWpm: segment.segment.targetWpm,
     emotion: segment.segment.emotion,
     speaker: segment.segment.speaker,
+    archetype: segment.segment.archetype,
     timing: segment.segment.timing,
     backgroundColor: segment.segment.backgroundColor,
     textColor: segment.segment.textColor,
@@ -2103,6 +2215,7 @@ _SegmentCandidate _compileSegment(_ParsedSegmentInternal parsedSegment, int base
     targetWpm: parsedSegment.segment.targetWpm!,
     emotion: segmentEmotion,
     speaker: parsedSegment.segment.speaker,
+    archetype: parsedSegment.segment.archetype,
     speedOffsets: speedOffsets,
   );
   final blocks = _buildBlocks(parsedSegment).map((entry) => _compileBlock(entry, inherited, analysis)).toList(growable: false);
@@ -2113,6 +2226,7 @@ _SegmentCandidate _compileSegment(_ParsedSegmentInternal parsedSegment, int base
       targetWpm: inherited.targetWpm,
       emotion: segmentEmotion,
       speaker: parsedSegment.segment.speaker,
+      archetype: parsedSegment.segment.archetype,
       timing: parsedSegment.segment.timing,
       backgroundColor: parsedSegment.segment.backgroundColor!,
       textColor: parsedSegment.segment.textColor!,
@@ -2139,6 +2253,7 @@ List<({TpsBlock block, bool isImplicit, _ContentSection? content})> _buildBlocks
         targetWpm: parsedSegment.segment.targetWpm,
         emotion: parsedSegment.segment.emotion,
         speaker: parsedSegment.segment.speaker,
+        archetype: parsedSegment.segment.archetype,
       ),
       isImplicit: true,
       content: parsedSegment.leadingContent,
@@ -2153,6 +2268,7 @@ List<({TpsBlock block, bool isImplicit, _ContentSection? content})> _buildBlocks
         targetWpm: parsedSegment.segment.targetWpm,
         emotion: parsedSegment.segment.emotion,
         speaker: parsedSegment.segment.speaker,
+        archetype: parsedSegment.segment.archetype,
       ),
       isImplicit: true,
       content: parsedSegment.directContent,
@@ -2165,10 +2281,13 @@ List<({TpsBlock block, bool isImplicit, _ContentSection? content})> _buildBlocks
 }
 
 _BlockCandidate _compileBlock(({TpsBlock block, bool isImplicit, _ContentSection? content}) entry, _InheritedFormattingState inherited, _DocumentAnalysis analysis) {
+  final resolvedArchetype = entry.block.archetype ?? inherited.archetype;
+  final blockWpm = entry.block.targetWpm ?? _resolveArchetypeWpm(resolvedArchetype) ?? inherited.targetWpm;
   final blockInherited = _InheritedFormattingState(
-    targetWpm: entry.block.targetWpm ?? inherited.targetWpm,
+    targetWpm: blockWpm,
     emotion: _resolveEmotion(entry.block.emotion, inherited.emotion),
     speaker: entry.block.speaker ?? inherited.speaker,
+    archetype: resolvedArchetype,
     speedOffsets: inherited.speedOffsets,
   );
   final content = _compileContent(entry.content?.text ?? "", entry.content?.startOffset ?? 0, blockInherited, analysis.lineStarts, analysis.diagnostics);
@@ -2179,6 +2298,7 @@ _BlockCandidate _compileBlock(({TpsBlock block, bool isImplicit, _ContentSection
       targetWpm: blockInherited.targetWpm,
       emotion: blockInherited.emotion,
       speaker: blockInherited.speaker,
+      archetype: resolvedArchetype,
       isImplicit: entry.isImplicit,
       startWordIndex: 0,
       endWordIndex: 0,
@@ -2308,6 +2428,7 @@ CompiledBlock _withRangeForBlock(CompiledBlock block, List<CompiledWord> words, 
     targetWpm: block.targetWpm,
     emotion: block.emotion,
     speaker: block.speaker,
+    archetype: block.archetype,
     isImplicit: block.isImplicit,
     startWordIndex: startWordIndex,
     endWordIndex: endWordIndex,
@@ -2329,6 +2450,7 @@ CompiledSegment _finalizeSegmentRange(CompiledSegment segment, List<CompiledBloc
     targetWpm: segment.targetWpm,
     emotion: segment.emotion,
     speaker: segment.speaker,
+    archetype: segment.archetype,
     timing: segment.timing,
     backgroundColor: segment.backgroundColor,
     textColor: segment.textColor,
@@ -2517,6 +2639,25 @@ _InlineScope? _createScope(_TagToken tag, Map<String, int> speedOffsets, int abs
   if (TpsSpec.deliveryModes.contains(tag.name)) {
     return _InlineScope(name: tag.name, deliveryMode: tag.name);
   }
+  if (TpsSpec.articulationStyles.contains(tag.name)) {
+    return _InlineScope(name: tag.name, articulationStyle: tag.name);
+  }
+  if (tag.name == TpsTags.energy) {
+    final level = int.tryParse(tag.argument ?? "");
+    if (level == null || level < TpsSpec.energyLevelMin || level > TpsSpec.energyLevelMax) {
+      diagnostics.add(_createDiagnostic(TpsDiagnosticCodes.invalidEnergyLevel, "Energy level must be an integer between ${TpsSpec.energyLevelMin} and ${TpsSpec.energyLevelMax}.", absoluteOffset, absoluteOffset + tag.raw.length, lineStarts));
+      return null;
+    }
+    return _InlineScope(name: tag.name, energyLevel: level);
+  }
+  if (tag.name == TpsTags.melody) {
+    final level = int.tryParse(tag.argument ?? "");
+    if (level == null || level < TpsSpec.melodyLevelMin || level > TpsSpec.melodyLevelMax) {
+      diagnostics.add(_createDiagnostic(TpsDiagnosticCodes.invalidMelodyLevel, "Melody level must be an integer between ${TpsSpec.melodyLevelMin} and ${TpsSpec.melodyLevelMax}.", absoluteOffset, absoluteOffset + tag.raw.length, lineStarts));
+      return null;
+    }
+    return _InlineScope(name: tag.name, melodyLevel: level);
+  }
   if (TpsSpec.emotions.contains(tag.name)) {
     return _InlineScope(name: tag.name, inlineEmotion: tag.name);
   }
@@ -2704,6 +2845,9 @@ _ActiveInlineState _resolveActiveState(List<_InlineScope> scopes, _InheritedForm
   String? pronunciationGuide;
   String? stressGuide;
   var stressWrap = false;
+  String? articulationStyle;
+  int? energyLevel;
+  int? melodyLevel;
   for (final scope in scopes) {
     if (scope.absoluteSpeed != null) {
       absoluteSpeed = scope.absoluteSpeed!;
@@ -2731,6 +2875,13 @@ _ActiveInlineState _resolveActiveState(List<_InlineScope> scopes, _InheritedForm
     pronunciationGuide = scope.pronunciationGuide ?? pronunciationGuide;
     stressGuide = scope.stressGuide ?? stressGuide;
     stressWrap = stressWrap || (scope.stressWrap ?? false);
+    articulationStyle = scope.articulationStyle ?? articulationStyle;
+    if (scope.energyLevel != null) {
+      energyLevel = scope.energyLevel;
+    }
+    if (scope.melodyLevel != null) {
+      melodyLevel = scope.melodyLevel;
+    }
   }
   return _ActiveInlineState(
     emotion: emotion,
@@ -2748,6 +2899,9 @@ _ActiveInlineState _resolveActiveState(List<_InlineScope> scopes, _InheritedForm
     absoluteSpeed: absoluteSpeed,
     hasRelativeSpeed: hasRelativeSpeed,
     relativeSpeedMultiplier: relativeSpeedMultiplier,
+    articulationStyle: articulationStyle,
+    energyLevel: energyLevel,
+    melodyLevel: melodyLevel,
   );
 }
 
@@ -2779,6 +2933,7 @@ CompiledSegment _normalizeSegment(CompiledSegment segment, Map<String, CompiledW
     targetWpm: segment.targetWpm,
     emotion: segment.emotion,
     speaker: segment.speaker,
+    archetype: segment.archetype,
     timing: segment.timing,
     backgroundColor: segment.backgroundColor,
     textColor: segment.textColor,
@@ -2801,6 +2956,7 @@ CompiledBlock _normalizeBlock(CompiledBlock block, Map<String, CompiledWord> wor
     targetWpm: block.targetWpm,
     emotion: block.emotion,
     speaker: block.speaker,
+    archetype: block.archetype,
     isImplicit: block.isImplicit,
     startWordIndex: block.startWordIndex,
     endWordIndex: block.endWordIndex,
@@ -2855,6 +3011,9 @@ CompiledWord _cloneWord(CompiledWord word) => CompiledWord(
         speedMultiplier: word.metadata.speedMultiplier,
         speaker: word.metadata.speaker,
         headCue: word.metadata.headCue,
+        articulationStyle: word.metadata.articulationStyle,
+        energyLevel: word.metadata.energyLevel,
+        melodyLevel: word.metadata.melodyLevel,
       ),
       segmentId: word.segmentId,
       blockId: word.blockId,
@@ -3081,6 +3240,9 @@ CompiledWord _compiledWordFromJson(Map<String, Object?> json) {
       speedMultiplier: (metadataJson["speedMultiplier"] as num?)?.toDouble(),
       speaker: metadataJson["speaker"] as String?,
       headCue: metadataJson["headCue"] as String?,
+      articulationStyle: metadataJson["articulationStyle"] as String?,
+      energyLevel: (metadataJson["energyLevel"] as num?)?.toInt(),
+      melodyLevel: (metadataJson["melodyLevel"] as num?)?.toInt(),
     ),
     segmentId: json["segmentId"]! as String,
     blockId: json["blockId"]! as String,
@@ -3097,6 +3259,7 @@ CompiledSegment _compiledSegmentFromJson(Map<String, Object?> json, Map<String, 
     targetWpm: (json["targetWpm"] as num).toInt(),
     emotion: json["emotion"]! as String,
     speaker: json["speaker"] as String?,
+    archetype: json["archetype"] as String?,
     timing: json["timing"] as String?,
     backgroundColor: json["backgroundColor"]! as String,
     textColor: json["textColor"]! as String,
@@ -3119,6 +3282,7 @@ CompiledBlock _compiledBlockFromJson(Map<String, Object?> json, Map<String, Comp
     targetWpm: (json["targetWpm"] as num).toInt(),
     emotion: json["emotion"]! as String,
     speaker: json["speaker"] as String?,
+    archetype: json["archetype"] as String?,
     isImplicit: json["isImplicit"] as bool? ?? false,
     startWordIndex: (json["startWordIndex"] as num).toInt(),
     endWordIndex: (json["endWordIndex"] as num).toInt(),
@@ -3183,6 +3347,12 @@ String? _normalizeValue(String? value) {
 }
 
 bool _isKnownEmotion(String value) => TpsSpec.emotions.contains(value.toLowerCase());
+int? _resolveArchetypeWpm(String? archetype) {
+  if (archetype == null) {
+    return null;
+  }
+  return TpsSpec.archetypeRecommendedWpm[archetype.toLowerCase()];
+}
 String _resolveEmotion(String? candidate, [String fallback = TpsSpec.defaultEmotion]) {
   final normalized = _normalizeValue(candidate)?.toLowerCase();
   return normalized != null && _isKnownEmotion(normalized) ? normalized : fallback;

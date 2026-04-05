@@ -10,6 +10,7 @@ public static class TpsSpec
     public const string DefaultEmotion = "neutral";
     public const string DefaultImplicitSegmentName = "Content";
     public const string DefaultProfile = "Actor";
+    public const string ArchetypePrefix = "Archetype:";
     public const string SpeakerPrefix = "Speaker:";
     public const string WpmSuffix = "WPM";
 
@@ -48,9 +49,12 @@ public static class TpsSpec
         public const string Building = "building";
         public const string EditPoint = "edit_point";
         public const string Emphasis = "emphasis";
+        public const string Energy = "energy";
         public const string Fast = "fast";
         public const string Highlight = "highlight";
+        public const string Legato = "legato";
         public const string Loud = "loud";
+        public const string Melody = "melody";
         public const string Normal = "normal";
         public const string Pause = "pause";
         public const string Phonetic = "phonetic";
@@ -59,6 +63,7 @@ public static class TpsSpec
         public const string Sarcasm = "sarcasm";
         public const string Slow = "slow";
         public const string Soft = "soft";
+        public const string Staccato = "staccato";
         public const string Stress = "stress";
         public const string Whisper = "whisper";
         public const string Xfast = "xfast";
@@ -67,14 +72,17 @@ public static class TpsSpec
 
     public static class DiagnosticCodes
     {
+        public const string InvalidEnergyLevel = "invalid-energy-level";
         public const string InvalidFrontMatter = "invalid-front-matter";
         public const string InvalidHeader = "invalid-header";
         public const string InvalidHeaderParameter = "invalid-header-parameter";
+        public const string InvalidMelodyLevel = "invalid-melody-level";
         public const string InvalidPause = "invalid-pause";
         public const string InvalidTagArgument = "invalid-tag-argument";
         public const string InvalidWpm = "invalid-wpm";
         public const string MismatchedClosingTag = "mismatched-closing-tag";
         public const string UnclosedTag = "unclosed-tag";
+        public const string UnknownArchetype = "unknown-archetype";
         public const string UnknownTag = "unknown-tag";
         public const string UnterminatedTag = "unterminated-tag";
     }
@@ -125,6 +133,44 @@ public static class TpsSpec
         "medium",
         "low"
     ];
+
+    public static IReadOnlyList<string> ArticulationStyles { get; } = [Tags.Legato, Tags.Staccato];
+
+    public static class ArchetypeNames
+    {
+        public const string Friend = "friend";
+        public const string Motivator = "motivator";
+        public const string Educator = "educator";
+        public const string Coach = "coach";
+        public const string Storyteller = "storyteller";
+        public const string Entertainer = "entertainer";
+    }
+
+    public static IReadOnlyList<string> Archetypes { get; } =
+    [
+        ArchetypeNames.Friend,
+        ArchetypeNames.Motivator,
+        ArchetypeNames.Educator,
+        ArchetypeNames.Coach,
+        ArchetypeNames.Storyteller,
+        ArchetypeNames.Entertainer
+    ];
+
+    public static IReadOnlyDictionary<string, int> ArchetypeRecommendedWpm { get; } =
+        new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+        {
+            [ArchetypeNames.Friend] = 135,
+            [ArchetypeNames.Motivator] = 155,
+            [ArchetypeNames.Educator] = 120,
+            [ArchetypeNames.Coach] = 145,
+            [ArchetypeNames.Storyteller] = 125,
+            [ArchetypeNames.Entertainer] = 150
+        };
+
+    public const int EnergyLevelMin = 1;
+    public const int EnergyLevelMax = 10;
+    public const int MelodyLevelMin = 1;
+    public const int MelodyLevelMax = 10;
 
     public static IReadOnlyDictionary<string, int> DefaultSpeedOffsets { get; } =
         new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)

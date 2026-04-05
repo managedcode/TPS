@@ -3,9 +3,10 @@
     "segmentName": "Call to Action",
     "segmentEmotion": "motivational",
     "segmentSpeaker": "Alex",
+    "segmentArchetype": "motivator",
     "blockName": "Closing Block",
     "blockEmotion": "energetic",
-    "baseWpm": 140,
+    "baseWpm": 155,
     "wordChecks": {
       "teleprompter": {
         "speedOverride": 180,
@@ -25,6 +26,14 @@
       },
       "development": {
         "stressGuide": "de-VE-lop-ment"
+      },
+      "Rise": {
+        "articulationStyle": "legato",
+        "energyLevel": 8,
+        "melodyLevel": 7
+      },
+      "Now.": {
+        "articulationStyle": "staccato"
       }
     },
     "controlChecks": {
@@ -45,6 +54,15 @@
     ],
     "header-parameter.tps": [
       "invalid-header-parameter"
+    ],
+    "invalid-energy.tps": [
+      "invalid-energy-level"
+    ],
+    "invalid-melody.tps": [
+      "invalid-melody-level"
+    ],
+    "unknown-archetype.tps": [
+      "unknown-archetype"
     ]
   }
 }

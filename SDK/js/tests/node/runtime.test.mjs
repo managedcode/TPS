@@ -40,6 +40,7 @@ test("compiles the runtime parity fixture into a deterministic state machine", (
   assert.equal(segment.name, expectations.runtimeParity.segmentName);
   assert.equal(segment.emotion, expectations.runtimeParity.segmentEmotion);
   assert.equal(segment.speaker, expectations.runtimeParity.segmentSpeaker);
+  assert.equal(segment.archetype, expectations.runtimeParity.segmentArchetype);
   assert.equal(segment.targetWpm, expectations.runtimeParity.baseWpm);
 
   const block = segment.blocks.find((candidate) => candidate.name === expectations.runtimeParity.blockName);
@@ -56,6 +57,10 @@ test("compiles the runtime parity fixture into a deterministic state machine", (
   assert.equal(words.moment.metadata.isHighlight, expectations.runtimeParity.wordChecks.moment.isHighlight);
   assert.equal(words.announcement.metadata.stressText, expectations.runtimeParity.wordChecks.announcement.stressText);
   assert.equal(words.development.metadata.stressGuide, expectations.runtimeParity.wordChecks.development.stressGuide);
+  assert.equal(words.Rise.metadata.articulationStyle, expectations.runtimeParity.wordChecks.Rise.articulationStyle);
+  assert.equal(words.Rise.metadata.energyLevel, expectations.runtimeParity.wordChecks.Rise.energyLevel);
+  assert.equal(words.Rise.metadata.melodyLevel, expectations.runtimeParity.wordChecks.Rise.melodyLevel);
+  assert.equal(words["Now"].metadata.articulationStyle, expectations.runtimeParity.wordChecks["Now."].articulationStyle);
 
   const pause = result.script.words.find((word) => word.kind === "pause");
   const editPoint = result.script.words.find((word) => word.kind === "edit-point");

@@ -253,6 +253,41 @@ internal sealed class TpsContentCompiler
             return new InlineScope(tag.Name, DeliveryMode: tag.Name);
         }
 
+        if (TpsSpec.ArticulationStyles.Contains(tag.Name, StringComparer.OrdinalIgnoreCase))
+        {
+            return new InlineScope(tag.Name, ArticulationStyle: tag.Name);
+        }
+
+        if (string.Equals(tag.Name, TpsSpec.Tags.Energy, StringComparison.Ordinal))
+        {
+            if (tag.Argument is null || !int.TryParse(tag.Argument, out var energyLevel) || energyLevel < TpsSpec.EnergyLevelMin || energyLevel > TpsSpec.EnergyLevelMax)
+            {
+                diagnostics.Add(TpsSupport.CreateDiagnostic(
+                    TpsSpec.DiagnosticCodes.InvalidEnergyLevel,
+                    $"Energy level must be an integer between {TpsSpec.EnergyLevelMin} and {TpsSpec.EnergyLevelMax}.",
+                    absoluteOffset,
+                    absoluteOffset + tag.Raw.Length,
+                    lineStarts));
+                return null;
+            }
+            return new InlineScope(tag.Name, EnergyLevel: energyLevel);
+        }
+
+        if (string.Equals(tag.Name, TpsSpec.Tags.Melody, StringComparison.Ordinal))
+        {
+            if (tag.Argument is null || !int.TryParse(tag.Argument, out var melodyLevel) || melodyLevel < TpsSpec.MelodyLevelMin || melodyLevel > TpsSpec.MelodyLevelMax)
+            {
+                diagnostics.Add(TpsSupport.CreateDiagnostic(
+                    TpsSpec.DiagnosticCodes.InvalidMelodyLevel,
+                    $"Melody level must be an integer between {TpsSpec.MelodyLevelMin} and {TpsSpec.MelodyLevelMax}.",
+                    absoluteOffset,
+                    absoluteOffset + tag.Raw.Length,
+                    lineStarts));
+                return null;
+            }
+            return new InlineScope(tag.Name, MelodyLevel: melodyLevel);
+        }
+
         if (TpsSpec.Emotions.Contains(tag.Name, StringComparer.OrdinalIgnoreCase))
         {
             return new InlineScope(tag.Name, InlineEmotion: tag.Name);
@@ -465,6 +500,9 @@ internal sealed class TpsContentCompiler
         string? inlineEmotion = null;
         string? volumeLevel = null;
         string? deliveryMode = null;
+        string? articulationStyle = (string?)null;
+        int? energyLevel = null;
+        int? melodyLevel = null;
         string? phoneticGuide = null;
         string? pronunciationGuide = null;
         string? stressGuide = null;
@@ -502,6 +540,9 @@ internal sealed class TpsContentCompiler
 
             volumeLevel = scope.VolumeLevel ?? volumeLevel;
             deliveryMode = scope.DeliveryMode ?? deliveryMode;
+            articulationStyle = scope.ArticulationStyle ?? articulationStyle;
+            if (scope.EnergyLevel is int scopeEnergy) energyLevel = scopeEnergy;
+            if (scope.MelodyLevel is int scopeMelody) melodyLevel = scopeMelody;
             phoneticGuide = scope.PhoneticGuide ?? phoneticGuide;
             pronunciationGuide = scope.PronunciationGuide ?? pronunciationGuide;
             stressGuide = scope.StressGuide ?? stressGuide;
@@ -516,6 +557,9 @@ internal sealed class TpsContentCompiler
             highlight,
             volumeLevel,
             deliveryMode,
+            articulationStyle,
+            energyLevel,
+            melodyLevel,
             phoneticGuide,
             pronunciationGuide,
             stressGuide,
@@ -530,7 +574,7 @@ internal sealed class TpsContentCompiler
         string.Equals(word.Kind, "word", StringComparison.Ordinal) && !string.IsNullOrEmpty(word.CleanText);
 }
 
-internal sealed record InheritedFormattingState(int TargetWpm, string Emotion, string? Speaker, IReadOnlyDictionary<string, int> SpeedOffsets);
+internal sealed record InheritedFormattingState(int TargetWpm, string Emotion, string? Speaker, IReadOnlyDictionary<string, int> SpeedOffsets, string? Archetype = null);
 
 internal sealed record ContentCompilationResult(List<WordSeed> Words, List<PhraseSeed> Phrases);
 
@@ -558,6 +602,9 @@ internal sealed record InlineScope(
     string? InlineEmotion = null,
     string? VolumeLevel = null,
     string? DeliveryMode = null,
+    string? ArticulationStyle = null,
+    int? EnergyLevel = null,
+    int? MelodyLevel = null,
     string? PhoneticGuide = null,
     string? PronunciationGuide = null,
     string? StressGuide = null,
@@ -574,6 +621,9 @@ internal sealed record ActiveInlineState(
     bool Highlight,
     string? VolumeLevel,
     string? DeliveryMode,
+    string? ArticulationStyle,
+    int? EnergyLevel,
+    int? MelodyLevel,
     string? PhoneticGuide,
     string? PronunciationGuide,
     string? StressGuide,
@@ -601,6 +651,12 @@ internal sealed class TokenAccumulator
 
     public string? DeliveryMode { get; private set; }
 
+    public string? ArticulationStyle { get; private set; }
+
+    public int? EnergyLevel { get; private set; }
+
+    public int? MelodyLevel { get; private set; }
+
     public string? PhoneticGuide { get; private set; }
 
     public string? PronunciationGuide { get; private set; }
@@ -625,6 +681,9 @@ internal sealed class TokenAccumulator
         InlineEmotionHint = state.InlineEmotion ?? InlineEmotionHint;
         VolumeLevel = state.VolumeLevel ?? VolumeLevel;
         DeliveryMode = state.DeliveryMode ?? DeliveryMode;
+        ArticulationStyle = state.ArticulationStyle ?? ArticulationStyle;
+        if (state.EnergyLevel is int stateEnergy) EnergyLevel = stateEnergy;
+        if (state.MelodyLevel is int stateMelody) MelodyLevel = stateMelody;
         PhoneticGuide = state.PhoneticGuide ?? PhoneticGuide;
         PronunciationGuide = state.PronunciationGuide ?? PronunciationGuide;
         StressGuide = state.StressGuide ?? StressGuide;
@@ -658,6 +717,9 @@ internal sealed class TokenAccumulator
             InlineEmotionHint = InlineEmotionHint,
             VolumeLevel = VolumeLevel,
             DeliveryMode = DeliveryMode,
+            ArticulationStyle = ArticulationStyle,
+            EnergyLevel = EnergyLevel,
+            MelodyLevel = MelodyLevel,
             PhoneticGuide = PhoneticGuide,
             PronunciationGuide = PronunciationGuide,
             StressText = _stressText.Length > 0 ? _stressText.ToString() : null,
