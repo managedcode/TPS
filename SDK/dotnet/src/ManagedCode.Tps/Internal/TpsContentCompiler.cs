@@ -500,7 +500,7 @@ internal sealed class TpsContentCompiler
         string? inlineEmotion = null;
         string? volumeLevel = null;
         string? deliveryMode = null;
-        string? articulationStyle = (string?)null;
+        var articulationStyle = default(string);
         int? energyLevel = null;
         int? melodyLevel = null;
         string? phoneticGuide = null;
@@ -541,8 +541,15 @@ internal sealed class TpsContentCompiler
             volumeLevel = scope.VolumeLevel ?? volumeLevel;
             deliveryMode = scope.DeliveryMode ?? deliveryMode;
             articulationStyle = scope.ArticulationStyle ?? articulationStyle;
-            if (scope.EnergyLevel is int scopeEnergy) energyLevel = scopeEnergy;
-            if (scope.MelodyLevel is int scopeMelody) melodyLevel = scopeMelody;
+            if (scope.EnergyLevel is int scopeEnergy)
+            {
+                energyLevel = scopeEnergy;
+            }
+
+            if (scope.MelodyLevel is int scopeMelody)
+            {
+                melodyLevel = scopeMelody;
+            }
             phoneticGuide = scope.PhoneticGuide ?? phoneticGuide;
             pronunciationGuide = scope.PronunciationGuide ?? pronunciationGuide;
             stressGuide = scope.StressGuide ?? stressGuide;
@@ -682,8 +689,15 @@ internal sealed class TokenAccumulator
         VolumeLevel = state.VolumeLevel ?? VolumeLevel;
         DeliveryMode = state.DeliveryMode ?? DeliveryMode;
         ArticulationStyle = state.ArticulationStyle ?? ArticulationStyle;
-        if (state.EnergyLevel is int stateEnergy) EnergyLevel = stateEnergy;
-        if (state.MelodyLevel is int stateMelody) MelodyLevel = stateMelody;
+        if (state.EnergyLevel is int stateEnergy)
+        {
+            EnergyLevel = stateEnergy;
+        }
+
+        if (state.MelodyLevel is int stateMelody)
+        {
+            MelodyLevel = stateMelody;
+        }
         PhoneticGuide = state.PhoneticGuide ?? PhoneticGuide;
         PronunciationGuide = state.PronunciationGuide ?? PronunciationGuide;
         StressGuide = state.StressGuide ?? StressGuide;

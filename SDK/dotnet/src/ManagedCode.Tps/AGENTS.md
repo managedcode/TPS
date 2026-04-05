@@ -66,6 +66,7 @@ For this .NET project:
 - Keep the `ManagedCode.Tps` namespace prefix intact.
 - Do not place test helpers or test-only code in this project.
 - Prefer small, composable types over large utility buckets.
+- Do not add new TPS catalog literals inline when the value is part of the public runtime contract; expose and reuse named constants instead.
 
 ## Exception Record
 

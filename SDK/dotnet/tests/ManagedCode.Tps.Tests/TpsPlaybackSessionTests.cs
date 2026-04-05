@@ -1,5 +1,5 @@
-using Microsoft.Extensions.Time.Testing;
 using ManagedCode.Tps.Models;
+using Microsoft.Extensions.Time.Testing;
 
 namespace ManagedCode.Tps.Tests;
 
@@ -328,7 +328,7 @@ public sealed class TpsPlaybackSessionTests
         using var session = new TpsPlaybackSession(script);
         var snapshots = new List<TpsPlaybackSnapshot>();
 
-        using var subscription = session.ObserveSnapshot(snapshot => snapshots.Add(snapshot));
+        using var subscription = session.ObserveSnapshot(snapshots.Add);
         session.NextWord();
 
         Assert.Equal("Ready", snapshots[0].State.CurrentWord?.CleanText);
@@ -367,7 +367,7 @@ public sealed class TpsPlaybackSessionTests
             });
         var snapshots = new List<TpsPlaybackSnapshot>();
 
-        var subscription = session.ObserveSnapshot(snapshot => snapshots.Add(snapshot));
+        var subscription = session.ObserveSnapshot(snapshots.Add);
         subscription.Dispose();
         context.Drain();
 
@@ -382,7 +382,7 @@ public sealed class TpsPlaybackSessionTests
         var snapshots = new List<TpsPlaybackSnapshot>();
         var statuses = new List<TpsPlaybackStatus>();
 
-        using var subscription = session.ObserveSnapshot(snapshot => snapshots.Add(snapshot), emitCurrent: false);
+        using var subscription = session.ObserveSnapshot(snapshots.Add, emitCurrent: false);
         EventHandler<TpsPlaybackSnapshotChangedEventArgs> handler = (_, args) => statuses.Add(args.Snapshot.Status);
         session.SnapshotChanged += handler;
 
@@ -447,7 +447,7 @@ public sealed class TpsPlaybackSessionTests
         using var player = TpsStandalonePlayer.Compile("## [Signal]\n### [Body]\nReady now.");
         var snapshots = new List<TpsPlaybackSnapshot>();
 
-        using var subscription = player.ObserveSnapshot(snapshot => snapshots.Add(snapshot));
+        using var subscription = player.ObserveSnapshot(snapshots.Add);
         player.NextWord();
 
         Assert.Equal("Ready", snapshots[0].State.CurrentWord?.CleanText);
@@ -478,7 +478,7 @@ public sealed class TpsPlaybackSessionTests
             }
         };
         player.SnapshotChanged += (_, args) => snapshotChanged.TrySetResult(args.Snapshot);
-        using var subscription = player.ObserveSnapshot(snapshot => observedSnapshots.Add(snapshot));
+        using var subscription = player.ObserveSnapshot(observedSnapshots.Add);
 
         context.Drain();
 
@@ -583,8 +583,8 @@ public sealed class TpsPlaybackSessionTests
 
         session.Dispose();
 
-        Assert.Throws<ObjectDisposedException>(() => session.Play());
-        Assert.Throws<ObjectDisposedException>(() => session.CreateSnapshot());
+        Assert.Throws<ObjectDisposedException>(session.Play);
+        Assert.Throws<ObjectDisposedException>(session.CreateSnapshot);
     }
 
     [Fact]

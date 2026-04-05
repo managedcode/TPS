@@ -607,26 +607,10 @@ public sealed class TpsPlaybackSession : IDisposable
         }
     }
 
-    private int ReadLiveElapsed()
-    {
-        lock (_syncRoot)
-        {
-            return ReadLiveElapsedLocked();
-        }
-    }
-
     private int ReadLiveElapsedLocked()
     {
         var deltaMs = Math.Max(0d, _timeProvider.GetElapsedTime(_playbackStartedAtTimestamp).TotalMilliseconds);
         return _playbackOffsetMs + (int)Math.Max(0d, Math.Round(deltaMs * PlaybackRate, MidpointRounding.AwayFromZero));
-    }
-
-    private Transition UpdatePosition(int elapsedMs, TpsPlaybackStatus requestedStatus)
-    {
-        lock (_syncRoot)
-        {
-            return UpdatePositionLocked(elapsedMs, requestedStatus);
-        }
     }
 
     private Transition UpdatePositionLocked(int elapsedMs, TpsPlaybackStatus requestedStatus)
@@ -660,25 +644,6 @@ public sealed class TpsPlaybackSession : IDisposable
             previousState.CurrentSegment?.Id != nextState.CurrentSegment?.Id,
             previousStatus != nextStatus,
             nextStatus == TpsPlaybackStatus.Completed && previousStatus != TpsPlaybackStatus.Completed);
-    }
-
-    private Transition UpdateStatusLocked(TpsPlaybackStatus nextStatus)
-    {
-        var previousStatus = Status;
-        Status = nextStatus;
-        return new Transition(
-            CurrentState,
-            CurrentState,
-            nextStatus,
-            previousStatus,
-            CreateSnapshotLocked(),
-            StateChangedRaised: false,
-            WordChangedRaised: false,
-            PhraseChangedRaised: false,
-            BlockChangedRaised: false,
-            SegmentChangedRaised: false,
-            StatusChangedRaised: previousStatus != nextStatus,
-            CompletedRaised: false);
     }
 
     private void Publish(Transition transition)

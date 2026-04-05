@@ -14,6 +14,77 @@ public static class TpsSpec
     public const string SpeakerPrefix = "Speaker:";
     public const string WpmSuffix = "WPM";
 
+    public static class EmotionNames
+    {
+        public const string Neutral = DefaultEmotion;
+        public const string Warm = "warm";
+        public const string Professional = "professional";
+        public const string Focused = "focused";
+        public const string Concerned = "concerned";
+        public const string Urgent = "urgent";
+        public const string Motivational = "motivational";
+        public const string Excited = "excited";
+        public const string Happy = "happy";
+        public const string Sad = "sad";
+        public const string Calm = "calm";
+        public const string Energetic = "energetic";
+    }
+
+    public static class EditPointPriorityNames
+    {
+        public const string High = "high";
+        public const string Medium = "medium";
+        public const string Low = "low";
+    }
+
+    public static class HeadCueCodes
+    {
+        public const string H0 = "H0";
+        public const string H1 = "H1";
+        public const string H4 = "H4";
+        public const string H5 = "H5";
+        public const string H6 = "H6";
+        public const string H7 = "H7";
+        public const string H8 = "H8";
+        public const string H9 = "H9";
+    }
+
+    public static class PaletteHex
+    {
+        public const string AccentBlue = "#2563EB";
+        public const string TextSlate900 = "#0F172A";
+        public const string BackgroundBlue400 = "#60A5FA";
+        public const string AccentOrange600 = "#EA580C";
+        public const string TextStone900 = "#1C1917";
+        public const string BackgroundOrange300 = "#FDBA74";
+        public const string AccentBlue700 = "#1D4ED8";
+        public const string BackgroundBlue300 = "#93C5FD";
+        public const string AccentGreen700 = "#15803D";
+        public const string TextGreen950 = "#052E16";
+        public const string BackgroundGreen300 = "#86EFAC";
+        public const string AccentRed700 = "#B91C1C";
+        public const string TextRose950 = "#1F1111";
+        public const string BackgroundRed300 = "#FCA5A5";
+        public const string AccentRed600 = "#DC2626";
+        public const string TextWhiteRose = "#FFF7F7";
+        public const string AccentViolet600 = "#7C3AED";
+        public const string TextWhite = "#FFFFFF";
+        public const string BackgroundViolet300 = "#C4B5FD";
+        public const string AccentPink600 = "#DB2777";
+        public const string TextWhitePink = "#FFF7FB";
+        public const string BackgroundPink300 = "#F9A8D4";
+        public const string AccentAmber600 = "#D97706";
+        public const string BackgroundAmber300 = "#FCD34D";
+        public const string AccentIndigo600 = "#4F46E5";
+        public const string TextIndigo50 = "#EEF2FF";
+        public const string BackgroundIndigo300 = "#A5B4FC";
+        public const string AccentTeal700 = "#0F766E";
+        public const string TextTeal50 = "#F0FDFA";
+        public const string BackgroundTeal200 = "#99F6E4";
+        public const string AccentOrange700 = "#C2410C";
+        public const string TextOrange50 = "#FFF7ED";
+    }
+
     public static class FrontMatterKeys
     {
         public const string Author = "author";
@@ -115,18 +186,18 @@ public static class TpsSpec
 
     public static IReadOnlyList<string> Emotions { get; } =
     [
-        "neutral",
-        "warm",
-        "professional",
-        "focused",
-        "concerned",
-        "urgent",
-        "motivational",
-        "excited",
-        "happy",
-        "sad",
-        "calm",
-        "energetic"
+        EmotionNames.Neutral,
+        EmotionNames.Warm,
+        EmotionNames.Professional,
+        EmotionNames.Focused,
+        EmotionNames.Concerned,
+        EmotionNames.Urgent,
+        EmotionNames.Motivational,
+        EmotionNames.Excited,
+        EmotionNames.Happy,
+        EmotionNames.Sad,
+        EmotionNames.Calm,
+        EmotionNames.Energetic
     ];
 
     public static IReadOnlyList<string> DeliveryModes { get; } =
@@ -155,9 +226,9 @@ public static class TpsSpec
 
     public static IReadOnlyList<string> EditPointPriorities { get; } =
     [
-        "high",
-        "medium",
-        "low"
+        EditPointPriorityNames.High,
+        EditPointPriorityNames.Medium,
+        EditPointPriorityNames.Low
     ];
 
     public static IReadOnlyList<string> ArticulationStyles { get; } = [Tags.Legato, Tags.Staccato];
@@ -250,35 +321,35 @@ public static class TpsSpec
     public static IReadOnlyDictionary<string, EmotionPalette> EmotionPalettes { get; } =
         new Dictionary<string, EmotionPalette>(StringComparer.OrdinalIgnoreCase)
         {
-            [DefaultEmotion] = new("#2563EB", "#0F172A", "#60A5FA"),
-            ["warm"] = new("#EA580C", "#1C1917", "#FDBA74"),
-            ["professional"] = new("#1D4ED8", "#0F172A", "#93C5FD"),
-            ["focused"] = new("#15803D", "#052E16", "#86EFAC"),
-            ["concerned"] = new("#B91C1C", "#1F1111", "#FCA5A5"),
-            ["urgent"] = new("#DC2626", "#FFF7F7", "#FCA5A5"),
-            ["motivational"] = new("#7C3AED", "#FFFFFF", "#C4B5FD"),
-            ["excited"] = new("#DB2777", "#FFF7FB", "#F9A8D4"),
-            ["happy"] = new("#D97706", "#1C1917", "#FCD34D"),
-            ["sad"] = new("#4F46E5", "#EEF2FF", "#A5B4FC"),
-            ["calm"] = new("#0F766E", "#F0FDFA", "#99F6E4"),
-            ["energetic"] = new("#C2410C", "#FFF7ED", "#FDBA74")
+            [EmotionNames.Neutral] = new(PaletteHex.AccentBlue, PaletteHex.TextSlate900, PaletteHex.BackgroundBlue400),
+            [EmotionNames.Warm] = new(PaletteHex.AccentOrange600, PaletteHex.TextStone900, PaletteHex.BackgroundOrange300),
+            [EmotionNames.Professional] = new(PaletteHex.AccentBlue700, PaletteHex.TextSlate900, PaletteHex.BackgroundBlue300),
+            [EmotionNames.Focused] = new(PaletteHex.AccentGreen700, PaletteHex.TextGreen950, PaletteHex.BackgroundGreen300),
+            [EmotionNames.Concerned] = new(PaletteHex.AccentRed700, PaletteHex.TextRose950, PaletteHex.BackgroundRed300),
+            [EmotionNames.Urgent] = new(PaletteHex.AccentRed600, PaletteHex.TextWhiteRose, PaletteHex.BackgroundRed300),
+            [EmotionNames.Motivational] = new(PaletteHex.AccentViolet600, PaletteHex.TextWhite, PaletteHex.BackgroundViolet300),
+            [EmotionNames.Excited] = new(PaletteHex.AccentPink600, PaletteHex.TextWhitePink, PaletteHex.BackgroundPink300),
+            [EmotionNames.Happy] = new(PaletteHex.AccentAmber600, PaletteHex.TextStone900, PaletteHex.BackgroundAmber300),
+            [EmotionNames.Sad] = new(PaletteHex.AccentIndigo600, PaletteHex.TextIndigo50, PaletteHex.BackgroundIndigo300),
+            [EmotionNames.Calm] = new(PaletteHex.AccentTeal700, PaletteHex.TextTeal50, PaletteHex.BackgroundTeal200),
+            [EmotionNames.Energetic] = new(PaletteHex.AccentOrange700, PaletteHex.TextOrange50, PaletteHex.BackgroundOrange300)
         };
 
     public static IReadOnlyDictionary<string, string> EmotionHeadCues { get; } =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            [DefaultEmotion] = "H0",
-            ["calm"] = "H0",
-            ["professional"] = "H9",
-            ["focused"] = "H5",
-            ["motivational"] = "H9",
-            ["urgent"] = "H4",
-            ["concerned"] = "H1",
-            ["sad"] = "H1",
-            ["warm"] = "H7",
-            ["happy"] = "H6",
-            ["excited"] = "H6",
-            ["energetic"] = "H8"
+            [EmotionNames.Neutral] = HeadCueCodes.H0,
+            [EmotionNames.Calm] = HeadCueCodes.H0,
+            [EmotionNames.Professional] = HeadCueCodes.H9,
+            [EmotionNames.Focused] = HeadCueCodes.H5,
+            [EmotionNames.Motivational] = HeadCueCodes.H9,
+            [EmotionNames.Urgent] = HeadCueCodes.H4,
+            [EmotionNames.Concerned] = HeadCueCodes.H1,
+            [EmotionNames.Sad] = HeadCueCodes.H1,
+            [EmotionNames.Warm] = HeadCueCodes.H7,
+            [EmotionNames.Happy] = HeadCueCodes.H6,
+            [EmotionNames.Excited] = HeadCueCodes.H6,
+            [EmotionNames.Energetic] = HeadCueCodes.H8
         };
 }
 

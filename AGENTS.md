@@ -174,6 +174,7 @@ List only the skills this repository should actively use.
 - Use `.editorconfig`, project files, and checked-in docs as the durable source of tooling truth.
 - Keep names, namespaces, and future .NET projects under the `ManagedCode.Tps` prefix unless a documented exception is approved.
 - Every TPS runtime library must publish a clear list of spec constants for keywords, tags, emotions, metadata keys, and other validation-critical terms.
+- Do not introduce magic string literals or repeated catalog literals for TPS spec terms, statuses, diagnostic codes, emotion names, palette keys, or similar runtime-contract data; define and reuse named constants.
 - Every TPS runtime library must include TPS format validation that reports actionable diagnostics for invalid structure, unknown tags, malformed attributes, and other authoring errors.
 - Keep each runtime in its own language folder under `SDK/`, and keep SDK design/testing/ADR documentation under `SDK/docs/`.
 - Design CI so the active runtime set is extensible beyond JavaScript, TypeScript, and C#, with future language additions enabled by configuration instead of ad hoc workflow rewrites.
