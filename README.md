@@ -107,7 +107,7 @@ version: "1.0"
 Segments are major sections of the script.
 
 ```markdown
-## [SegmentName|120WPM|Emotion|Timing]
+## [SegmentName|120WPM|Emotion|Timing|Archetype:Name]
 ```
 
 All parameters after the name are optional, separated by `|`. Parameters are identified by format, not by position:
@@ -209,6 +209,8 @@ Inline markers are embedded within phrase text to control presentation.
 | `[xfast]` | 1.5× | 210 |
 
 **Note:** All relative speed tags are **relative to the base speed**, not absolute values. The multiplier is calculated as `1 + (offset / 100)`. For example, `slow` with offset `-20` → multiplier `1 + (-20/100)` = `0.8`. Tags stack multiplicatively when nested: `[xslow][slow]text[/slow][/xslow]` = base × 0.6 × 0.8 = 48% of base.
+
+**Note on `[xfast]`:** At the default base of 140 WPM, `[xfast]` produces 210 WPM — above the comfortable teleprompter range (100–170). This is intentional: `[xfast]` is designed for short throwaway phrases where the teleprompter scrolls quickly past low-importance text. The reader is not expected to articulate every word at 210 WPM — the visual speed cue signals "skim through this." For sustained reading, authors should prefer `[fast]` (175 WPM) or lower the `base_wpm`.
 
 #### Runtime Speed Control
 
@@ -457,7 +459,7 @@ Each archetype has expected delivery parameter ranges. These are the "ideal" val
 | Volume | `soft` or default | Intimate, not projecting |
 | Speed | 125–150 WPM | Unhurried, conversational pace |
 | Pauses | Natural, comfortable | Not dramatic |
-| Fillers | Tolerated | "um," "you know" add authenticity |
+| Fillers | Tolerated | "um," "you know" add authenticity _(author guidance only — not validated)_ |
 
 **Motivator** — _Inspire_ (recommended WPM: **155**)
 
@@ -469,19 +471,19 @@ Each archetype has expected delivery parameter ranges. These are the "ideal" val
 | Volume | `loud` | Projected, fills the room |
 | Speed | 145–170 WPM | Energetic, building — fastest teleprompter archetype |
 | Pauses | Strategic dramatic pauses | After climactic statements — let it land |
-| Fillers | None | Momentum should not be broken |
+| Fillers | None | Momentum should not be broken _(author guidance only — not validated)_ |
 
 **Educator** — _Inform_ (recommended WPM: **120**)
 
 | Parameter | Expected | Notes |
 |-----------|----------|-------|
-| Articulation | neutral (neither) | Clear, precise diction — not strongly legato or staccato |
+| Articulation | none expected | Clear, precise diction — neither `[legato]` nor `[staccato]` expected; both produce warnings |
 | Energy | 3–5 | Calm, grounded, steady |
 | Melody | 2–4 | Low — matter-of-fact, informational |
 | Volume | default | Medium, controlled, consistent |
 | Speed | 110–135 WPM | Deliberate, measured — slowest archetype for comprehension |
 | Pauses | Frequent, structured | Between concepts for processing |
-| Fillers | None | Precision matters |
+| Fillers | None | Precision matters _(author guidance only — not validated)_ |
 
 **Coach** — _Guide & instruct_ (recommended WPM: **145**)
 
@@ -493,31 +495,31 @@ Each archetype has expected delivery parameter ranges. These are the "ideal" val
 | Volume | `loud` | Assertive, commanding |
 | Speed | 135–160 WPM | Punchy, variable — fast bursts then pause |
 | Pauses | Sharp, short | Between directives (beat. beat. beat.) |
-| Fillers | Zero tolerance | Every word is deliberate |
+| Fillers | Zero tolerance | Every word is deliberate _(author guidance only — not validated)_ |
 
 **Storyteller** — _Transport & engage_ (recommended WPM: **125**)
 
 | Parameter | Expected | Notes |
 |-----------|----------|-------|
-| Articulation | mixed (`legato` with `staccato` moments) | Fluid with dramatic punctuation |
+| Articulation | both valid | Fluid with dramatic punctuation — `[legato]` and `[staccato]` both accepted, no warnings |
 | Energy | 4–7 | Medium, modulated — rises and falls with narrative |
 | Melody | 8–10 | Very high — the most melodic archetype |
 | Volume | variable | Whisper to full projection within one story |
 | Speed | 100–150 WPM | Highly variable — slows for drama, speeds for action |
 | Pauses | Long, dramatic | Cliffhanger beats, suspense gaps |
-| Fillers | None | Every word chosen for narrative effect |
+| Fillers | None | Every word chosen for narrative effect _(author guidance only — not validated)_ |
 
 **Entertainer** — _Delight_ (recommended WPM: **150**)
 
 | Parameter | Expected | Notes |
 |-----------|----------|-------|
-| Articulation | mixed | `staccato` for punchlines, `legato` for setups |
+| Articulation | both valid | `staccato` for punchlines, `legato` for setups — both accepted, no warnings |
 | Energy | 6–8 | High, playful, light |
 | Melody | 7–9 | High — sing-song quality, playful rises |
 | Volume | variable | Medium-high with sudden drops for comedic effect |
 | Speed | 140–165 WPM | Rhythmic, comedic timing is paramount |
 | Pauses | Critical | Before/after punchlines |
-| Fillers | Intentional | Used for comedic timing |
+| Fillers | Intentional | Used for comedic timing _(author guidance only — not validated)_ |
 
 ##### Archetype Validation
 
@@ -529,14 +531,19 @@ Validation rules:
 |-----------|----------|---------|
 | `[staccato]` inside `Archetype:Friend` | warning | Friend expects legato delivery |
 | `[legato]` inside `Archetype:Coach` | warning | Coach expects staccato delivery |
+| `[legato]` or `[staccato]` inside `Archetype:Educator` | warning | Educator expects no articulation tags (natural diction) |
 | `[energy:2]` inside `Archetype:Motivator` | warning | Motivator expects energy 7–10 |
 | `[energy:9]` inside `Archetype:Educator` | warning | Educator expects energy 3–5 |
+| `[energy:3]` inside `Archetype:Entertainer` | warning | Entertainer expects energy 6–8 |
 | `[melody:9]` inside `Archetype:Coach` | warning | Coach expects melody 1–3 |
 | `[melody:2]` inside `Archetype:Storyteller` | warning | Storyteller expects melody 8–10 |
+| `[melody:2]` inside `Archetype:Entertainer` | warning | Entertainer expects melody 7–9 |
 | `[whisper]` inside `Archetype:Motivator` | warning | Motivator expects loud delivery |
 | `[loud]` inside `Archetype:Friend` | warning | Friend expects soft/default volume |
 | `[xfast]` inside `Archetype:Educator` | warning | Educator expects slower pace (110–135) |
 | `[xslow]` inside `Archetype:Motivator` | warning | Motivator expects faster pace (145–170) |
+
+Note: `Archetype:Storyteller` and `Archetype:Entertainer` accept both `[legato]` and `[staccato]` without warnings — both articulation styles are valid for these archetypes.
 
 Validation is **advisory** — it helps authors stay within an archetype's established delivery profile, but deliberate violations are valid. For example, a Coach might intentionally drop to `[energy:3]` for a quiet, intense moment before building back up.
 
@@ -569,14 +576,14 @@ Beyond inline tag validation, each archetype has a distinct **rhythm** — measu
 
 | Condition | Severity | Example |
 |-----------|----------|---------|
-| Average phrase length > 10 words in `Archetype:Coach` | warning | Coach expects short, punchy phrases (3–8 words) |
-| Average phrase length < 8 words in `Archetype:Educator` | warning | Educator expects longer, explanatory phrases (10–25 words) |
-| Pause frequency < 4 per 100 words in `Archetype:Educator` | warning | Educator expects frequent pauses between concepts |
-| Pause frequency < 8 per 100 words in `Archetype:Coach` | warning | Coach expects pauses between each directive |
-| Emphasis density < 10% in `Archetype:Coach` | warning | Coach expects heavy emphasis — key words should stand out |
-| Emphasis density > 15% in `Archetype:Educator` | warning | Educator expects restrained emphasis — precision, not drama |
-| Average pause > 1000 ms in `Archetype:Coach` | warning | Coach expects short, sharp pauses (200–400 ms) |
-| Average pause < 500 ms in `Archetype:Storyteller` | warning | Storyteller expects longer dramatic pauses |
+| Average phrase length > 8 words in `Archetype:Coach` | warning | Coach expects short, punchy phrases (3–8 words) |
+| Average phrase length < 10 words in `Archetype:Educator` | warning | Educator expects longer, explanatory phrases (10–25 words) |
+| Pause frequency < 6 per 100 words in `Archetype:Educator` | warning | Educator expects frequent pauses between concepts (6–12) |
+| Pause frequency < 8 per 100 words in `Archetype:Coach` | warning | Coach expects pauses between each directive (8–15) |
+| Emphasis density < 15% in `Archetype:Coach` | warning | Coach expects heavy emphasis (15–30%) |
+| Emphasis density > 8% in `Archetype:Educator` | warning | Educator expects restrained emphasis (3–8%) |
+| Average pause > 400 ms in `Archetype:Coach` | warning | Coach expects short, sharp pauses (200–400 ms) |
+| Average pause < 500 ms in `Archetype:Storyteller` | warning | Storyteller expects longer dramatic pauses (500–3000 ms) |
 | No speed variation in `Archetype:Storyteller` | warning | Storyteller expects dynamic speed changes for narrative effect |
 
 **Example — Coach rhythm (good):**
@@ -592,7 +599,7 @@ No excuses. / No delays. / **Today.**
 [/loud][/melody][/energy][/staccato]
 ```
 
-Rhythm analysis: avg phrase 3.3 words, 15 pauses/100w, avg pause 450ms, emphasis 33% — matches Coach profile.
+Rhythm analysis: avg phrase 3.3 words, 15 pauses/100w, avg pause 350ms, emphasis 33% — matches Coach profile.
 
 **Example — Coach rhythm (warning):**
 
@@ -695,7 +702,7 @@ Melody is specified with the `[melody:N]` tag where N is an integer from **1 to 
 | 7–8 | High melody. Expressive, musical, wide pitch range. | Storyteller, motivational build-up. |
 | 9–10 | Dramatic. Theatrical, sweeping pitch contours. | Voice actor, preacher in full flow. |
 
-### Vocal Archetypes
+### Vocal Archetype Keywords
 
 Vocal archetypes are a **closed set** — parsers should treat unknown archetype keywords as invalid header parameters. Each archetype defines a composite delivery persona based on Vinh Giang's vocal communication framework.
 
@@ -705,10 +712,10 @@ The `Archetype:Name` parameter is added to segment or block headers using the `|
 |---------|------|-----------------|--------------|--------|--------|
 | `Friend` | Connect | 135 | `legato` | 4–6 | 6–8 |
 | `Motivator` | Inspire | 155 | `legato` | 7–10 | 7–9 |
-| `Educator` | Inform | 120 | neutral | 3–5 | 2–4 |
+| `Educator` | Inform | 120 | none expected | 3–5 | 2–4 |
 | `Coach` | Guide & instruct | 145 | `staccato` | 7–9 | 1–3 |
-| `Storyteller` | Transport & engage | 125 | mixed | 4–7 | 8–10 |
-| `Entertainer` | Delight | 150 | mixed | 6–8 | 7–9 |
+| `Storyteller` | Transport & engage | 125 | both valid | 4–7 | 8–10 |
+| `Entertainer` | Delight | 150 | both valid | 6–8 | 7–9 |
 
 See the [Vocal Archetypes](#vocal-archetypes) section for full parameter profiles and validation rules.
 
@@ -805,7 +812,7 @@ For any word, the effective WPM is determined by (highest priority first):
 5. `base_wpm` from front matter
 6. Default: 140 WPM
 
-For example, `## [Rally|Archetype:Motivator]` without an explicit WPM uses 175 WPM (Motivator's recommended). But `## [Rally|150WPM|Archetype:Motivator]` uses 150 WPM — the explicit override wins.
+For example, `## [Rally|Archetype:Motivator]` without an explicit WPM uses 155 WPM (Motivator's recommended). But `## [Rally|150WPM|Archetype:Motivator]` uses 150 WPM — the explicit override wins.
 
 ### Pause Handling
 
@@ -855,7 +862,7 @@ Phrases are the smallest unit for timing calculation.
 
 ### Nested Speed Resolution
 
-When speed tags are nested, relative tags (`[slow]`, `[fast]`, etc.) stack multiplicatively against the **base speed** — not against each other:
+When speed tags are nested, relative tags (`[slow]`, `[fast]`, etc.) stack multiplicatively — each multiplier compounds on the previous:
 
 - `[slow]text[/slow]` = base × 0.8
 - `[xslow][slow]text[/slow][/xslow]` = base × 0.6 × 0.8 = base × 0.48
@@ -975,7 +982,7 @@ The Actor profile targets natural spoken delivery — reading aloud from a telep
 |------|-------|
 | WPM error range | < 80 or > 220 |
 | WPM warning range | < 90 or > 200 |
-| Recommended WPM | 130–160 |
+| Recommended WPM | 125–150 |
 | Segment/Block WPM | Single integer |
 | Inline speed | Integer, respects allowed range |
 
@@ -1081,10 +1088,10 @@ and a [emphasis]30% increase[/emphasis] in engagement. //
 ## [Action Items|Focused|Archetype:Coach]
 
 ### [Next Steps]
-[staccato][energy:8][melody:2][loud]Three things. **Today.** //
-One — download the beta. //
-Two — run the benchmark. //
-Three — share your feedback.[/loud][/melody][/energy][/staccato] //
+[staccato][energy:8][melody:2][loud]**Three** things. **Today.** //
+**One** — download the **beta**. //
+**Two** — run the **benchmark**. //
+**Three** — share your **feedback**.[/loud][/melody][/energy][/staccato]
 
 ## [Closing|Warm|Archetype:Friend]
 
