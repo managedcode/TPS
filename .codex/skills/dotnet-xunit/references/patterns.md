@@ -214,75 +214,33 @@ public class StringUtilityTests
 }
 ```
 
-## Mocking with NSubstitute
+## Aspire-First Boundary Tests
 
-Prefer NSubstitute for readable substitute configuration:
-
-```csharp
-public class OrderServiceTests(ITestOutputHelper output)
-{
-    [Fact]
-    public async Task PlaceOrder_ValidOrder_SendsNotification()
-    {
-        // Arrange
-        var notificationService = Substitute.For<INotificationService>();
-        var orderRepository = Substitute.For<IOrderRepository>();
-        orderRepository.SaveAsync(Arg.Any<Order>()).Returns(Task.FromResult(true));
-
-        var service = new OrderService(orderRepository, notificationService);
-        var order = new Order { CustomerId = 1, Items = [new OrderItem { ProductId = 1, Quantity = 2 }] };
-
-        // Act
-        await service.PlaceOrderAsync(order);
-
-        // Assert
-        await notificationService.Received(1).SendOrderConfirmationAsync(Arg.Is<Order>(o => o.CustomerId == 1));
-        output.WriteLine("Order placed and notification sent");
-    }
-
-    [Fact]
-    public async Task PlaceOrder_RepositoryFails_ThrowsException()
-    {
-        // Arrange
-        var notificationService = Substitute.For<INotificationService>();
-        var orderRepository = Substitute.For<IOrderRepository>();
-        orderRepository.SaveAsync(Arg.Any<Order>()).ThrowsAsync(new DataException("Connection failed"));
-
-        var service = new OrderService(orderRepository, notificationService);
-        var order = new Order { CustomerId = 1 };
-
-        // Act & Assert
-        await Assert.ThrowsAsync<DataException>(() => service.PlaceOrderAsync(order));
-        await notificationService.DidNotReceive().SendOrderConfirmationAsync(Arg.Any<Order>());
-    }
-}
-```
-
-## Mocking with Moq
-
-Use Moq when the project already depends on it:
+For hosted, integration, browser, or infrastructure-backed behavior, prefer an Aspire-managed AppHost and real resources. Stub, Fake, and Mock doubles are forbidden by default; use them only with a documented exception and removal plan.
 
 ```csharp
-public class PaymentProcessorTests
+public class CheckoutFlowTests
 {
     [Fact]
-    public async Task ProcessPayment_ValidCard_ReturnsSuccess()
+    public async Task Checkout_ValidCart_ReturnsReceipt()
     {
-        // Arrange
-        var gatewayMock = new Mock<IPaymentGateway>();
-        gatewayMock
-            .Setup(g => g.ChargeAsync(It.IsAny<string>(), It.Is<decimal>(d => d > 0)))
-            .ReturnsAsync(new PaymentResult { Success = true, TransactionId = "TX123" });
+        // Arrange - resolve a client from the Aspire-managed test host
+        await using var app = await DistributedApplicationTestingBuilder
+            .CreateAsync<Projects.MyApp_AppHost>();
+        await using var host = await app.BuildAsync();
+        await host.StartAsync();
 
-        var processor = new PaymentProcessor(gatewayMock.Object);
+        var client = host.CreateHttpClient("api");
+        await host.ResourceNotifications.WaitForResourceHealthyAsync("api");
 
         // Act
-        var result = await processor.ProcessPaymentAsync("4111111111111111", 99.99m);
+        using var response = await client.PostAsJsonAsync("/checkout", new { Sku = "starter", Quantity = 1 });
+        var receipt = await response.Content.ReadFromJsonAsync<Receipt>();
 
-        // Assert
-        Assert.True(result.Success);
-        Assert.Equal("TX123", result.TransactionId);
-        gatewayMock.Verify(g => g.ChargeAsync("4111111111111111", 99.99m), Times.Once);
+        // Assert - verify observable behavior, not implementation calls
+        response.EnsureSuccessStatusCode();
+        Assert.NotNull(receipt);
+        Assert.NotEqual(Guid.Empty, receipt.Id);
     }
 }
 ```
@@ -389,4 +347,3 @@ dotnet test --filter "Category!=Integration"
 
 - [xUnit.net Theory Data](https://xunit.net/docs/getting-started/v3/theory-data)
 - [xUnit.net Shared Context](https://xunit.net/docs/shared-context)
-- [NSubstitute Documentation](https://nsubstitute.github.io/help/getting-started/)

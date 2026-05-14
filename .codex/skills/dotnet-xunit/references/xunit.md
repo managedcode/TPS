@@ -19,6 +19,15 @@ VSTest compatibility package when the repo intentionally uses that runner:
 dotnet add package xunit.runner.visualstudio
 ```
 
+Aspire CLI is mandatory alongside MCAF/.NET test setup when the repo has integration, browser, hosted, or infrastructure-backed tests:
+
+```bash
+curl -sSL https://aspire.dev/install.sh | bash
+aspire --version
+```
+
+Do not add mocking libraries as part of default xUnit setup. Stub, Fake, and Mock doubles are forbidden by default and require a documented exception with a removal plan.
+
 ## Verify First
 
 Before adding packages, check what the repo already references:

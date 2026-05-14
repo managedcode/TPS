@@ -29,6 +29,7 @@ Parent: `../AGENTS.md`
 - `test`: `...`
 - `format`: `...`
 - `analyze`: `...` (delete if not used)
+- `aspire`: `aspire run ...` (required when this project owns integration tests, browser tests, or infrastructure-backed tests)
 
 For .NET projects also document:
 
@@ -42,6 +43,13 @@ For .NET projects also document:
 - `...`
 
 For .NET projects, install the needed `.NET` skills from the [Managed Code Skills catalog](https://skills.managed-code.com/).
+Aspire CLI is mandatory with MCAF/.NET setup when the repo has integration, browser, hosted, or infrastructure-backed tests. Install and validate it:
+
+```bash
+curl -sSL https://aspire.dev/install.sh | bash
+aspire --version
+```
+
 The local skill list usually includes:
 
 - `mcaf-testing`
@@ -63,3 +71,7 @@ The local skill list usually includes:
 
 - Project-specific rules go here.
 - Local rules may tighten root rules, but must not weaken them silently.
+- Stub, Fake, and Mock doubles are forbidden by default; avoid them and use real implementations, Aspire-managed resources, public APIs, or user-visible flows.
+- If a Stub, Fake, or Mock is unavoidable, document why in the nearest test or durable doc and include a removal plan.
+- Integration tests and browser tests must run only through Aspire-managed AppHost orchestration.
+- Keep infrastructure required by integration or browser coverage in Aspire projects/resources instead of ad hoc test startup code.

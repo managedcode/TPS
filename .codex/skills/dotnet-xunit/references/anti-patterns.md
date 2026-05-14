@@ -65,9 +65,9 @@ public class UserServiceTests
 }
 ```
 
-## Excessive Mocking
+## Test Doubles Instead of Behavior
 
-Over-mocking creates brittle tests that verify implementation rather than behavior.
+Stub, Fake, and Mock doubles are forbidden by default. They create brittle tests when they replace behavior that should be proven through real implementations, Aspire-managed resources, or observable state.
 
 Bad:
 
@@ -114,9 +114,9 @@ public class OrderServiceTests
     [Fact]
     public void PlaceOrder_ValidOrder_ReturnsOrderId()
     {
-        // Arrange - use real implementations where cheap, mock only external boundaries
+        // Arrange - use real implementations and observable state
         var repository = new InMemoryOrderRepository();
-        var notificationService = Substitute.For<INotificationService>();
+        var notificationService = new RecordingNotificationService();
         var service = new OrderService(repository, notificationService);
         var order = new Order { CustomerId = 1, Items = [new OrderItem { ProductId = 1, Quantity = 1 }] };
 
@@ -128,6 +128,7 @@ public class OrderServiceTests
         var savedOrder = repository.GetById(orderId);
         Assert.NotNull(savedOrder);
         Assert.Equal(OrderStatus.Placed, savedOrder.Status);
+        Assert.Contains(notificationService.SentOrderIds, id => id == orderId);
     }
 }
 ```
@@ -188,7 +189,7 @@ public class CacheTests
         // Arrange
         var store = new InMemoryDataStore();
         store.Set("key", "original");
-        var timeProvider = new FakeTimeProvider();
+        var timeProvider = new ControlledTimeProvider();
         var cache = new Cache(store, timeProvider, ttl: TimeSpan.FromMinutes(5));
 
         // Act
@@ -320,7 +321,7 @@ public class TimestampTests
     {
         // Arrange
         var fixedTime = new DateTimeOffset(2024, 1, 15, 10, 30, 0, TimeSpan.Zero);
-        var timeProvider = new FakeTimeProvider(fixedTime);
+        var timeProvider = new ControlledTimeProvider(fixedTime);
         var service = new RecordService(timeProvider);
 
         // Act
@@ -536,14 +537,14 @@ public class UserRegistrationTests
     public void RegisterUser_ValidData_SendsWelcomeEmail()
     {
         // Arrange
-        var emailService = Substitute.For<IEmailService>();
+        var emailService = new RecordingEmailService();
         var service = new UserService(emailService);
 
         // Act
         service.Register("test@example.com", "password123");
 
         // Assert
-        emailService.Received(1).SendWelcomeEmail("test@example.com");
+        Assert.Contains("test@example.com", emailService.WelcomeRecipients);
     }
 
     [Fact]

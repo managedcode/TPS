@@ -47,11 +47,14 @@ compatibility: "Requires the repository’s build and test tooling; uses command
    - `mcaf-dotnet-xunit`
    - `mcaf-dotnet-tunit`
    - `mcaf-dotnet-mstest`
-5. Prefer integration, API, or UI coverage when behaviour crosses boundaries.
-6. Prove the user flow or caller-visible system flow, not just internal details.
-7. Add a regression test for every bug that can be captured reliably.
-8. If the stack is .NET and production code changed, do not stop at tests only. Finish with the repo-defined format and analyzer pass as well.
-9. Use deeper testing references only when the repo’s current strategy is unclear.
+5. When installing or validating MCAF/.NET test setup, require Aspire CLI for integration, browser, hosted, or infrastructure-backed tests. Install with `curl -sSL https://aspire.dev/install.sh | bash` on macOS/Linux and validate with `aspire --version`.
+6. Prefer Aspire-backed integration, API, or UI coverage when behaviour crosses boundaries.
+7. Treat Stub, Fake, and Mock doubles as forbidden by default. Use real implementations, Aspire-managed resources, public APIs, or user-visible flows instead.
+8. Allow a Stub, Fake, or Mock only when the real dependency cannot practically run through Aspire or when an interaction has no observable state or output. Document the reason and removal plan.
+9. Prove the user flow or caller-visible system flow, not just internal details.
+10. Add a regression test for every bug that can be captured reliably.
+11. If the stack is .NET and production code changed, do not stop at tests only. Finish with the repo-defined format and analyzer pass as well.
+12. Use deeper testing references only when the repo’s current strategy is unclear.
 
 ## Deliver
 
@@ -63,6 +66,8 @@ compatibility: "Requires the repository’s build and test tooling; uses command
 - the new behaviour is covered at the right level
 - the main user flow or caller-visible system flow is proven
 - tests assert meaningful outcomes, not implementation trivia
+- Stub, Fake, and Mock doubles are absent, or every exception has a documented reason and removal plan
+- infrastructure-backed tests run through Aspire instead of ad hoc startup code
 - coverage expectations from `AGENTS.md` are met, or the exception is documented
 - the verification sequence matches `AGENTS.md`
 - for .NET changes, tests were not treated as a substitute for formatting or analyzer gates

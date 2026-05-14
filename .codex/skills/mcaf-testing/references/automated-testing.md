@@ -8,6 +8,8 @@ Automated testing in MCAF is evidence, not ceremony.
 - default to TDD: write the failing test first, make it pass, then refactor
 - pick the highest-value test level that proves the change
 - tests prove user-visible or caller-visible flow, not just internal implementation
+- Stub, Fake, and Mock doubles are forbidden by default; avoid them unless an exception is explicitly documented with the reason and removal plan
+- use Aspire-managed resources for integration, browser, hosted, and infrastructure-backed tests
 - start small, then widen verification only when necessary
 - flaky tests are bugs
 
@@ -20,15 +22,16 @@ Automated testing in MCAF is evidence, not ceremony.
 ## Test-Level Selection
 
 - unit tests for isolated logic
-- integration tests for real boundary interaction
+- integration tests for real boundary interaction through Aspire-managed orchestration when infrastructure or hosting is involved
 - API tests for public contracts
-- UI or end-to-end tests for user-visible flows
+- UI or end-to-end tests for user-visible flows through Aspire-managed application hosting
 
 ## User-Flow Coverage
 
 - tests must prove the main user flow or caller-visible system flow changed by the work
 - for user-visible behaviour, cover the happy path and the most important failure or edge path at integration, API, or UI level
 - for cross-boundary changes, prefer tests that exercise the real contract between components over isolated implementation checks
+- prefer moving verification into Aspire whenever the behavior needs hosted services, browsers, containers, databases, queues, caches, or emulators
 - if the change is not directly user-facing, prove the system flow at the boundary that another module, job, or API caller actually uses
 
 ## Coverage Norms
@@ -48,7 +51,8 @@ Automated testing in MCAF is evidence, not ceremony.
 
 ## Common Smells
 
-- mocks, fakes, or stubs hiding broken integration paths
+- any Stub, Fake, or Mock without a documented exception and removal plan
+- ad hoc infrastructure startup outside Aspire for integration or browser tests
 - huge suites run before any focused verification
 - tests that only prove implementation detail
 - tests nobody trusts enough to keep

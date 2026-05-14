@@ -65,3 +65,6 @@ For this .NET project:
 - Keep test project namespaces under `ManagedCode.Tps.Tests`.
 - Do not move production logic into test helpers.
 - Prefer behavior-oriented tests over implementation-detail assertions.
+- Stub, Fake, and Mock doubles are forbidden by default; use real implementations and Aspire-managed resources unless an exception is documented with a reason and removal plan.
+- Keep integration and browser tests Aspire-owned: they must use the repository AppHost and Aspire-managed resources instead of starting local infrastructure directly from tests.
+- Keep any infrastructure required by integration or browser coverage in Aspire projects/resources so `aspire run` remains the canonical orchestration path.

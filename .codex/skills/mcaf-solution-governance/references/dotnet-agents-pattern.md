@@ -3,6 +3,13 @@
 Use this reference when the solution stack is .NET and the root or local `AGENTS.md` needs concrete command and tooling guidance.
 The `.NET` skill bundle itself lives in the [Managed Code Skills catalog](https://skills.managed-code.com/), not in this repository.
 
+When installing or documenting MCAF for a .NET repository, also install Aspire CLI whenever the repo has integration, browser, hosted, or infrastructure-backed tests:
+
+```bash
+curl -sSL https://aspire.dev/install.sh | bash
+aspire --version
+```
+
 ## Root AGENTS.md Expectations
 
 Record the real commands, not placeholders:
@@ -76,6 +83,8 @@ For each .NET project or module, record:
 - the active test framework
 - the active runner model
 - the coverage driver if the module runs coverage in isolation
+- the Aspire command when the module owns integration, browser, hosted, or infrastructure-backed tests
+- the local rule that Stub, Fake, and Mock doubles are forbidden by default and require a documented exception
 
 Good `Applicable Skills` examples:
 

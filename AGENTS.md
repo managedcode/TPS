@@ -171,6 +171,12 @@ List only the skills this repository should actively use.
 - Bug fixes start with a failing regression test when practical.
 - Test user-visible behavior and boundary contracts, not only internal implementation details.
 - Prefer realistic verification over mock-heavy tests.
+- Stub, Fake, and Mock test doubles are forbidden by default. Avoid them and prove behavior through real implementations, Aspire-managed resources, public APIs, or user-visible flows.
+- A Stub may only supply deterministic indirect input, a Fake may only replace a dependency that cannot practically run in Aspire, and a Mock may only verify an interaction that has no observable state or output. Every exception must be documented in the nearest test or durable doc with the reason and removal plan.
+- Aspire CLI is a required local prerequisite alongside the MCAF skill setup. Install it with `curl -sSL https://aspire.dev/install.sh | bash` on macOS/Linux and verify with `aspire --version`.
+- All repository tests must be able to run under Aspire orchestration when the test surface depends on application hosting, services, browsers, or external infrastructure.
+- Integration tests and browser tests must run only through Aspire-managed AppHost orchestration; do not create parallel ad hoc service startup, browser host, container, database, queue, cache, or emulator infrastructure outside Aspire for those tests.
+- Test infrastructure that supports integration or browser coverage belongs in Aspire projects and Aspire resources so local, CI, and future runtime verification use the same orchestration path. Prefer moving more verification into Aspire whenever infrastructure, hosting, or end-to-end behavior is involved.
 - Flaky tests are failures and must be fixed, not ignored.
 - Active runtime CI coverage gates must stay at or above 90% unless an ADR explicitly changes that policy.
 - Repository or module coverage must not go down without an explicit written exception.
