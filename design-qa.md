@@ -6,12 +6,14 @@
 - Final live passport: <https://tps.ai.prostir.build/?v=final-14> (revision `12`)
 - Approved product logo: `.codex/prostir/tps/assets/tps-mark-v2-64.png`
 - Automatic social preview: <https://tps.ai.prostir.build/social-preview.png>
+- Published Agent logo: <https://api.prostir.build/agents/tps/logo>
+- Published Skill logo: <https://api.prostir.build/skills/tps/logo>
 
 ## Comparison passes
 
 - Typography and layout: the final implementation preserves the reference's warm editorial surface, high-contrast serif hero, restrained sans-serif copy, gold accent, two-column source-to-TPS specimen, and sparse navigation. The richer production copy intentionally adds one text line while retaining the hierarchy.
 - Responsive behavior: verified at 1280×720 and 390×844. Mobile has no horizontal overflow, keeps usable tap targets, stacks the specimen cleanly, and preserves the hero hierarchy.
-- Color and assets: the warm paper, dark ink, muted gold, and monospaced syntax palette match the selected direction. The approved horizontal TPS mark is embedded in the passport and uploaded to both the Agent and Skill; Prostir reports `hasLogo: true` for both products.
+- Color and assets: the warm paper, dark ink, muted gold, and monospaced syntax palette match the selected direction. The approved horizontal TPS mark is embedded in the passport and uploaded to both the Agent and Skill. After publication refresh, both public logo routes return HTTP 200, `image/png`, 512×512 RGBA, 4,720 bytes, and the same SHA-256 (`3ce29d52c7cda64fa3413f04343c1ea94e455f503c64117e194ee5ac937f5554`).
 - Content and SEO: the intent-matched H1 is `Format text for a teleprompter with AI.` Copy directly describes an AI teleprompter script formatter that returns TelePrompterScript without rewriting source text. Canonical metadata, indexable robots directives, Open Graph/Twitter tags, `WebApplication`, and `FAQPage` structured data are present. Open Graph and Twitter use Prostir's automatic `/social-preview.png` route.
 - Interaction and accessibility: EN/UA switching, endpoint copy state, semantic headings and navigation, focus styles, reduced motion, and the subtle accessible `P` standard-passport link were verified. All 13 external links expose `target="_blank"`, `rel="noopener noreferrer"`, and a pointer cursor. The live response permits popups to escape the passport sandbox.
 
