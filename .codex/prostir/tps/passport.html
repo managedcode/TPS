@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#faf8f4">
+  <meta name="description" content="Format text for a teleprompter with TPS Agent. Add pacing, pauses, emotion, emphasis, and speaker cues without rewriting your words.">
+  <meta name="author" content="Managed Code">
+  <meta name="publisher" content="Managed Code">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="canonical" href="https://tps.ai.prostir.build/">
+  <link rel="icon" href="https://tps.ai.prostir.build/favicon.ico" sizes="any">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <meta property="og:title" content="AI Teleprompter Script Formatter — TPS Agent">
+  <meta property="og:description" content="Format text for a teleprompter with AI. TPS Agent adds TelePrompterScript structure and delivery cues without rewriting your words.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="TPS Agent by Managed Code">
+  <meta property="og:url" content="https://tps.ai.prostir.build/">
+  <meta property="og:image" content="https://tps.ai.prostir.build/social-preview.png">
+  <meta property="og:image:secure_url" content="https://tps.ai.prostir.build/social-preview.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="TPS Agent is an AI teleprompter script formatter that preserves the source text">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AI Teleprompter Script Formatter — TPS Agent">
+  <meta name="twitter:description" content="Format text for a teleprompter with AI. TPS Agent adds TelePrompterScript structure and delivery cues without rewriting your words.">
+  <meta name="twitter:image" content="https://tps.ai.prostir.build/social-preview.png">
+  <meta name="twitter:image:alt" content="TPS Agent is an AI teleprompter script formatter that preserves the source text">
+  <title>AI Teleprompter Script Formatter — TPS Agent | Managed Code</title>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "TPS Agent",
+      "alternateName": "TPS AI Agent",
+      "url": "https://tps.ai.prostir.build/",
+      "description": "An AI teleprompter script formatter that turns source text into valid TPS TelePrompterScript without rewriting the words.",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "Any",
+      "inLanguage": ["en", "uk"],
+      "provider": {
+        "@type": "Organization",
+        "name": "Managed Code",
+        "url": "https://managed-code.com/"
+      },
+      "isBasedOn": "https://tps.managed-code.com/",
+      "sameAs": [
+        "https://github.com/managedcode/TPS",
+        "https://github.com/managedcode/PrompterOne"
+      ],
+      "featureList": [
+        "TPS teleprompter script formatting",
+        "Pacing and pause direction",
+        "Emotion, emphasis, and speaker cues",
+        "Lossless source-text preservation"
+      ]
+    }
+  </script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Does TPS Agent write or rewrite my text?","acceptedAnswer":{"@type":"Answer","text":"No. TPS Agent formats the text you supply without paraphrasing, translating, correcting, shortening, expanding, censoring, or reordering it."}},{"@type":"Question","name":"What kind of text can I format?","acceptedAnswer":{"@type":"Answer","text":"Speeches, presentations, video scripts, lessons, webinars, podcasts, voice-over copy, dialogue, and other text intended to be spoken."}},{"@type":"Question","name":"What does TPS Agent add?","acceptedAnswer":{"@type":"Answer","text":"Valid TPS structure plus pacing, pauses, emotion, emphasis, energy, pronunciation, and speaker cues when supported by the text or your instructions."}},{"@type":"Question","name":"Can I request a target duration?","acceptedAnswer":{"@type":"Answer","text":"Yes, as a pacing constraint. If the unchanged text cannot fit, the Agent preserves it and asks whether you want to change the duration or revise the source."}},{"@type":"Question","name":"Is the result compatible with PrompterOne?","acceptedAnswer":{"@type":"Answer","text":"Yes. PrompterOne is an open-source editor, rehearsal studio, and teleprompter that implements the TPS format."}},{"@type":"Question","name":"How do I connect TPS Agent?","acceptedAnswer":{"@type":"Answer","text":"Use the published Streamable HTTP MCP endpoint from an MCP-capable client. Send source text and receive one complete TPS document."}},{"@type":"Question","name":"Does TPS Agent preserve Ukrainian and other languages?","acceptedAnswer":{"@type":"Answer","text":"Yes. The Agent preserves the source language and text exactly while adding TPS markup around it."}}]}</script>
+  <style>:root{--paper:#faf8f4;--surface:#fffdf9;--ink:#251f18;--text:#4b433a;--muted:#766b5d;--line:#ded7cc;--line-strong:#c8bdad;--gold:#b58b34;--gold-dark:#775b23;--code-blue:#4e55ba;--code-green:#407c61;--code-gold:#9b6d16;--font:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--display:"Playfair Display",Georgia,serif;--mono:"JetBrains Mono","SFMono-Regular",Consolas,monospace;}*{box-sizing:border-box;}html{scroll-behavior:smooth;}body{min-width:320px;margin:0;overflow-x:hidden;color:var(--ink);background:var(--paper);font-family:var(--font);line-height:1.55;-webkit-font-smoothing:antialiased;}a{color:inherit;}button,a{-webkit-tap-highlight-color:transparent;}button{font:inherit;}.shell{width:min(1120px,calc(100% - 48px));margin:0 auto;}.site-header{min-height:66px;display:flex;align-items:center;justify-content:space-between;gap:28px;border-bottom:1px solid var(--line);}.brand{display:inline-flex;align-items:center;gap:11px;color:var(--ink);font-weight:700;letter-spacing:-0.025em;text-decoration:none;white-space:nowrap;}.brand img{width:27px;height:27px;display:block;}.nav{display:flex;align-items:center;justify-content:flex-end;gap:26px;}.nav a{color:var(--text);font-size:14px;font-weight:500;text-decoration:none;text-underline-offset:5px;}.nav a:hover{text-decoration:underline;}.language{min-width:46px;padding:8px 11px;border:1px solid var(--line-strong);border-radius:999px;color:var(--ink);background:transparent;cursor:pointer;font-size:13px;font-weight:600;}.hero{padding:clamp(28px,2.5vw,34px) 0 24px;}h1{max-width:15ch;margin:0;font-family:var(--display);font-size:clamp(56px,6.4vw,92px);font-weight:700;line-height:0.96;letter-spacing:-0.055em;}.lead{max-width:720px;margin:24px 0 0;color:var(--text);font-size:clamp(18px,1.35vw,20px);line-height:1.58;}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px;}.button{min-height:50px;display:inline-flex;align-items:center;justify-content:center;padding:0 20px;border:1px solid var(--line-strong);border-radius:10px;color:var(--ink);background:transparent;cursor:pointer;font-weight:650;text-decoration:none;transition:background 140ms ease,border-color 140ms ease,color 140ms ease;}.button-primary{border-color:var(--gold);color:#fff;background:var(--gold);}.button-primary:hover{border-color:var(--gold-dark);background:var(--gold-dark);}.button-secondary:hover{border-color:var(--gold);color:var(--gold-dark);}.specimen{display:grid;grid-template-columns:0.92fr 1.38fr;margin:20px 0 0;overflow:hidden;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,0.34);}.specimen-pane{min-width:0;padding:clamp(24px,3vw,38px);}.specimen-pane + .specimen-pane{border-left:1px solid var(--line);}.specimen-label{display:block;margin-bottom:22px;color:var(--code-gold);font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;}pre{margin:0;overflow-x:auto;color:var(--ink);font:13px/1.72 var(--mono);white-space:pre-wrap;overflow-wrap:anywhere;}.syntax{color:var(--code-blue);}.meta{color:var(--code-green);}.emphasis{color:var(--code-gold);font-weight:600;}.section{display:grid;grid-template-columns:minmax(260px,0.72fr) minmax(0,1.28fr);gap:clamp(42px,8vw,112px);padding:clamp(72px,9vw,118px) 0;border-top:1px solid var(--line);}.section h2{max-width:13ch;margin:0;font-family:var(--display);font-size:clamp(40px,5vw,68px);font-weight:700;line-height:1.02;letter-spacing:-0.04em;}.section-copy{min-width:0;max-width:720px;color:var(--text);font-size:18px;}.section-copy>p{margin:0;}.section-copy>p + p{margin-top:22px;}.plain-list{margin:34px 0 0;padding:0;list-style:none;border-top:1px solid var(--line);}.plain-list li{display:grid;grid-template-columns:minmax(150px,0.45fr) minmax(0,1fr);gap:24px;padding:20px 0;border-bottom:1px solid var(--line);font-size:15px;}.plain-list strong{color:var(--ink);}.plain-list span{color:var(--muted);}.resource-links{margin-top:34px;border-top:1px solid var(--line);}.resource-links a{display:grid;grid-template-columns:minmax(180px,0.62fr) minmax(0,1fr);gap:24px;padding:21px 0;border-bottom:1px solid var(--line);color:var(--ink);text-decoration:none;}.resource-links a:hover strong{color:var(--gold-dark);}.resource-links strong{font-size:15px;}.resource-links span{color:var(--muted);font-size:14px;}.connect{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:42px;align-items:end;padding:clamp(62px,8vw,98px) 0;border-top:1px solid var(--line);}.connect h2{max-width:15ch;margin:0;font-family:var(--display);font-size:clamp(38px,4.6vw,62px);line-height:1.04;letter-spacing:-0.04em;}.connect p{max-width:610px;margin:18px 0 0;color:var(--text);font-size:17px;}.endpoint{max-width:100%;display:flex;align-items:center;gap:14px;padding:9px 9px 9px 15px;border:1px solid var(--line-strong);border-radius:10px;background:var(--surface);}.endpoint code{color:var(--gold-dark);font:12px/1.45 var(--mono);overflow-wrap:anywhere;}.copy-button{min-height:38px;padding:0 13px;border:0;border-radius:7px;color:#fff;background:var(--ink);cursor:pointer;font-weight:650;}.site-footer{min-height:112px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:28px;border-top:1px solid var(--line);color:var(--muted);font-size:13px;}.footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:18px;}.footer-links a,.managed-code{color:var(--ink);text-underline-offset:4px;}.attribution{text-align:right;}.passport-link{position:fixed;right:14px;bottom:10px;z-index:10;padding:7px 10px;color:var(--gold-dark);opacity:0.13;font-family:var(--display);font-size:24px;font-weight:700;text-decoration:none;transition:opacity 140ms ease;}.passport-link:hover,.passport-link:focus-visible{opacity:1;}:focus-visible{outline:3px solid var(--gold);outline-offset:3px;}[hidden]{display:none !important;}@media (max-width:820px){.shell{width:min(1120px,calc(100% - 30px));}.site-header{align-items:flex-start;flex-wrap:wrap;padding:20px 0 16px;}.nav{width:100%;justify-content:flex-start;gap:16px;overflow-x:auto;}.nav a{white-space:nowrap;}h1{font-size:clamp(48px,14vw,76px);}.specimen,.section,.connect{grid-template-columns:1fr;}.specimen-pane + .specimen-pane{border-top:1px solid var(--line);border-left:0;}.section{gap:30px;}.section h2{max-width:16ch;}.connect{align-items:start;}.endpoint{width:100%;}.site-footer{grid-template-columns:1fr;padding:32px 0 42px;gap:14px;}.footer-links{justify-content:flex-start;}.attribution{text-align:left;}}@media (max-width:520px){.hero{padding-top:46px;}h1{font-size:clamp(45px,14.5vw,66px);}.lead{font-size:17px;}.button{width:100%;}.specimen-pane{padding:22px 18px;}pre{font-size:11px;}.section{padding:62px 0;}.plain-list li,.resource-links a{grid-template-columns:1fr;gap:7px;}.endpoint{align-items:stretch;flex-direction:column;}.copy-button{width:100%;}.nav a:nth-child(3),.nav a:nth-child(4){display:none;}}@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto;}*{transition:none !important;}}</style>
+  <style>.table-wrap{margin-top:34px;overflow-x:auto;border-top:1px solid var(--line);}.comparison{width:100%;min-width:650px;border-collapse:collapse;font-size:14px;}.comparison th,.comparison td{padding:18px 14px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;}.comparison thead th{color:var(--muted);font-size:11px;letter-spacing:.1em;text-transform:uppercase;}.comparison tbody th{color:var(--ink);}.comparison td{color:var(--text);}.faq{margin-top:34px;border-top:1px solid var(--line);}.faq details{border-bottom:1px solid var(--line);}.faq summary{padding:20px 0;color:var(--ink);cursor:pointer;font-weight:650;}.faq details p{margin:0;padding:0 0 22px;color:var(--muted);font-size:16px;}.brand img{width:48px;height:32px;object-fit:contain;}a[href]{cursor:pointer;}</style>
+</head>
+<body>
+  <div class="shell">
+    <header class="site-header">
+      <a class="brand" href="https://tps.managed-code.com/" target="_blank" rel="noopener noreferrer">
+        <img src="data:image/png;base64,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" alt="TPS">
+        <span>TPS Agent</span>
+      </a>
+      <nav class="nav" aria-label="Primary navigation">
+        <a href="https://tps.managed-code.com/" target="_blank" rel="noopener noreferrer" data-copy="navStandard">Standard</a>
+        <a href="https://github.com/managedcode/TPS" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://github.com/managedcode/PrompterOne" target="_blank" rel="noopener noreferrer">PrompterOne</a>
+        <a href="https://managed-code.com/" target="_blank" rel="noopener noreferrer">Managed Code</a>
+        <button class="language" id="language" type="button" aria-label="Switch to Ukrainian" aria-pressed="false">UA</button>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <h1 data-copy="headline">Format text for a teleprompter with AI.</h1>
+        <p class="lead" data-copy="lead">TPS Agent is an AI teleprompter script formatter. Paste the text you want to present; it adds TelePrompterScript structure, pacing, pauses, emotion, emphasis, and speaker cues without rewriting your words.</p>
+        <div class="actions">
+          <button class="button button-primary" type="button" data-copy-action data-copy="copyEndpoint">Copy agent endpoint</button>
+          <a class="button button-secondary" href="https://tps.managed-code.com/" target="_blank" rel="noopener noreferrer" data-copy="readStandard">Read the TPS standard</a>
+        </div>
+
+        <div class="specimen" aria-labelledby="specimen-title">
+          <div class="specimen-pane">
+            <span class="specimen-label" id="specimen-title" data-copy="sourceLabel">Your text</span>
+            <pre data-lang="en">We built this together.
+
+It matters to our customers.
+
+Now we are ready to launch.</pre>
+            <pre data-lang="uk" hidden>Ми створили це разом.
+
+Це важливо для наших клієнтів.
+
+Тепер ми готові до запуску.</pre>
+          </div>
+          <div class="specimen-pane">
+            <span class="specimen-label" data-copy="resultLabel">TPS output — formatted, not rewritten</span>
+            <pre data-lang="en"><span class="meta">---</span>
+<span class="meta">profile:</span> Actor
+<span class="meta">base_wpm:</span> 140
+<span class="meta">---</span>
+
+<span class="syntax">## [Opening|Warm|Archetype:Friend]</span>
+<span class="syntax">[legato]</span>We built this together.<span class="syntax">[/legato]</span>
+
+<span class="syntax">## [Why it matters|Focused|Archetype:Coach]</span>
+It matters to our <span class="emphasis">[emphasis]customers[/emphasis]</span>.
+
+<span class="syntax">## [Next step|Motivational|Archetype:Motivator]</span>
+<span class="syntax">[staccato]</span>Now we are ready to launch.<span class="syntax">[/staccato]</span></pre>
+            <pre data-lang="uk" hidden><span class="meta">---</span>
+<span class="meta">profile:</span> Actor
+<span class="meta">base_wpm:</span> 140
+<span class="meta">---</span>
+
+<span class="syntax">## [Вступ|Warm|Archetype:Friend]</span>
+<span class="syntax">[legato]</span>Ми створили це разом.<span class="syntax">[/legato]</span>
+
+<span class="syntax">## [Чому це важливо|Focused|Archetype:Coach]</span>
+Це важливо для наших <span class="emphasis">[emphasis]клієнтів[/emphasis]</span>.
+
+<span class="syntax">## [Наступний крок|Motivational|Archetype:Motivator]</span>
+<span class="syntax">[staccato]</span>Тепер ми готові до запуску.<span class="syntax">[/staccato]</span></pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="formatting">
+        <h2 data-copy="boundaryTitle">Formatting, not rewriting.</h2>
+        <div class="section-copy">
+          <p data-copy="boundaryBody">Your text is the source of truth. TPS Agent does not rewrite, translate, correct, summarize, or reorder it. Remove the TPS markup and the original words, punctuation, language, and order remain.</p>
+          <p data-en="The Agent edits the document around your text, not the text itself. A lossless recovery check confirms that removing TPS markup returns the original words in the original order." data-uk="Агент редагує документ навколо вашого тексту, а не сам текст. Перевірка безвтратного відновлення підтверджує: після видалення TPS-розмітки залишаються ті самі слова в тому самому порядку.">The Agent edits the document around your text, not the text itself. A lossless recovery check confirms that removing TPS markup returns the original words in the original order.</p>
+          <ul class="plain-list">
+            <li><strong data-copy="addsStructure">Structure</strong><span data-copy="addsStructureBody">Segments and blocks that follow the ideas already present in your text.</span></li>
+            <li><strong data-copy="addsDelivery">Delivery</strong><span data-copy="addsDeliveryBody">Pacing, pauses, emotion, emphasis, energy, and speaker cues.</span></li>
+            <li><strong data-en="Source preserved" data-uk="Джерело збережено">Source preserved</strong><span data-en="Spelling, punctuation, language, numbers, quotations, and order remain unchanged." data-uk="Правопис, пунктуація, мова, числа, цитати й порядок залишаються незмінними.">Spelling, punctuation, language, numbers, quotations, and order remain unchanged.</span></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section" id="use-cases">
+        <h2 data-en="Format the text you already have." data-uk="Форматуйте текст, який у вас уже є.">Format the text you already have.</h2>
+        <div class="section-copy">
+          <p data-en="Use TPS Agent when the words already exist and the next job is performance: clear teleprompter structure, deliberate pacing, and delivery guidance." data-uk="Використовуйте TPS Agent, коли слова вже є, а наступне завдання — подача: зрозуміла структура для телесуфлера, продуманий темп і режисура читання.">Use TPS Agent when the words already exist and the next job is performance: clear teleprompter structure, deliberate pacing, and delivery guidance.</p>
+          <ul class="plain-list">
+            <li><strong data-en="Speeches & keynotes" data-uk="Промови й keynote-виступи">Speeches &amp; keynotes</strong><span data-en="Turn a speech draft into a paced teleprompter document without changing the speech." data-uk="Перетворіть чернетку промови на документ із темпом для телесуфлера, не змінюючи саму промову.">Turn a speech draft into a paced teleprompter document without changing the speech.</span></li>
+            <li><strong data-en="Video scripts" data-uk="Відеосценарії">Video scripts</strong><span data-en="Add beats, pauses, emphasis, and energy cues for confident on-camera delivery." data-uk="Додайте такти, паузи, акценти й підказки енергії для впевненої роботи в кадрі.">Add beats, pauses, emphasis, and energy cues for confident on-camera delivery.</span></li>
+            <li><strong data-en="Presentations & demos" data-uk="Презентації й демо">Presentations &amp; demos</strong><span data-en="Organize transitions, speaker turns, and key messages for a natural read." data-uk="Організуйте переходи, зміни спікерів і ключові повідомлення для природного читання.">Organize transitions, speaker turns, and key messages for a natural read.</span></li>
+            <li><strong data-en="Lessons & webinars" data-uk="Уроки й вебінари">Lessons &amp; webinars</strong><span data-en="Break long explanations into readable segments with natural breathing room." data-uk="Розбийте довгі пояснення на читабельні сегменти з природним місцем для дихання.">Break long explanations into readable segments with natural breathing room.</span></li>
+            <li><strong data-en="Podcasts & voice-over" data-uk="Подкасти й озвучення">Podcasts &amp; voice-over</strong><span data-en="Direct tone, rhythm, pronunciation, and emphasis while keeping the copy intact." data-uk="Керуйте тоном, ритмом, вимовою й акцентами, зберігаючи текст без змін.">Direct tone, rhythm, pronunciation, and emphasis while keeping the copy intact.</span></li>
+            <li><strong data-en="Dialogue & multiple speakers" data-uk="Діалоги й кілька спікерів">Dialogue &amp; multiple speakers</strong><span data-en="Preserve every line while adding speaker-aware structure and delivery cues." data-uk="Збережіть кожну репліку, додавши структуру й підказки з урахуванням спікерів.">Preserve every line while adding speaker-aware structure and delivery cues.</span></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section" id="how-it-works">
+        <h2 data-en="From source text to valid TPS." data-uk="Від вихідного тексту до валідного TPS.">From source text to valid TPS.</h2>
+        <div class="section-copy">
+          <p data-en="The workflow is intentionally narrow: preserve the copy, add performance direction, validate the document." data-uk="Процес навмисно вузький: зберегти текст, додати режисуру подачі, перевірити документ.">The workflow is intentionally narrow: preserve the copy, add performance direction, validate the document.</p>
+          <ul class="plain-list">
+            <li><strong data-en="Send source text" data-uk="Надішліть вихідний текст">Send source text</strong><span data-en="Paste the exact text you want to preserve and add any pacing, tone, speaker, or duration constraints." data-uk="Вставте точний текст, який треба зберегти, і за потреби вкажіть темп, тон, спікера чи тривалість.">Paste the exact text you want to preserve and add any pacing, tone, speaker, or duration constraints.</span></li>
+            <li><strong data-en="Add TPS direction" data-uk="Додайте TPS-режисуру">Add TPS direction</strong><span data-en="The Agent maps topic shifts and delivery intent, then adds only valid TPS headers, tags, cues, and escapes." data-uk="Агент визначає зміни теми й намір подачі, після чого додає лише валідні TPS-заголовки, теги, підказки й екранування.">The Agent maps topic shifts and delivery intent, then adds only valid TPS headers, tags, cues, and escapes.</span></li>
+            <li><strong data-en="Validate preservation" data-uk="Перевірте збереження">Validate preservation</strong><span data-en="TPS syntax is checked, then a recovery audit verifies that removing markup reconstructs the source text exactly." data-uk="Синтаксис TPS перевіряється, а аудит відновлення підтверджує, що видалення розмітки точно відтворює вихідний текст.">TPS syntax is checked, then a recovery audit verifies that removing markup reconstructs the source text exactly.</span></li>
+            <li><strong data-en="Receive one .tps document" data-uk="Отримайте один .tps-документ">Receive one .tps document</strong><span data-en="Use the result in a compatible teleprompter, editor, SDK, or MCP workflow." data-uk="Використовуйте результат у сумісному телесуфлері, редакторі, SDK або MCP-процесі.">Use the result in a compatible teleprompter, editor, SDK, or MCP workflow.</span></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section" id="comparison">
+        <h2 data-en="Why TPS instead of plain text or subtitles?" data-uk="Чому TPS, а не plain text чи субтитри?">Why TPS instead of plain text or subtitles?</h2>
+        <div class="section-copy">
+          <p data-en="Plain text stores words. SRT and WebVTT time captions. TPS is designed for live teleprompter delivery, where pace, pauses, emotion, emphasis, and speaker intent matter." data-uk="Plain text зберігає слова. SRT і WebVTT синхронізують субтитри. TPS створено для живої роботи з телесуфлером, де важливі темп, паузи, емоції, акценти й намір спікера.">Plain text stores words. SRT and WebVTT time captions. TPS is designed for live teleprompter delivery, where pace, pauses, emotion, emphasis, and speaker intent matter.</p>
+          <div class="table-wrap"><table class="comparison"><thead><tr><th data-en="Format" data-uk="Формат">Format</th><th data-en="Designed for" data-uk="Призначення">Designed for</th><th data-en="Delivery direction" data-uk="Режисура подачі">Delivery direction</th></tr></thead><tbody><tr><th>Plain text</th><td data-en="Words and paragraphs" data-uk="Слова й абзаци">Words and paragraphs</td><td data-en="None" data-uk="Немає">None</td></tr><tr><th>SRT / WebVTT</th><td data-en="Timed subtitles and captions" data-uk="Синхронізовані субтитри">Timed subtitles and captions</td><td data-en="Timestamps, not performance cues" data-uk="Таймкоди, а не підказки подачі">Timestamps, not performance cues</td></tr><tr><th>TPS</th><td data-en="Teleprompter performance" data-uk="Подача через телесуфлер">Teleprompter performance</td><td data-en="Pace, pauses, emotion, emphasis, pronunciation, and speakers" data-uk="Темп, паузи, емоції, акценти, вимова й спікери">Pace, pauses, emotion, emphasis, pronunciation, and speakers</td></tr></tbody></table></div>
+        </div>
+      </section>
+
+      <section class="section" id="tps-standard">
+        <h2 data-copy="standardTitle">What is TPS?</h2>
+        <div class="section-copy">
+          <p data-copy="standardBody">TPS (TelePrompterScript) is an open, Markdown-based file format for teleprompter scripts. It keeps scripts readable in any text editor while giving compatible teleprompter software structured pace, timing, pauses, emotion, emphasis, and speaker cues.</p>
+          <p data-en="It is human-readable like Markdown and structured enough for validators, compilers, teleprompter players, editors, and SDKs." data-uk="Він читабельний для людини, як Markdown, і водночас достатньо структурований для валідаторів, компіляторів, плеєрів телесуфлера, редакторів і SDK.">It is human-readable like Markdown and structured enough for validators, compilers, teleprompter players, editors, and SDKs.</p>
+          <p data-copy="standardNote">The Agent formats the text. The TPS standard defines the document it returns.</p>
+          <div class="resource-links">
+            <a href="https://tps.managed-code.com/" target="_blank" rel="noopener noreferrer"><strong data-copy="specLink">TPS format specification</strong><span data-copy="specLinkBody">Syntax, authoring rules, glossary, examples, and SDKs.</span></a>
+            <a href="https://github.com/managedcode/TPS" target="_blank" rel="noopener noreferrer"><strong>managedcode/TPS</strong><span data-copy="repoLinkBody">The open-source specification, validators, compilers, players, and runtimes.</span></a>
+            <a href="https://github.com/managedcode/PrompterOne" target="_blank" rel="noopener noreferrer"><strong>PrompterOne</strong><span data-copy="prompterLinkBody">An open-source editor, rehearsal studio, and teleprompter that implements TPS.</span></a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="faq">
+        <h2 data-en="Before you connect." data-uk="Перед підключенням.">Before you connect.</h2>
+        <div class="section-copy">
+          <p data-en="Everything the Agent changes—and everything it must leave alone." data-uk="Усе, що Агент змінює, і все, що він зобов’язаний залишити без змін.">Everything the Agent changes—and everything it must leave alone.</p>
+          <div class="faq">
+            <details><summary data-en="Does TPS Agent write or rewrite my text?" data-uk="TPS Agent пише або переписує мій текст?">Does TPS Agent write or rewrite my text?</summary><p data-en="No. It formats the text you supply. It does not paraphrase, translate, correct, shorten, expand, censor, or reorder source copy." data-uk="Ні. Він форматує наданий текст, але не перефразовує, не перекладає, не виправляє, не скорочує, не розширює, не цензурує й не змінює порядок.">No. It formats the text you supply. It does not paraphrase, translate, correct, shorten, expand, censor, or reorder source copy.</p></details>
+            <details><summary data-en="What kind of text can I format?" data-uk="Який текст можна форматувати?">What kind of text can I format?</summary><p data-en="Speeches, presentations, video scripts, lessons, webinars, podcasts, voice-over copy, dialogue, and other text intended to be spoken." data-uk="Промови, презентації, відеосценарії, уроки, вебінари, подкасти, тексти для озвучення, діалоги та інший текст для усної подачі.">Speeches, presentations, video scripts, lessons, webinars, podcasts, voice-over copy, dialogue, and other text intended to be spoken.</p></details>
+            <details><summary data-en="What does the Agent add?" data-uk="Що саме додає Агент?">What does the Agent add?</summary><p data-en="Valid TPS structure plus pacing, pauses, emotion, emphasis, energy, pronunciation, and speaker cues when supported by the text or your instructions." data-uk="Валідну TPS-структуру, а також темп, паузи, емоції, акценти, енергію, вимову й підказки спікерам, якщо це випливає з тексту або ваших інструкцій.">Valid TPS structure plus pacing, pauses, emotion, emphasis, energy, pronunciation, and speaker cues when supported by the text or your instructions.</p></details>
+            <details><summary data-en="Can I request a target duration?" data-uk="Чи можна вказати цільову тривалість?">Can I request a target duration?</summary><p data-en="Yes, as a pacing constraint. If the unchanged text cannot fit, the Agent preserves it and asks whether you want to change the duration or revise the source." data-uk="Так, як обмеження темпу. Якщо незмінений текст не вміщується, Агент збереже його й запитає, чи змінити тривалість або вихідний текст.">Yes, as a pacing constraint. If the unchanged text cannot fit, the Agent preserves it and asks whether you want to change the duration or revise the source.</p></details>
+            <details><summary data-en="Is the result compatible with PrompterOne?" data-uk="Результат сумісний із PrompterOne?">Is the result compatible with PrompterOne?</summary><p data-en="Yes. PrompterOne is an open-source editor, rehearsal studio, and teleprompter that implements the TPS format." data-uk="Так. PrompterOne — це open-source редактор, студія репетицій і телесуфлер, що підтримує формат TPS.">Yes. PrompterOne is an open-source editor, rehearsal studio, and teleprompter that implements the TPS format.</p></details>
+            <details><summary data-en="How do I connect TPS Agent?" data-uk="Як підключити TPS Agent?">How do I connect TPS Agent?</summary><p data-en="Use the published Streamable HTTP MCP endpoint from an MCP-capable client. Send source text and receive one complete TPS document." data-uk="Використайте опублікований Streamable HTTP MCP endpoint у клієнті з підтримкою MCP. Надішліть вихідний текст і отримайте один повний TPS-документ.">Use the published Streamable HTTP MCP endpoint from an MCP-capable client. Send source text and receive one complete TPS document.</p></details>
+            <details><summary data-en="Does it preserve Ukrainian and other languages?" data-uk="Він зберігає українську та інші мови?">Does it preserve Ukrainian and other languages?</summary><p data-en="Yes. The Agent preserves the source language and text exactly while adding TPS markup around it." data-uk="Так. Агент точно зберігає мову й сам текст, додаючи TPS-розмітку навколо нього.">Yes. The Agent preserves the source language and text exactly while adding TPS markup around it.</p></details>
+          </div>
+        </div>
+      </section>
+
+      <section class="connect">
+        <div>
+          <h2 data-en="Connect the AI teleprompter formatter." data-uk="Підключіть AI-форматувальник для телесуфлера.">Connect the AI teleprompter formatter.</h2>
+          <p data-en="Add the Streamable HTTP endpoint to any MCP-capable client. Send text, specify optional delivery constraints, and receive one valid TPS document." data-uk="Додайте Streamable HTTP endpoint до будь-якого клієнта з підтримкою MCP. Надішліть текст, за потреби вкажіть обмеження подачі й отримайте один валідний TPS-документ.">Add the Streamable HTTP endpoint to any MCP-capable client. Send text, specify optional delivery constraints, and receive one valid TPS document.</p>
+        </div>
+        <div class="endpoint">
+          <code id="endpoint">https://tps.ai.prostir.build/mcp</code>
+          <button class="copy-button" type="button" data-copy-action data-copy="copy">Copy</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <strong>TPS Agent</strong>
+      <div class="footer-links">
+        <a href="https://tps.managed-code.com/" target="_blank" rel="noopener noreferrer" data-copy="navStandard">Standard</a>
+        <a href="https://github.com/managedcode/TPS" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://github.com/managedcode/PrompterOne" target="_blank" rel="noopener noreferrer">PrompterOne</a>
+      </div>
+      <div class="attribution"><span data-copy="attribution">TPS is an open format by</span> <a class="managed-code" href="https://managed-code.com/" target="_blank" rel="noopener noreferrer">Managed Code</a>.</div>
+    </footer>
+  </div>
+
+  <a class="passport-link" href="?passport=default" aria-label="Open the standard Prostir passport" title="Prostir passport">P</a>
+
+  <script>
+    (() => {
+      const endpoint = "https://tps.ai.prostir.build/mcp";
+      const copy = {
+        en: {
+          title: "AI Teleprompter Script Formatter — TPS Agent | Managed Code",
+          description: "Format text for a teleprompter with TPS Agent. Add pacing, pauses, emotion, emphasis, and speaker cues without rewriting your words.",
+          navStandard: "Standard",
+          headline: "Format text for a teleprompter with AI.",
+          lead: "TPS Agent is an AI teleprompter script formatter. Paste the text you want to present; it adds TelePrompterScript structure, pacing, pauses, emotion, emphasis, and speaker cues without rewriting your words.",
+          copyEndpoint: "Copy agent endpoint",
+          readStandard: "Read the TPS standard",
+          sourceLabel: "Your text",
+          resultLabel: "TPS output — formatted, not rewritten",
+          boundaryTitle: "Formatting, not rewriting.",
+          boundaryBody: "Your text is the source of truth. TPS Agent does not rewrite, translate, correct, summarize, or reorder it. Remove the TPS markup and the original words, punctuation, language, and order remain.",
+          addsStructure: "Structure",
+          addsStructureBody: "Segments and blocks that follow the ideas already present in your text.",
+          addsDelivery: "Delivery",
+          addsDeliveryBody: "Pacing, pauses, emotion, emphasis, energy, and speaker cues.",
+          keepsCopy: "Your copy",
+          keepsCopyBody: "Every source word stays in its original language and order.",
+          standardTitle: "What is TPS?",
+          standardBody: "TPS (TelePrompterScript) is an open, Markdown-based file format for teleprompter scripts. It keeps scripts readable in any text editor while giving compatible teleprompter software structured pace, timing, pauses, emotion, emphasis, and speaker cues.",
+          standardNote: "The Agent formats the text. The TPS standard defines the document it returns.",
+          specLink: "TPS format specification",
+          specLinkBody: "Syntax, authoring rules, glossary, examples, and SDKs.",
+          repoLinkBody: "The open-source specification, validators, compilers, players, and runtimes.",
+          prompterLinkBody: "An open-source editor, rehearsal studio, and teleprompter that implements TPS.",
+          connectTitle: "Use TPS Agent from any MCP client.",
+          connectBody: "Connect the published Streamable HTTP endpoint, send source text, and receive one complete TPS document.",
+          copy: "Copy",
+          copied: "Copied",
+          selected: "Selected — copy manually",
+          attribution: "TPS is an open format by"
+        },
+        uk: {
+          title: "AI-форматування тексту для телесуфлера — TPS Agent | Managed Code",
+          description: "Форматуйте текст для телесуфлера з TPS Agent: структура, темп, паузи, емоції, акценти й репліки без переписування ваших слів.",
+          navStandard: "Стандарт",
+          headline: "Форматуйте текст для телесуфлера за допомогою AI.",
+          lead: "TPS Agent — це AI-форматувальник сценаріїв для телесуфлера. Вставте текст, який хочете подати; агент додасть структуру TelePrompterScript, темп, паузи, емоції, акценти та репліки, не переписуючи ваших слів.",
+          copyEndpoint: "Скопіювати endpoint агента",
+          readStandard: "Відкрити стандарт TPS",
+          sourceLabel: "Ваш текст",
+          resultLabel: "TPS-результат — відформатовано, не переписано",
+          boundaryTitle: "Форматування, а не переписування.",
+          boundaryBody: "Ваш текст — єдине джерело правди. TPS Agent не переписує, не перекладає, не виправляє, не скорочує й не змінює його порядок. Приберіть TPS-розмітку — оригінальні слова, пунктуація, мова та послідовність залишаться.",
+          addsStructure: "Структура",
+          addsStructureBody: "Сегменти й блоки, що повторюють логіку вже наданого тексту.",
+          addsDelivery: "Подача",
+          addsDeliveryBody: "Темп, паузи, емоції, акценти, енергія та репліки спікерів.",
+          keepsCopy: "Ваш текст",
+          keepsCopyBody: "Кожне початкове слово залишається своєю мовою та у своєму порядку.",
+          standardTitle: "Що таке TPS?",
+          standardBody: "TPS (TelePrompterScript) — це відкритий формат сценаріїв для телесуфлера на основі Markdown. Текст залишається читабельним у будь-якому редакторі, а сумісні телесуфлери отримують структуровані дані про темп, таймінг, паузи, емоції, акценти та спікерів.",
+          standardNote: "Агент форматує текст. Стандарт TPS визначає документ, який він повертає.",
+          specLink: "Специфікація формату TPS",
+          specLinkBody: "Синтаксис, правила авторингу, глосарій, приклади та SDK.",
+          repoLinkBody: "Open-source специфікація, валідатори, компілятори, плеєри та рантайми.",
+          prompterLinkBody: "Open-source редактор, студія репетицій і телесуфлер із підтримкою TPS.",
+          connectTitle: "Підключіть TPS Agent до будь-якого MCP-клієнта.",
+          connectBody: "Додайте опублікований Streamable HTTP endpoint, надішліть вихідний текст і отримайте один повний TPS-документ.",
+          copy: "Копіювати",
+          copied: "Скопійовано",
+          selected: "Виділено — скопіюйте вручну",
+          attribution: "TPS — відкритий формат від"
+        }
+      };
+
+      let language = "en";
+      const metaDescription = document.querySelector('meta[name="description"]');
+      const languageButton = document.getElementById("language");
+
+      function setLanguage(nextLanguage) {
+        language = nextLanguage;
+        const labels = copy[language];
+        document.documentElement.lang = language;
+        document.title = labels.title;
+        metaDescription.content = labels.description;
+        document.querySelectorAll("[data-copy]").forEach((element) => {
+          const value = labels[element.dataset.copy];
+          if (value) element.textContent = value;
+        });
+        document.querySelectorAll("[data-en][data-uk]").forEach((element) => {
+          element.textContent = element.dataset[language];
+        });
+        document.querySelectorAll("[data-lang]").forEach((element) => {
+          element.hidden = element.dataset.lang !== language;
+        });
+        languageButton.textContent = language === "en" ? "UA" : "EN";
+        languageButton.setAttribute("aria-pressed", String(language === "uk"));
+        languageButton.setAttribute("aria-label", language === "en" ? "Switch to Ukrainian" : "Switch to English");
+      }
+
+      async function copyEndpoint(button) {
+        let copied = false;
+        try {
+          await navigator.clipboard.writeText(endpoint);
+          copied = true;
+        } catch {
+          const textarea = document.createElement("textarea");
+          textarea.value = endpoint;
+          textarea.setAttribute("readonly", "");
+          textarea.style.cssText = "position:fixed;inset:0 auto auto -9999px;opacity:0";
+          document.body.appendChild(textarea);
+          textarea.select();
+          copied = document.execCommand("copy");
+          textarea.remove();
+          button.focus();
+        }
+        if (!copied) {
+          const selection = window.getSelection();
+          const range = document.createRange();
+          range.selectNodeContents(document.getElementById("endpoint"));
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+        button.dataset.result = copied ? "copied" : "selected";
+        button.textContent = copy[language][button.dataset.result];
+        window.setTimeout(() => { button.textContent = copy[language][button.dataset.copy]; }, 1400);
+      }
+
+      languageButton.addEventListener("click", () => setLanguage(language === "en" ? "uk" : "en"));
+      document.querySelectorAll("[data-copy-action]").forEach((button) => {
+        button.addEventListener("click", () => copyEndpoint(button));
+      });
+      setLanguage("en");
+    })();
+  </script>
+</body>
+</html>

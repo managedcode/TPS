@@ -379,6 +379,35 @@ Melody controls the **pitch variation and inflection contour** of delivery on a 
 
 Melody is independent of speed and energy — a slow, low-energy passage can still be highly melodic (think: a lullaby), and a fast, high-energy passage can be flat (think: an auctioneer).
 
+#### Delivery Parameter Model
+
+TPS delivery cues answer the authoring question: **how should this be spoken?** TPS does not synthesize a voice or store audio. It stores timed, structured cues that a reader or teleprompter renderer can translate into vocal behavior.
+
+Think of delivery as several independent curves layered over the same spoken text:
+
+| Curve | TPS control | What changes for the speaker | Renderer hint |
+|-------|-------------|------------------------------|---------------|
+| **Flat baseline** | inherited WPM, emotion, archetype, and untagged text | Default delivery for the current segment or block. No special push. | Straight or neutral indicator. |
+| **Speed** | `base_wpm`, header WPM, `[slow]`, `[fast]`, `[150WPM]` | How quickly words move past the reader and how much time each phrase receives. | Denser/faster spacing for quick text, wider/slower spacing for careful text. |
+| **Pitch / melody** | `[melody:N]` | How much the voice rises and falls. Low melody is flat and factual; high melody is expressive and musical. | Flat dash for low melody, wave or rising/falling contour for high melody. |
+| **Volume** | `[soft]`, `[loud]`, `[whisper]` | How projected or intimate the voice should feel. | Smaller/lighter text for soft or whisper, larger/bolder text for loud. |
+| **Pause** | `/`, `//`, `[pause:Ns]`, `[pause:Nms]`, `[breath]` | Where the speaker stops, lets a point land, or takes a breath. | Visible gaps, beat marks, or breath indicators between words/phrases. |
+| **Combined contour** | nested inline tags plus inherited archetype profile | The full shape of the passage: pace, projection, inflection, energy, and silence together. | A composite visual rhythm, not raw tag text. |
+
+These curves are intentionally independent. A passage can be slow and loud, fast and flat, soft but high-energy, or low-volume with long dramatic pauses. Archetypes define expected combinations, but inline tags remain the most specific instruction.
+
+Example combined contour:
+
+```markdown
+### [Decision|Archetype:Coach]
+
+[staccato][energy:8][melody:2][loud]
+**Stop.** / Check the logs. / Confirm the fix. // Ship it.
+[/loud][/melody][/energy][/staccato]
+```
+
+This reads as short, direct, high-energy, low-melody, projected speech with frequent sharp pauses. The same words under `Archetype:Friend` would normally use smoother articulation, warmer melody, lower volume, and fewer hard stops.
+
 #### Speaker Tags
 
 For multi-talent scripts, mark who reads each section:
@@ -621,7 +650,7 @@ Rhythm analysis: avg phrase 35 words, 1 pause/100w, emphasis 0% — **multiple w
 
 ##### Recommended Archetype Sequencing
 
-Vinh Giang recommends transitioning between archetypes every 3–5 minutes for maximum audience engagement. A recommended presentation flow:
+Vinh Giang recommends transitioning between archetypes every 3–5 minutes for maximum audience engagement. TPS treats these transitions as **intent changes**, not decoration. Change archetype when the speaker's job changes: connect, explain why, explain what, show how, then reconnect.
 
 ```markdown
 ## [Opening|Warm|Archetype:Friend]
@@ -632,6 +661,18 @@ Vinh Giang recommends transitioning between archetypes every 3–5 minutes for m
 ```
 
 This sequence — **Friend → Motivator → Educator → Coach → Friend** — builds connection, establishes purpose, delivers content, drives action, and closes with rapport.
+
+| Step | Archetype | Listener question | Speaker intent | Delivery shift |
+|------|-----------|-------------------|----------------|----------------|
+| 1 | `Friend` | "Can I trust you?" | Build connection and lower resistance. | Warm, conversational, legato, moderate energy, natural pauses. |
+| 2 | `Motivator` | "Why should I care?" | Create purpose, stakes, and emotional momentum. | Higher energy, broader melody, projected volume, strategic dramatic pauses. |
+| 3 | `Educator` | "What do I need to understand?" | Explain concepts, facts, structure, and evidence. | Slower WPM, clear phrasing, restrained emphasis, frequent processing pauses. |
+| 4 | `Coach` | "How do I act?" | Turn understanding into instructions or decisions. | Short phrases, staccato articulation, louder delivery, sharp pauses, strong emphasis. |
+| 5 | `Friend` | "Are we still connected?" | Return to rapport and make the close feel human. | Softer volume, smoother rhythm, warmer melody, comfortable pace. |
+
+Authors should usually make archetype changes at segment boundaries, because a segment represents a meaningful rhetorical move. Blocks may override archetype for short local shifts, for example a single `Coach` block inside an `Educator` segment when a lesson turns into an action checklist.
+
+Avoid switching archetype every sentence. Rapid changes can make the script feel unstable and can create noisy validation warnings. If the intent has not changed, prefer inline tags such as `[slow]`, `[energy:8]`, `[melody:2]`, `[loud]`, or `//` to shape the moment within the current archetype.
 
 ## Keyword Reference
 

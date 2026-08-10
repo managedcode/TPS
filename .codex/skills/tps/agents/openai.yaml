@@ -1,0 +1,4 @@
+interface:
+  display_name: "TPS Script Director"
+  short_description: "Lossless script-to-TPS direction"
+  default_prompt: "Use $tps to mark up my script as TPS without changing any source text."

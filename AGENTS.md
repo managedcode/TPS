@@ -88,6 +88,7 @@ List only the skills this repository should actively use.
 - `dotnet-mcaf-devex` — developer-experience and onboarding guidance.
 - `dotnet-mcaf-documentation` — durable documentation structure and navigation.
 - `dotnet-mcaf-source-control` — source-control workflow and branch/commit rules.
+- `tps` — losslessly direct finished scripts as valid TPS without rewriting source copy.
 
 ## Rules to Follow (Mandatory)
 
