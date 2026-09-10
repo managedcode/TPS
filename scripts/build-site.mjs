@@ -71,7 +71,8 @@ const summary = extractSummary(tokens) ?? "Markdown-based teleprompter scripts w
 const sections = extractSections(tokens);
 const stats = buildStats(readme, sections);
 const articleHtml = enhanceArticleHtml(md.renderer.render(trimTitle(tokens), md.options, {}));
-const glossaryHtml = enhanceArticleHtml(md.render(glossaryMarkdown));
+const glossaryTokens = md.parse(glossaryMarkdown, {});
+const glossaryHtml = enhanceArticleHtml(md.renderer.render(trimTitle(glossaryTokens), md.options, {}));
 const heroTitle = buildHeroTitle(title);
 const quickAnswers = buildQuickAnswers(summary);
 const keywords = buildKeywords();
@@ -109,7 +110,10 @@ await mkdir(path.join(distDir, "examples"), { recursive: true });
 await mkdir(path.join(distDir, "sdk"), { recursive: true });
 await mkdir(path.join(distDir, "glossary"), { recursive: true });
 await mkdir(path.join(distDir, "skills"), { recursive: true });
+await mkdir(path.join(distDir, "Skills"), { recursive: true });
 await cp(publicDir, distDir, { recursive: true });
+await cp(path.join(rootDir, "Skills"), path.join(distDir, "Skills"), { recursive: true });
+await cp(path.join(rootDir, "Skills"), path.join(distDir, "skills"), { recursive: true });
 
 const page = `<!DOCTYPE html>
 <html lang="en">
@@ -451,6 +455,9 @@ function enhanceArticleHtml(html) {
   result = highlightTpsCodeBlocks(result);
   // Rewrite examples/*.tps links to examples/*.html for the website
   result = result.replace(/href="examples\/([^"]+)\.tps"/g, 'href="examples/$1.html"');
+  // Rewrite repository relative Skills links to website /skills/ route
+  result = result.replace(/href="Skills\/"/g, 'href="skills/"');
+  result = result.replace(/href="Skills\/tps-convert\.md"/g, 'href="skills/"');
   return result;
 }
 
